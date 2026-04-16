@@ -2,6 +2,8 @@ import { useState, useRef, type ChangeEvent, type KeyboardEvent } from 'react'
 import type { Character } from '../types/character'
 import { getXpProgress } from '../constants/dnd'
 import { useCharacters } from '../hooks/useCharacters'
+import { clampNumber, formatNumber } from '../utils/number'
+import { resolveHpBarColor } from '../utils/character'
 import Button from '../components/atoms/Button'
 import IconButton from '../components/atoms/IconButton'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
@@ -10,25 +12,9 @@ import TrashIcon from '../components/atoms/icons/TrashIcon'
 import UsersIcon from '../components/atoms/icons/UsersIcon'
 import XIcon from '../components/atoms/icons/XIcon'
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Tipos do formulário ─────────────────────────────────────────────────────
 
-function hpColor(pct: number): string {
-  if (pct > 75) return '#22c55e'
-  if (pct > 25) return '#ECC83B'
-  return '#D72334'
-}
-
-function fmt(n: number): string {
-  return n.toLocaleString('pt-BR')
-}
-
-function clamp(val: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, val))
-}
-
-// ─── Modal de Personagem ─────────────────────────────────────────────────────
-
-type FormData = {
+type CharacterFormData = {
   name: string
   playerName: string
   characterClass: string
@@ -40,7 +26,7 @@ type FormData = {
   notes: string
 }
 
-const EMPTY_FORM: FormData = {
+const EMPTY_CHARACTER_FORM: CharacterFormData = {
   name: '',
   playerName: '',
   characterClass: '',
@@ -52,30 +38,34 @@ const EMPTY_FORM: FormData = {
   notes: '',
 }
 
-function toForm(c: Character): FormData {
+function characterToFormData(character: Character): CharacterFormData {
   return {
-    name: c.name,
-    playerName: c.playerName,
-    characterClass: c.characterClass,
-    race: c.race,
-    maxHP: String(c.maxHP),
-    currentHP: String(c.currentHP),
-    xp: String(c.xp),
-    imageUrl: c.imageUrl,
-    notes: c.notes,
+    name: character.name,
+    playerName: character.playerName,
+    characterClass: character.characterClass,
+    race: character.race,
+    maxHP: String(character.maxHP),
+    currentHP: String(character.currentHP),
+    xp: String(character.xp),
+    imageUrl: character.imageUrl,
+    notes: character.notes,
   }
 }
 
-interface ModalProps {
-  initial: Character | null
+// ─── Modal de Personagem ─────────────────────────────────────────────────────
+
+interface CharacterModalProps {
+  initialCharacter: Character | null
   onSave: (data: Omit<Character, 'id'>) => void
   onClose: () => void
 }
 
-function CharacterModal({ initial, onSave, onClose }: ModalProps) {
-  const [form, setForm] = useState<FormData>(initial ? toForm(initial) : EMPTY_FORM)
+function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalProps) {
+  const [form, setForm] = useState<CharacterFormData>(
+    initialCharacter ? characterToFormData(initialCharacter) : EMPTY_CHARACTER_FORM
+  )
 
-  function set(field: keyof FormData, value: string) {
+  function updateField(field: keyof CharacterFormData, value: string) {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
@@ -83,7 +73,7 @@ function CharacterModal({ initial, onSave, onClose }: ModalProps) {
     e.preventDefault()
     if (!form.name.trim()) return
     const maxHP = Math.max(1, parseInt(form.maxHP, 10) || 1)
-    const currentHP = clamp(parseInt(form.currentHP, 10) || maxHP, 0, maxHP)
+    const currentHP = clampNumber(parseInt(form.currentHP, 10) || maxHP, 0, maxHP)
     const xp = Math.max(0, parseInt(form.xp, 10) || 0)
     onSave({
       name: form.name.trim(),
@@ -98,7 +88,7 @@ function CharacterModal({ initial, onSave, onClose }: ModalProps) {
     })
   }
 
-  function handleBackdrop(e: React.MouseEvent<HTMLDivElement>) {
+  function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) onClose()
   }
 
@@ -112,139 +102,74 @@ function CharacterModal({ initial, onSave, onClose }: ModalProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-      onClick={handleBackdrop}
+      onClick={handleBackdropClick}
     >
       <div className="bg-black-400 border border-black-100 rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-black-200">
           <h2 className="text-white-100 font-bold text-lg">
-            {initial ? 'Editar Personagem' : 'Novo Personagem'}
+            {initialCharacter ? 'Editar Personagem' : 'Novo Personagem'}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-white-300 hover:text-white-100 transition-colors p-1"
-          >
+          <button type="button" onClick={onClose} className="text-white-300 hover:text-white-100 transition-colors p-1">
             <XIcon size={20} />
           </button>
         </div>
-
         <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
           <div>
             <label className={labelClass}>URL da Imagem do Personagem</label>
-            <input
-              className={inputClass}
-              placeholder="https://..."
-              value={form.imageUrl}
-              onChange={e => set('imageUrl', e.target.value)}
-            />
+            <input className={inputClass} placeholder="https://..." value={form.imageUrl} onChange={e => updateField('imageUrl', e.target.value)} />
             {form.imageUrl && (
               <div className="mt-2 w-16 h-20 rounded-lg overflow-hidden border border-black-100">
-                <img
-                  src={form.imageUrl}
-                  alt="preview"
-                  className="w-full h-full object-cover"
-                  onError={e => { e.currentTarget.style.display = 'none' }}
-                />
+                <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none' }} />
               </div>
             )}
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Nome do Personagem *</label>
-              <input
-                className={inputClass}
-                placeholder="Gandalf"
-                value={form.name}
-                onChange={e => set('name', e.target.value)}
-                required
-              />
+              <input className={inputClass} placeholder="Gandalf" value={form.name} onChange={e => updateField('name', e.target.value)} required />
             </div>
             <div>
               <label className={labelClass}>Nome do Jogador</label>
-              <input
-                className={inputClass}
-                placeholder="João"
-                value={form.playerName}
-                onChange={e => set('playerName', e.target.value)}
-              />
+              <input className={inputClass} placeholder="João" value={form.playerName} onChange={e => updateField('playerName', e.target.value)} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Classe</label>
-              <input
-                className={inputClass}
-                placeholder="Mago"
-                value={form.characterClass}
-                onChange={e => set('characterClass', e.target.value)}
-              />
+              <input className={inputClass} placeholder="Mago" value={form.characterClass} onChange={e => updateField('characterClass', e.target.value)} />
             </div>
             <div>
               <label className={labelClass}>Raça</label>
-              <input
-                className={inputClass}
-                placeholder="Elfo"
-                value={form.race}
-                onChange={e => set('race', e.target.value)}
-              />
+              <input className={inputClass} placeholder="Elfo" value={form.race} onChange={e => updateField('race', e.target.value)} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>HP Máximo</label>
-              <input
-                type="number"
-                min={1}
-                className={inputClass}
-                placeholder="45"
-                value={form.maxHP}
-                onChange={e => set('maxHP', e.target.value)}
-              />
+              <input type="number" min={1} className={inputClass} placeholder="45" value={form.maxHP} onChange={e => updateField('maxHP', e.target.value)} />
             </div>
             <div>
               <label className={labelClass}>HP Atual</label>
-              <input
-                type="number"
-                min={0}
-                className={inputClass}
-                placeholder="= HP Máximo"
-                value={form.currentHP}
-                onChange={e => set('currentHP', e.target.value)}
-              />
+              <input type="number" min={0} className={inputClass} placeholder="= HP Máximo" value={form.currentHP} onChange={e => updateField('currentHP', e.target.value)} />
             </div>
           </div>
-
           <div>
             <label className={labelClass}>Pontos de Experiência (XP Total)</label>
-            <input
-              type="number"
-              min={0}
-              className={inputClass}
-              placeholder="0"
-              value={form.xp}
-              onChange={e => set('xp', e.target.value)}
-            />
+            <input type="number" min={0} className={inputClass} placeholder="0" value={form.xp} onChange={e => updateField('xp', e.target.value)} />
           </div>
-
           <div>
             <label className={labelClass}>Anotações</label>
             <textarea
               className={`${inputClass} resize-none h-18`}
               placeholder="Condições, itens importantes, lembretes rápidos..."
               value={form.notes}
-              onChange={e => set('notes', e.target.value)}
+              onChange={e => updateField('notes', e.target.value)}
             />
           </div>
-
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
-              Cancelar
-            </Button>
+            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">Cancelar</Button>
             <Button type="submit" variant="primary" className="w-auto! flex-1">
-              {initial ? 'Salvar Alterações' : 'Adicionar Personagem'}
+              {initialCharacter ? 'Salvar Alterações' : 'Adicionar Personagem'}
             </Button>
           </div>
         </form>
@@ -255,47 +180,47 @@ function CharacterModal({ initial, onSave, onClose }: ModalProps) {
 
 // ─── Card de Personagem ──────────────────────────────────────────────────────
 
-interface CardProps {
+interface CharacterCardProps {
   character: Character
   onEdit: () => void
   onDelete: () => void
   onHpAdjust: (delta: number) => void
 }
 
-const HP_ADJUSTMENTS = [-10, -5, -1, 1, 5, 10] as const
+const HP_DELTA_OPTIONS = [-10, -5, -1, 1, 5, 10] as const
 
-function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CardProps) {
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [editingHp, setEditingHp] = useState(false)
-  const [hpInput, setHpInput] = useState('')
+function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCardProps) {
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+  const [isEditingHp, setIsEditingHp] = useState(false)
+  const [hpInputValue, setHpInputValue] = useState('')
 
-  const hpPct = character.maxHP > 0
+  const hpPercentage = character.maxHP > 0
     ? Math.round((character.currentHP / character.maxHP) * 100)
     : 0
 
-  const xpData = getXpProgress(character.xp)
-  const isDead = character.currentHP === 0
+  const xpProgress = getXpProgress(character.xp)
+  const isCharacterDead = character.currentHP === 0
 
   function startHpEdit() {
-    setHpInput(String(character.currentHP))
-    setEditingHp(true)
+    setHpInputValue(String(character.currentHP))
+    setIsEditingHp(true)
   }
 
   function commitHpEdit() {
-    const val = parseInt(hpInput, 10)
-    if (!isNaN(val)) {
-      onHpAdjust(clamp(val, 0, character.maxHP) - character.currentHP)
+    const newHp = parseInt(hpInputValue, 10)
+    if (!isNaN(newHp)) {
+      onHpAdjust(clampNumber(newHp, 0, character.maxHP) - character.currentHP)
     }
-    setEditingHp(false)
+    setIsEditingHp(false)
   }
 
-  function handleHpKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  function handleHpInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') commitHpEdit()
-    if (e.key === 'Escape') setEditingHp(false)
+    if (e.key === 'Escape') setIsEditingHp(false)
   }
 
   return (
-    <div className={`bg-black-300 border rounded-xl overflow-hidden flex transition-colors ${isDead ? 'border-red-400/60' : 'border-black-100'}`}>
+    <div className={`bg-black-300 border rounded-xl overflow-hidden flex transition-colors ${isCharacterDead ? 'border-red-400/60' : 'border-black-100'}`}>
       <div className="w-28 shrink-0 bg-black-400 relative self-stretch min-h-50">
         {character.imageUrl ? (
           <img src={character.imageUrl} alt={character.name} className="w-full h-full object-cover absolute inset-0" />
@@ -304,7 +229,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CardProps) {
             <UsersIcon size={40} />
           </div>
         )}
-        {isDead && (
+        {isCharacterDead && (
           <div className="absolute inset-0 bg-red-500/20 flex items-end justify-center pb-2">
             <span className="text-red-100 text-xs font-bold tracking-widest">CAÍDO</span>
           </div>
@@ -317,23 +242,21 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CardProps) {
             <h3 className="text-white-100 font-bold text-base leading-tight truncate">{character.name}</h3>
             <p className="text-white-300/70 text-xs mt-0.5 truncate">
               {[character.characterClass, character.race].filter(Boolean).join(' · ')}
-              {character.playerName && (
-                <span className="text-white-300/40"> — {character.playerName}</span>
-              )}
+              {character.playerName && <span className="text-white-300/40"> — {character.playerName}</span>}
             </p>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="bg-red-400/20 border border-red-400/40 text-red-100 text-xs font-bold px-2 py-0.5 rounded-full">
-              Lv {xpData.level}
+              Lv {xpProgress.level}
             </span>
             <IconButton onClick={onEdit} title="Editar"><PencilIcon size={14} /></IconButton>
-            {confirmDelete ? (
+            {isConfirmingDelete ? (
               <div className="flex items-center gap-1 text-xs">
-                <button onClick={() => setConfirmDelete(false)} className="text-white-300 hover:text-white-100 transition-colors px-1.5 py-1">Não</button>
+                <button onClick={() => setIsConfirmingDelete(false)} className="text-white-300 hover:text-white-100 transition-colors px-1.5 py-1">Não</button>
                 <button onClick={onDelete} className="text-red-100 hover:text-red-200 transition-colors font-semibold px-1.5 py-1">Sim</button>
               </div>
             ) : (
-              <IconButton onClick={() => setConfirmDelete(true)} title="Remover"><TrashIcon size={14} /></IconButton>
+              <IconButton onClick={() => setIsConfirmingDelete(true)} title="Remover"><TrashIcon size={14} /></IconButton>
             )}
           </div>
         </div>
@@ -341,37 +264,37 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CardProps) {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <span className="text-white-300/80 text-xs font-medium flex items-center gap-1.5">
-              <span style={{ color: hpColor(hpPct) }}>♥</span> Pontos de Vida
+              <span style={{ color: resolveHpBarColor(hpPercentage) }}>♥</span> Pontos de Vida
             </span>
             <div className="flex items-center gap-1 text-sm">
-              {editingHp ? (
-                <input autoFocus type="number" value={hpInput}
-                  onChange={e => setHpInput(e.target.value)}
-                  onBlur={commitHpEdit} onKeyDown={handleHpKeyDown}
+              {isEditingHp ? (
+                <input autoFocus type="number" value={hpInputValue}
+                  onChange={e => setHpInputValue(e.target.value)}
+                  onBlur={commitHpEdit} onKeyDown={handleHpInputKeyDown}
                   className="w-14 bg-black-500 border border-red-100 rounded px-1.5 text-center text-white-100 text-sm focus:outline-none tabular-nums"
                 />
               ) : (
                 <button onClick={startHpEdit} title="Clique para editar HP"
                   className="font-bold tabular-nums hover:opacity-70 transition-opacity"
-                  style={{ color: hpColor(hpPct) }}>
+                  style={{ color: resolveHpBarColor(hpPercentage) }}>
                   {character.currentHP}
                 </button>
               )}
               <span className="text-white-300/40 tabular-nums">/ {character.maxHP}</span>
-              <span className="text-white-300/30 text-xs ml-1">({hpPct}%)</span>
+              <span className="text-white-300/30 text-xs ml-1">({hpPercentage}%)</span>
             </div>
           </div>
           <div className="h-2 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${hpPct}%`, backgroundColor: hpColor(hpPct), transition: 'width 0.35s ease, background-color 0.5s ease' }} />
+            <div className="h-full rounded-full" style={{ width: `${hpPercentage}%`, backgroundColor: resolveHpBarColor(hpPercentage), transition: 'width 0.35s ease, background-color 0.5s ease' }} />
           </div>
           <div className="flex gap-1 mt-0.5">
-            {HP_ADJUSTMENTS.map(delta => {
-              const btnCls = delta < 0
+            {HP_DELTA_OPTIONS.map(delta => {
+              const adjustButtonClass = delta < 0
                 ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
                 : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
               return (
                 <button key={delta} onClick={() => onHpAdjust(delta)}
-                  className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer ${btnCls}`}>
+                  className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer ${adjustButtonClass}`}>
                   {delta > 0 ? `+${delta}` : delta}
                 </button>
               )
@@ -386,18 +309,18 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CardProps) {
               <span className="text-yellow">✦</span> Experiência
             </span>
             <span className="text-white-300/50 text-xs tabular-nums">
-              {xpData.isMaxLevel
+              {xpProgress.isMaxLevel
                 ? <span className="text-yellow font-semibold">Nível Máximo</span>
-                : `${fmt(xpData.xpIntoLevel)} / ${fmt(xpData.xpNeeded)}`
+                : `${formatNumber(xpProgress.xpIntoLevel)} / ${formatNumber(xpProgress.xpNeeded)}`
               }
             </span>
           </div>
           <div className="h-2 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${xpData.percentage}%`, backgroundColor: '#ECC83B', transition: 'width 0.35s ease' }} />
+            <div className="h-full rounded-full" style={{ width: `${xpProgress.percentage}%`, backgroundColor: '#ECC83B', transition: 'width 0.35s ease' }} />
           </div>
-          {!xpData.isMaxLevel && (
+          {!xpProgress.isMaxLevel && (
             <p className="text-white-300/40 text-xs">
-              {fmt(character.xp)} XP total · Nível {xpData.level} → {xpData.level + 1}
+              {formatNumber(character.xp)} XP total · Nível {xpProgress.level} → {xpProgress.level + 1}
             </p>
           )}
         </div>
@@ -420,15 +343,15 @@ function Personagens() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null)
-  const importRef = useRef<HTMLInputElement>(null)
+  const importInputRef = useRef<HTMLInputElement>(null)
 
-  function openForNew() {
+  function openNewCharacterModal() {
     setEditingCharacter(null)
     setIsModalOpen(true)
   }
 
-  function openForEdit(c: Character) {
-    setEditingCharacter(c)
+  function openEditCharacterModal(character: Character) {
+    setEditingCharacter(character)
     setIsModalOpen(true)
   }
 
@@ -437,7 +360,7 @@ function Personagens() {
     setEditingCharacter(null)
   }
 
-  function handleSave(data: Omit<Character, 'id'>) {
+  function handleCharacterSave(data: Omit<Character, 'id'>) {
     if (editingCharacter) {
       updateCharacter(editingCharacter.id, data)
     } else {
@@ -446,21 +369,23 @@ function Personagens() {
     closeModal()
   }
 
-  function handleHpAdjust(id: string, delta: number) {
-    const c = characters.find(ch => ch.id === id)
-    if (!c) return
-    updateCharacter(id, { currentHP: clamp(c.currentHP + delta, 0, c.maxHP) })
+  function handleHpAdjust(characterId: string, delta: number) {
+    const character = characters.find(c => c.id === characterId)
+    if (!character) return
+    updateCharacter(characterId, {
+      currentHP: clampNumber(character.currentHP + delta, 0, character.maxHP),
+    })
   }
 
-  function handleImport(e: ChangeEvent<HTMLInputElement>) {
+  function handleImportFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) importJSON(file)
     e.target.value = ''
   }
 
-  const totalHP = characters.reduce((sum, c) => sum + c.currentHP, 0)
-  const totalMaxHP = characters.reduce((sum, c) => sum + c.maxHP, 0)
-  const groupPct = totalMaxHP > 0 ? (totalHP / totalMaxHP) * 100 : 0
+  const totalGroupHP = characters.reduce((sum, character) => sum + character.currentHP, 0)
+  const totalGroupMaxHP = characters.reduce((sum, character) => sum + character.maxHP, 0)
+  const groupHpPercentage = totalGroupMaxHP > 0 ? (totalGroupHP / totalGroupMaxHP) * 100 : 0
 
   return (
     <div className="flex flex-col gap-6 p-8 min-h-full">
@@ -474,10 +399,10 @@ function Personagens() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <input ref={importRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+          <input ref={importInputRef} type="file" accept=".json" onChange={handleImportFileChange} className="hidden" />
           {characters.length > 0 && (
             <>
-              <Button variant="secondary" onClick={() => importRef.current?.click()} className="w-auto! px-4 text-xs">
+              <Button variant="secondary" onClick={() => importInputRef.current?.click()} className="w-auto! px-4 text-xs">
                 Importar JSON
               </Button>
               <Button variant="secondary" onClick={exportJSON} className="w-auto! px-4 text-xs">
@@ -485,7 +410,7 @@ function Personagens() {
               </Button>
             </>
           )}
-          <Button variant="primary" onClick={openForNew} className="w-auto! px-4 gap-2">
+          <Button variant="primary" onClick={openNewCharacterModal} className="w-auto! px-4 gap-2">
             <PlusIcon size={15} /> Adicionar
           </Button>
         </div>
@@ -496,12 +421,12 @@ function Personagens() {
           <div className="flex items-center gap-2">
             <span className="text-red-100 text-sm">♥</span>
             <span className="text-white-300 text-sm">HP do Grupo</span>
-            <span className="text-white-100 font-bold tabular-nums text-sm">{fmt(totalHP)} / {fmt(totalMaxHP)}</span>
+            <span className="text-white-100 font-bold tabular-nums text-sm">{formatNumber(totalGroupHP)} / {formatNumber(totalGroupMaxHP)}</span>
           </div>
           <div className="flex-1 h-1.5 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${groupPct}%`, backgroundColor: hpColor(groupPct), transition: 'width 0.35s ease' }} />
+            <div className="h-full rounded-full" style={{ width: `${groupHpPercentage}%`, backgroundColor: resolveHpBarColor(groupHpPercentage), transition: 'width 0.35s ease' }} />
           </div>
-          <span className="text-white-300/50 text-xs tabular-nums">{Math.round(groupPct)}%</span>
+          <span className="text-white-300/50 text-xs tabular-nums">{Math.round(groupHpPercentage)}%</span>
         </div>
       )}
 
@@ -517,10 +442,10 @@ function Personagens() {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={openForNew} className="gap-2">
+            <Button onClick={openNewCharacterModal} className="gap-2">
               <PlusIcon size={15} /> Adicionar personagem
             </Button>
-            <Button variant="secondary" onClick={() => importRef.current?.click()} className="w-auto! px-5">
+            <Button variant="secondary" onClick={() => importInputRef.current?.click()} className="w-auto! px-5">
               Importar JSON
             </Button>
           </div>
@@ -529,18 +454,24 @@ function Personagens() {
 
       {characters.length > 0 && (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          {characters.map(c => (
-            <CharacterCard key={c.id} character={c}
-              onEdit={() => openForEdit(c)}
-              onDelete={() => deleteCharacter(c.id)}
-              onHpAdjust={delta => handleHpAdjust(c.id, delta)}
+          {characters.map(character => (
+            <CharacterCard
+              key={character.id}
+              character={character}
+              onEdit={() => openEditCharacterModal(character)}
+              onDelete={() => deleteCharacter(character.id)}
+              onHpAdjust={delta => handleHpAdjust(character.id, delta)}
             />
           ))}
         </div>
       )}
 
       {isModalOpen && (
-        <CharacterModal initial={editingCharacter} onSave={handleSave} onClose={closeModal} />
+        <CharacterModal
+          initialCharacter={editingCharacter}
+          onSave={handleCharacterSave}
+          onClose={closeModal}
+        />
       )}
     </div>
   )
