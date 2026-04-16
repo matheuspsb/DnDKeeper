@@ -2,6 +2,7 @@ import { useState, type KeyboardEvent } from 'react'
 import type { Character } from '../../types/character'
 import { getXpProgress } from '../../constants/dnd'
 import { HP_DELTA_OPTIONS } from '../../constants/character'
+import { resolveImageUrl } from '../../constants/arts'
 import { clampNumber, formatNumber } from '../../utils/number'
 import { resolveHpBarColor } from '../../utils/character'
 import IconButton from '../atoms/IconButton'
@@ -50,7 +51,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
     <div className={`bg-black-300 border rounded-xl overflow-hidden flex transition-colors ${isCharacterDead ? 'border-red-400/60' : 'border-black-100'}`}>
       <div className="w-28 shrink-0 bg-black-400 relative self-stretch min-h-50">
         {character.imageUrl ? (
-          <img src={character.imageUrl} alt={character.name} className="w-full h-full object-cover absolute inset-0" />
+          <img src={resolveImageUrl(character.imageUrl)} alt={character.name} className="w-full h-full object-cover absolute inset-0" />
         ) : (
           <div className="w-full h-full absolute inset-0 flex items-center justify-center text-white-300/20">
             <UsersIcon size={40} />

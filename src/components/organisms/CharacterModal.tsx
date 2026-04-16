@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Character } from '../../types/character'
 import { characterFormSchema, type CharacterFormInput, type CharacterFormOutput } from '../../schemas/character'
-import { LOCAL_ARTS } from '../../constants/arts'
+import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../constants/arts'
 import Button from '../atoms/Button'
 import XIcon from '../atoms/icons/XIcon'
 
@@ -89,19 +89,22 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
           <div className="flex flex-col gap-2">
             <label className={labelClass}>Imagem do Personagem</label>
             <div className="flex gap-2">
-              {LOCAL_ARTS.map(art => (
-                <button
-                  key={art.url}
-                  type="button"
-                  onClick={() => setValue('imageUrl', art.url, { shouldValidate: true })}
-                  className={`w-14 h-18 rounded-lg overflow-hidden border-2 shrink-0 transition-colors ${imageUrl === art.url ? 'border-red-100' : 'border-black-100 hover:border-white-300/40'}`}
-                >
-                  <img src={art.url} alt={art.name} className="w-full h-full object-cover" />
-                </button>
-              ))}
-              {imageUrl && !LOCAL_ARTS.some(a => a.url === imageUrl) && (
+              {LOCAL_ARTS.map(art => {
+                const artKey = toLocalArtUrl(art.key)
+                return (
+                  <button
+                    key={art.key}
+                    type="button"
+                    onClick={() => setValue('imageUrl', artKey, { shouldValidate: true })}
+                    className={`w-14 h-18 rounded-lg overflow-hidden border-2 shrink-0 transition-colors ${imageUrl === artKey ? 'border-red-100' : 'border-black-100 hover:border-white-300/40'}`}
+                  >
+                    <img src={art.url} alt={art.name} className="w-full h-full object-cover" />
+                  </button>
+                )
+              })}
+              {imageUrl && !LOCAL_ARTS.some(a => toLocalArtUrl(a.key) === imageUrl) && (
                 <div className="w-14 h-18 rounded-lg overflow-hidden border-2 border-red-100 shrink-0">
-                  <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none' }} />
+                  <img src={resolveImageUrl(imageUrl)} alt="preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none' }} />
                 </div>
               )}
             </div>
