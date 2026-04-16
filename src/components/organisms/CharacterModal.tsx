@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Character } from '../../types/character'
 import { characterFormSchema, type CharacterFormInput, type CharacterFormOutput } from '../../schemas/character'
+import { LOCAL_ARTS } from '../../constants/arts'
 import Button from '../atoms/Button'
 import XIcon from '../atoms/icons/XIcon'
 
@@ -40,6 +41,7 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CharacterFormInput, unknown, CharacterFormOutput>({
     resolver: zodResolver(characterFormSchema),
@@ -84,18 +86,30 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
           </button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 flex flex-col gap-4">
-          <div>
-            <label className={labelClass}>URL da Imagem do Personagem</label>
+          <div className="flex flex-col gap-2">
+            <label className={labelClass}>Imagem do Personagem</label>
+            <div className="flex gap-2">
+              {LOCAL_ARTS.map(art => (
+                <button
+                  key={art.url}
+                  type="button"
+                  onClick={() => setValue('imageUrl', art.url, { shouldValidate: true })}
+                  className={`w-14 h-18 rounded-lg overflow-hidden border-2 shrink-0 transition-colors ${imageUrl === art.url ? 'border-red-100' : 'border-black-100 hover:border-white-300/40'}`}
+                >
+                  <img src={art.url} alt={art.name} className="w-full h-full object-cover" />
+                </button>
+              ))}
+              {imageUrl && !LOCAL_ARTS.some(a => a.url === imageUrl) && (
+                <div className="w-14 h-18 rounded-lg overflow-hidden border-2 border-red-100 shrink-0">
+                  <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none' }} />
+                </div>
+              )}
+            </div>
             <input
               {...register('imageUrl')}
               className={inputClass}
-              placeholder="https://..."
+              placeholder="ou cole uma URL externa..."
             />
-            {imageUrl && (
-              <div className="mt-2 w-16 h-20 rounded-lg overflow-hidden border border-black-100">
-                <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none' }} />
-              </div>
-            )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
