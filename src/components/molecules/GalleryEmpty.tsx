@@ -1,6 +1,10 @@
 import ImageIcon from '../atoms/icons/ImageIcon'
 
-function GalleryEmpty({ message = 'Nenhum item adicionado ainda.' }) {
+interface GalleryEmptyProps {
+  message?: string
+}
+
+function GalleryEmpty({ message = 'Nenhum item adicionado ainda.' }: GalleryEmptyProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 mt-24 text-white-300">
       <ImageIcon size={48} strokeWidth={1.5} />

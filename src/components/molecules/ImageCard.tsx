@@ -1,6 +1,13 @@
+import type { DriveImage } from '../../types/image'
 import ExpandIcon from '../atoms/icons/ExpandIcon'
 
-function ImageCard({ image, blurred, onClick }) {
+interface ImageCardProps {
+  image: DriveImage
+  blurred: boolean
+  onClick: (image: DriveImage) => void
+}
+
+function ImageCard({ image, blurred, onClick }: ImageCardProps) {
   return (
     <button
       onClick={() => onClick(image)}
@@ -12,10 +19,7 @@ function ImageCard({ image, blurred, onClick }) {
         className={`h-full w-full object-cover transition-all duration-300 group-hover:scale-105 ${blurred ? 'blur-xl' : ''}`}
       />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-        <ExpandIcon
-          stroke="white"
-          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
+        <ExpandIcon className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 stroke-white" />
       </div>
     </button>
   )

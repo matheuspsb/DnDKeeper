@@ -1,11 +1,19 @@
 import { useEffect } from 'react'
+import type { DriveImage } from '../../types/image'
 import ChevronLeftIcon from '../atoms/icons/ChevronLeftIcon'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
 import XIcon from '../atoms/icons/XIcon'
 
-function Lightbox({ image, onClose, onPrev, onNext }) {
+interface LightboxProps {
+  image: DriveImage
+  onClose: () => void
+  onPrev: (() => void) | null
+  onNext: (() => void) | null
+}
+
+function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
   useEffect(() => {
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft' && onPrev) onPrev()
       if (e.key === 'ArrowRight' && onNext) onNext()

@@ -1,7 +1,12 @@
-function IconButton({ active = false, title, children, className = '', ...props }) {
+import type { ButtonHTMLAttributes } from 'react'
+
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  active?: boolean
+}
+
+function IconButton({ active = false, children, className = '', ...props }: IconButtonProps) {
   return (
     <button
-      title={title}
       className={`
         flex items-center justify-center w-10 h-10 rounded-lg border transition-colors
         ${active

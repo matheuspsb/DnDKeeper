@@ -8,7 +8,9 @@
       "Bash(cd /tmp)",
       "Bash(npx create-vite@latest rpg-system-temp --template react)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebSearch",
+      "Bash(xargs rm *)"
     ]
   }
 }

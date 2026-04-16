@@ -4,8 +4,9 @@ import UsersIcon from '../components/atoms/icons/UsersIcon'
 import Sons from '../pages/Sons'
 import Artes from '../pages/Artes'
 import Personagens from '../pages/Personagens'
+import type { AppRoute } from '../types/route'
 
-export const ROUTES = [
+export const ROUTES: AppRoute[] = [
   {
     id: 'sons',
     path: '/sons',
