@@ -1,10 +1,10 @@
 import { useState, useRef, type ChangeEvent } from 'react'
 import type { Character } from '../types/character'
 import { useCharacters } from '../hooks/useCharacters'
-import { clampNumber, formatNumber } from '../utils/number'
-import { resolveHpBarColor } from '../utils/character'
+import { clampNumber } from '../utils/number'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
+import GroupHpBar from '../components/molecules/GroupHpBar'
 import CharactersEmpty from '../components/molecules/CharactersEmpty'
 import CharacterCard from '../components/organisms/CharacterCard'
 import CharacterModal from '../components/organisms/CharacterModal'
@@ -91,17 +91,11 @@ function Personagens() {
       </div>
 
       {characters.length > 1 && (
-        <div className="bg-black-400 border border-black-100 rounded-xl px-5 py-3 flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-red-100 text-sm">♥</span>
-            <span className="text-white-300 text-sm">HP do Grupo</span>
-            <span className="text-white-100 font-bold tabular-nums text-sm">{formatNumber(totalGroupHP)} / {formatNumber(totalGroupMaxHP)}</span>
-          </div>
-          <div className="flex-1 h-1.5 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${groupHpPercentage}%`, backgroundColor: resolveHpBarColor(groupHpPercentage), transition: 'width 0.35s ease' }} />
-          </div>
-          <span className="text-white-300/50 text-xs tabular-nums">{Math.round(groupHpPercentage)}%</span>
-        </div>
+        <GroupHpBar
+          totalHP={totalGroupHP}
+          totalMaxHP={totalGroupMaxHP}
+          percentage={groupHpPercentage}
+        />
       )}
 
       {characters.length === 0 && (
