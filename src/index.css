@@ -35,6 +35,18 @@
   --font-sans: 'Segoe UI', system-ui, sans-serif;
 }
 
+@layer base {
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
 body {
   background-color: #17181C;
   color: #F5F5F5;
