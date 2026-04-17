@@ -56,17 +56,23 @@ src/
 │   │
 │   ├── molecules/                          # Combinações de atoms com lógica de apresentação simples
 │   │   ├── CharactersEmpty.tsx             # Estado vazio da página de personagens — com ações
+│   │   ├── DifficultyMeter.tsx             # Medidor de dificuldade do encontro — zonas coloridas + animação de partículas
 │   │   ├── GalleryEmpty.tsx                # Estado vazio genérico com ícone e mensagem
 │   │   ├── GroupHpBar.tsx                  # Barra de HP total do grupo — recebe totalHP, totalMaxHP, percentage
 │   │   ├── ImageCard.tsx                   # Card de imagem com hover, blur e ícone de expandir
 │   │   ├── InitiativeBadge.tsx             # Badge de iniciativa editável inline (clique para editar)
 │   │   ├── InitiativeEmpty.tsx             # Estado vazio da página de iniciativa
-│   │   └── RandomTableCard.tsx             # Card de tabela aleatória — memoizado, onRoll estável via memo+useCallback
+│   │   ├── RandomTableCard.tsx             # Card de tabela aleatória — memoizado, onRoll estável via memo+useCallback
+│   │   └── StatCard.tsx                    # Card de stat genérico — label, value, sub opcional
 │   │
 │   └── organisms/                          # Blocos complexos com estado ou múltiplas responsabilidades
 │       ├── CharacterCard.tsx               # Card completo de personagem — HP, XP, notas, ações
 │       ├── CharacterModal.tsx              # Modal de criação/edição de personagem — usa RHF + Zod
 │       ├── CombatantRow.tsx                # Linha de combatente na iniciativa — status, HP, ajustes
+│       ├── EncounterHistoryPanel.tsx       # Histórico de snapshots de combate — envio de XP por encontro ou em lote
+│       ├── EncounterMonstersPanel.tsx      # Painel de monstros do encontro — nome, CR, quantidade
+│       ├── EncounterPartyPanel.tsx         # Painel de membros do grupo — nome e nível, importação de personagens
+│       ├── EncounterResultPanel.tsx        # Resultado do encontro — dificuldade, XP total, XP por jogador
 │       ├── InitiativeAddForm.tsx           # Formulário de adição de combatente — usa RHF + Zod
 │       ├── Lightbox.tsx                    # Modal de imagem expandida — navegação por clique e teclado (←→ Esc)
 │       └── Sidebar.tsx                     # Navegação lateral colapsável com logo e rotas
@@ -75,6 +81,7 @@ src/
 │   ├── arts.ts                             # LOCAL_ARTS (import.meta.glob), resolveImageUrl, toLocalArtUrl
 │   ├── character.ts                        # HP_DELTA_OPTIONS — deltas dos botões de ajuste de HP
 │   ├── dnd.ts                              # XP_THRESHOLDS, getLevel, getXpProgress
+│   ├── encounter.ts                        # CR_XP, THRESHOLDS_PER_LEVEL, DIFFICULTY_LABEL/COLOR/BG/ORDER, getEncounterMultiplier
 │   ├── initiative.ts                       # HP_DELTAS — deltas dos botões na iniciativa
 │   ├── randomTables.ts                     # RANDOM_TABLES + TABLE_CATEGORIES, TABLES_BY_CATEGORY, TABLES_BY_ID
 │   └── routes.tsx                          # Fonte única das rotas: id, path, label, icon, element
@@ -82,11 +89,14 @@ src/
 ├── hooks/
 │   ├── useCharacters.ts                    # CRUD de personagens com persistência em localStorage
 │   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
+│   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
+│   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
 │   └── useInitiative.ts                    # Estado da iniciativa (combatentes, turno, rodada) + localStorage
 │
 ├── pages/
 │   ├── Artes.tsx                           # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
 │   ├── Characters.tsx                      # Gestão de personagens — HP, XP, modal de criação/edição
+│   ├── Encounter.tsx                       # Calculadora de XP de encontro — party, monstros, resultado e histórico
 │   ├── Initiative.tsx                      # Controle de turnos de combate — lista ordenada por iniciativa
 │   ├── RandomTables.tsx                    # Tabelas aleatórias — 17 tabelas em 6 categorias, rolar individualmente ou tudo
 │   └── Sounds.tsx                          # (em construção)
@@ -101,6 +111,7 @@ src/
 │
 ├── types/
 │   ├── character.ts                        # Character { id, name, playerName, characterClass, race, currentHP, maxHP, xp, imageUrl, notes }
+│   ├── encounter.ts                        # PartyMember, MonsterEntry, CR, EncounterResult, EncounterSnapshot, EncounterPartyMemberSnapshot
 │   ├── icon.ts                             # IconProps { size, className, strokeWidth }
 │   ├── image.ts                            # DriveImage { id, name, url, fullUrl }
 │   ├── initiative.ts                       # Combatant { ..., imageUrl? }, CombatantStatus
@@ -109,6 +120,7 @@ src/
 │
 ├── utils/
 │   ├── character.ts                        # resolveHpBarColor(percentage) — cor dinâmica da barra de HP
+│   ├── encounter.ts                        # calculateEncounter(party, monsters) → EncounterResult; spawnParticles(count) → Particle[]
 │   ├── number.ts                           # clampNumber, formatNumber
 │   └── random.ts                           # pickRandom<T>(entries) — sorteia um item de qualquer array
 │
@@ -161,6 +173,7 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 
 - `useCharacters` — persiste em `localStorage` com chave `dndkeeper_characters`
 - `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
+- `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
 - Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
 
 ## Paleta de cores
@@ -199,6 +212,7 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 | `/artes` | Artes | funcional — **path não renomear** (configurado na API do Drive) |
 | `/personagens` | Characters | funcional |
 | `/iniciativa` | Initiative | funcional |
+| `/encontro` | Encounter | funcional |
 | `/tabelas` | RandomTables | em construção |
 
 ## Deploy
@@ -244,6 +258,20 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - **Separação de layers**: a `<img>` fica dentro de um `<div class="absolute inset-0 overflow-hidden">` próprio; o gradiente e os overlays ficam como irmãos fora desse wrapper — evita que o gradiente participe do contexto de compositing da animação e elimina o flicker
 - Botões de ação (editar/deletar) ficam invisíveis por padrão e aparecem com `group-hover:opacity-100`; usam `bg-red-100 text-white-100` sem borda
 - Inputs `type="number"` sem setas nativas — regra global em `@layer base` no `index.css`
+
+## Calculadora de Encontro
+
+- Página `/encontro` — calcula dificuldade e XP de um encontro com base no grupo e nos monstros
+- **Fluxo**: party (nível por membro) + monsters (CR + quantidade) → `calculateEncounter()` → `EncounterResult`
+- `calculateEncounter` em `utils/encounter.ts` soma o XP bruto dos monstros, aplica o multiplicador por quantidade (`getEncounterMultiplier`) e compara com os thresholds do grupo para determinar a dificuldade
+- Os thresholds por nível ficam em `THRESHOLDS_PER_LEVEL` (`constants/encounter.ts`); são somados por membro do grupo
+- **Histórico**: cada encontro pode ser salvo como `EncounterSnapshot` via `useEncounterHistory`
+  - `EncounterSnapshot` tem flag `xpSent: boolean` para controlar se o XP já foi enviado aos personagens
+  - Envio distribui `xpPerPlayer` para cada membro da party via `useCharacters.addXp`
+  - É possível enviar snapshots individuais ou todos os pendentes de uma vez ("Enviar Tudo")
+- **`DifficultyMeter`**: detecta mudança de dificuldade durante o render (comparação com estado anterior via `useState`), chama `spawnParticles` de `utils/encounter.ts` e anima partículas via CSS custom properties `--dx`/`--dy` + classe `.encounter-particle` em `index.css`
+  - `DIFFICULTY_ORDER` em `constants/encounter.ts` é usado para determinar se a dificuldade subiu ou desceu (quantidade de partículas difere)
+- A página de encontro **não usa RHF** — os painéis de party e monstros usam inputs controlados diretamente
 
 ## Convenções
 
