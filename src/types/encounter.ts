@@ -34,3 +34,19 @@ export interface EncounterResult {
   thresholds: DifficultyThresholds
   difficulty: EncounterDifficulty
 }
+
+export interface EncounterPartyMemberSnapshot {
+  id: string
+  name: string
+}
+
+export interface EncounterSnapshot {
+  id: string
+  savedAt: number
+  party: EncounterPartyMemberSnapshot[]
+  difficulty: EncounterDifficulty
+  rawXp: number
+  xpPerPlayer: number
+  monsterCount: number
+  xpSent: boolean
+}

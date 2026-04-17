@@ -2,37 +2,22 @@ import type { EncounterResult } from '../../types/encounter'
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR, DIFFICULTY_BG } from '../../constants/encounter'
 import { formatNumber } from '../../utils/number'
 import DifficultyMeter from '../molecules/DifficultyMeter'
+import StatCard from '../molecules/StatCard'
 
-interface XpResultPanelProps {
+interface EncounterResultPanelProps {
   result: EncounterResult
   partySize: number
   monsterCount: number
 }
 
-interface StatCardProps {
-  label: string
-  value: string
-  sub?: string
-}
-
-function StatCard({ label, value, sub }: StatCardProps) {
-  return (
-    <div className="flex flex-col gap-1 bg-black-400 border border-black-100 rounded-xl px-4 py-3">
-      <span className="text-white-300/60 text-[10px] font-medium uppercase tracking-wider">{label}</span>
-      <span className="text-white-100 text-xl font-bold tabular-nums">{value}</span>
-      {sub && <span className="text-white-300/40 text-[10px]">{sub}</span>}
-    </div>
-  )
-}
-
-function XpResultPanel({ result, partySize, monsterCount }: XpResultPanelProps) {
+function EncounterResultPanel({ result, partySize, monsterCount }: EncounterResultPanelProps) {
   const { rawXp, adjustedXp, multiplier, xpPerPlayer, thresholds, difficulty } = result
 
   const isEmpty = partySize === 0 && monsterCount === 0
 
   return (
     <div className="bg-black-300 border border-black-100 rounded-xl flex flex-col gap-5 p-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <span className="text-white-100 font-semibold text-sm">Resultado</span>
         {!isEmpty && (
           <span
@@ -104,4 +89,4 @@ function XpResultPanel({ result, partySize, monsterCount }: XpResultPanelProps) 
   )
 }
 
-export default XpResultPanel
+export default EncounterResultPanel

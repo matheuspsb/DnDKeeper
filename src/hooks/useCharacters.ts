@@ -78,5 +78,12 @@ export function useCharacters() {
     [mutate],
   )
 
-  return { characters, addCharacter, updateCharacter, deleteCharacter, exportJSON, importJSON }
+  const addXp = useCallback(
+    (id: string, amount: number) => {
+      mutate(prev => prev.map(c => (c.id === id ? { ...c, xp: c.xp + amount } : c)))
+    },
+    [mutate],
+  )
+
+  return { characters, addCharacter, updateCharacter, deleteCharacter, exportJSON, importJSON, addXp }
 }
