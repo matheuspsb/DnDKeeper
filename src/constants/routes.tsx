@@ -3,11 +3,13 @@ import ImageIcon from '../components/atoms/icons/ImageIcon'
 import UsersIcon from '../components/atoms/icons/UsersIcon'
 import SwordsIcon from '../components/atoms/icons/SwordsIcon'
 import DiceIcon from '../components/atoms/icons/DiceIcon'
+import StarIcon from '../components/atoms/icons/StarIcon'
 import Sounds from '../pages/Sounds'
 import Artes from '../pages/Artes'
 import Characters from '../pages/Characters'
 import Initiative from '../pages/Initiative'
 import RandomTables from '../pages/RandomTables'
+import Encounter from '../pages/Encounter'
 import type { AppRoute } from '../types/route'
 
 export const ROUTES: AppRoute[] = [
@@ -45,5 +47,12 @@ export const ROUTES: AppRoute[] = [
     label: 'Tabelas',
     element: <RandomTables />,
     icon: <DiceIcon />,
+  },
+  {
+    id: 'encontro',
+    path: '/encontro',
+    label: 'Encontro',
+    element: <Encounter />,
+    icon: <StarIcon />,
   },
 ]
