@@ -1,6 +1,5 @@
 import type { Combatant, CombatantStatus } from '../../types/initiative'
 import { HP_DELTAS } from '../../constants/initiative'
-import IconButton from '../atoms/IconButton'
 import TrashIcon from '../atoms/icons/TrashIcon'
 import TypeBadge from '../atoms/TypeBadge'
 import InitiativeBadge from '../molecules/InitiativeBadge'
@@ -28,63 +27,70 @@ function CombatantRow({ combatant, status, onRemove, onAdjustHp, onUpdateInitiat
     : hpPercent > 25 ? '#facc15'
     : '#D72334'
 
-  const containerClass = isCurrent
-    ? 'bg-red-500/10 border-2 border-red-100/40 rounded-xl p-4'
-    : `bg-black-300 border border-black-100 rounded-xl px-4 py-3 ${isDone ? 'opacity-40' : ''}`
-
   return (
-    <div className={containerClass}>
-      <div className="flex items-center gap-3">
-        <InitiativeBadge value={combatant.initiative} isCurrent={isCurrent} onUpdate={onUpdateInitiative} />
+    <div className={`rounded-xl overflow-hidden ${isCurrent ? 'p-0.5 current-turn-border' : ''} ${isDone ? 'opacity-40' : ''}`}>
+      <div
+        className={`flex flex-col gap-3 p-4 min-h-44
+          ${isCurrent
+            ? 'bg-black-300 rounded-[10px]'
+            : 'bg-black-300 rounded-xl border border-black-100'
+          }`}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <InitiativeBadge value={combatant.initiative} isCurrent={isCurrent} onUpdate={onUpdateInitiative} />
+          <button
+            onClick={onRemove}
+            title="Remover"
+            className="flex items-center justify-center w-7 h-7 rounded-lg text-white-300/40 hover:text-white-300 transition-colors cursor-pointer shrink-0"
+          >
+            <TrashIcon size={13} />
+          </button>
+        </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`font-bold truncate ${isCurrent ? 'text-white-100 text-base' : 'text-white-100 text-sm'}`}>
-              {combatant.name}
-            </span>
+        <div className="flex-1">
+          <span className={`font-bold leading-tight block ${isCurrent ? 'text-white-100 text-base' : 'text-white-100 text-sm'}`}>
+            {combatant.name}
+          </span>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <TypeBadge isPlayer={combatant.isPlayer} />
-            {isCurrent && (
-              <span className="text-xs font-bold tracking-widest text-red-100/70 ml-1">TURNO ATUAL</span>
-            )}
           </div>
+        </div>
 
-          {combatant.hp !== null && combatant.maxHp !== null && (
-            <div className="mt-1.5 flex items-center gap-2">
-              <span className="text-xs tabular-nums" style={{ color: hpColor }}>
+        {combatant.hp !== null && combatant.maxHp !== null && (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium" style={{ color: hpColor }}>♥ HP</span>
+              <span className="tabular-nums font-semibold" style={{ color: hpColor }}>
                 {combatant.hp} / {combatant.maxHp}
               </span>
-              <div className="flex-1 h-1.5 bg-black-500 rounded-full overflow-hidden max-w-32">
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${hpPercent}%`, backgroundColor: hpColor }}
-                />
-              </div>
             </div>
-          )}
-        </div>
+            <div className="h-1.5 w-full bg-black-500 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{ width: `${hpPercent}%`, backgroundColor: hpColor }}
+              />
+            </div>
+          </div>
+        )}
 
-        <IconButton onClick={onRemove} title="Remover">
-          <TrashIcon size={14} />
-        </IconButton>
+        {combatant.hp !== null && (
+          <div className="flex gap-1">
+            {HP_DELTAS.map(delta => (
+              <button
+                key={delta}
+                onClick={() => onAdjustHp(delta)}
+                className={`flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer
+                  ${delta < 0
+                    ? 'border-red-400/40 text-red-100/80 hover:text-red-100 hover:bg-red-400/10 bg-black-500'
+                    : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
+                  }`}
+              >
+                {delta > 0 ? `+${delta}` : delta}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-
-      {isCurrent && combatant.hp !== null && (
-        <div className="flex gap-1 mt-3">
-          {HP_DELTAS.map(delta => (
-            <button
-              key={delta}
-              onClick={() => onAdjustHp(delta)}
-              className={`flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer
-                ${delta < 0
-                  ? 'border-red-400/40 text-red-100/80 hover:text-red-100 hover:bg-red-400/10 bg-black-500'
-                  : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
-                }`}
-            >
-              {delta > 0 ? `+${delta}` : delta}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

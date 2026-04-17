@@ -53,3 +53,28 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* ── Border beam (turno atual na iniciativa) ─────────────────────────────── */
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-beam {
+  to { --border-angle: 360deg; }
+}
+
+.current-turn-border {
+  animation: border-beam 2s linear infinite;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    transparent 70%,
+    #D72334 80%,
+    #FF5566 87%,
+    #D72334 94%,
+    transparent 100%
+  );
+}
