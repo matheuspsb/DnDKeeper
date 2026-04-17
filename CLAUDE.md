@@ -203,6 +203,17 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - `vercel.json` na raiz configura rewrite `"/(.*)" → "/index.html"` para SPAs com `BrowserRouter`
 - Sem esse rewrite, rotas acessadas diretamente (ex: `/personagens`) retornam 404
 
+## Estilo visual dos cards de personagem
+
+- Layout **portrait** (vertical): imagem no topo (`h-64`, `object-cover object-top`), conteúdo abaixo
+- Grid em `Characters.tsx`: `grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`
+- Hover do card: `hover:-translate-y-1 hover:shadow-xl` com `transition-all duration-300`
+- Imagem com zoom suave no hover: `group-hover:scale-105` com `duration-500`
+- **Gradiente inferior da imagem**: posicionado em `-bottom-3` (não `bottom-0`) para evitar gap de 1px entre o clip do `overflow-hidden` e o gradiente durante a animação de escala — bug de compositing de GPU
+- **Separação de layers**: a `<img>` fica dentro de um `<div class="absolute inset-0 overflow-hidden">` próprio; o gradiente e os overlays ficam como irmãos fora desse wrapper — evita que o gradiente participe do contexto de compositing da animação e elimina o flicker
+- Botões de ação (editar/deletar) ficam invisíveis por padrão e aparecem com `group-hover:opacity-100`; usam `bg-red-100 text-white-100` sem borda
+- Inputs `type="number"` sem setas nativas — regra global em `@layer base` no `index.css`
+
 ## Convenções
 
 - **TypeScript sempre** — nenhum arquivo `.js`/`.jsx`

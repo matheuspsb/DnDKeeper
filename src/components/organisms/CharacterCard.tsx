@@ -5,7 +5,6 @@ import { HP_DELTA_OPTIONS } from '../../constants/character'
 import { resolveImageUrl } from '../../constants/arts'
 import { clampNumber, formatNumber } from '../../utils/number'
 import { resolveHpBarColor } from '../../utils/character'
-import IconButton from '../atoms/IconButton'
 import PencilIcon from '../atoms/icons/PencilIcon'
 import TrashIcon from '../atoms/icons/TrashIcon'
 import UsersIcon from '../atoms/icons/UsersIcon'
@@ -47,64 +46,112 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
     if (e.key === 'Escape') setIsEditingHp(false)
   }
 
+  const hpColor = resolveHpBarColor(hpPercentage)
+
   return (
-    <div className={`bg-black-300 border rounded-xl overflow-hidden flex transition-colors ${isCharacterDead ? 'border-red-400/60' : 'border-black-100'}`}>
-      <div className="w-28 shrink-0 bg-black-400 relative self-stretch min-h-50">
-        {character.imageUrl ? (
-          <img src={resolveImageUrl(character.imageUrl)} alt={character.name} className="w-full h-full object-cover absolute inset-0" />
-        ) : (
-          <div className="w-full h-full absolute inset-0 flex items-center justify-center text-white-300/20">
-            <UsersIcon size={40} />
-          </div>
-        )}
+    <div
+      className={`group bg-black-300 border rounded-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black-500/60
+        ${isCharacterDead ? 'border-red-400/60' : 'border-black-100 hover:border-black-200'}`}
+    >
+      <div className="h-64 relative bg-black-400 shrink-0">
+        <div className="absolute inset-0 overflow-hidden">
+          {character.imageUrl ? (
+            <img
+              src={resolveImageUrl(character.imageUrl)}
+              alt={character.name}
+              className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white-300/20">
+              <UsersIcon size={52} />
+            </div>
+          )}
+        </div>
+
+        <div className="absolute inset-x-0 -bottom-3 h-24 bg-linear-to-t from-black-300 to-transparent pointer-events-none" />
+
+        <div className="absolute top-2.5 left-2.5">
+          <span className="bg-black-500/70 border border-red-400/40 text-red-100 text-xs font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+            Lv {xpProgress.level}
+          </span>
+        </div>
+
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <button
+            onClick={onEdit}
+            title="Editar"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-white-100 hover:bg-red-200 transition-colors cursor-pointer"
+          >
+            <PencilIcon size={14} />
+          </button>
+          {isConfirmingDelete ? (
+            <div className="flex items-center gap-0.5 bg-red-100/90 backdrop-blur-sm rounded-lg px-1">
+              <button
+                onClick={() => setIsConfirmingDelete(false)}
+                className="text-white-100/70 hover:text-white-100 transition-colors px-1.5 py-1 text-xs cursor-pointer"
+              >
+                Não
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-white-100 hover:text-white-200 transition-colors font-semibold px-1.5 py-1 text-xs cursor-pointer"
+              >
+                Sim
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsConfirmingDelete(true)}
+              title="Remover"
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-white-100 hover:bg-red-200 transition-colors cursor-pointer"
+            >
+              <TrashIcon size={14} />
+            </button>
+          )}
+        </div>
+
         {isCharacterDead && (
-          <div className="absolute inset-0 bg-red-500/20 flex items-end justify-center pb-2">
+          <div className="absolute inset-0 bg-red-500/20 flex items-end justify-center pb-3 pointer-events-none">
             <span className="text-red-100 text-xs font-bold tracking-widest">CAÍDO</span>
           </div>
         )}
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-3 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-white-100 font-bold text-base leading-tight truncate">{character.name}</h3>
-            <p className="text-white-300/70 text-xs mt-0.5 truncate">
-              {[character.characterClass, character.race].filter(Boolean).join(' · ')}
-              {character.playerName && <span className="text-white-300/40"> — {character.playerName}</span>}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="bg-red-400/20 border border-red-400/40 text-red-100 text-xs font-bold px-2 py-0.5 rounded-full">
-              Lv {xpProgress.level}
-            </span>
-            <IconButton onClick={onEdit} title="Editar"><PencilIcon size={14} /></IconButton>
-            {isConfirmingDelete ? (
-              <div className="flex items-center gap-1 text-xs">
-                <button onClick={() => setIsConfirmingDelete(false)} className="text-white-300 hover:text-white-100 transition-colors px-1.5 py-1">Não</button>
-                <button onClick={onDelete} className="text-red-100 hover:text-red-200 transition-colors font-semibold px-1.5 py-1">Sim</button>
-              </div>
-            ) : (
-              <IconButton onClick={() => setIsConfirmingDelete(true)} title="Remover"><TrashIcon size={14} /></IconButton>
+
+        <div className="min-w-0">
+          <h3 className="text-white-100 font-bold text-base leading-tight truncate">{character.name}</h3>
+          <p className="text-white-300/60 text-xs mt-0.5 truncate">
+            {[character.characterClass, character.race].filter(Boolean).join(' · ')}
+            {character.playerName && (
+              <span className="text-white-300/40"> — {character.playerName}</span>
             )}
-          </div>
+          </p>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <span className="text-white-300/80 text-xs font-medium flex items-center gap-1.5">
-              <span style={{ color: resolveHpBarColor(hpPercentage) }}>♥</span> Pontos de Vida
+              <span style={{ color: hpColor }}>♥</span> Pontos de Vida
             </span>
             <div className="flex items-center gap-1 text-sm">
               {isEditingHp ? (
-                <input autoFocus type="number" value={hpInputValue}
+                <input
+                  autoFocus
+                  type="number"
+                  value={hpInputValue}
                   onChange={e => setHpInputValue(e.target.value)}
-                  onBlur={commitHpEdit} onKeyDown={handleHpInputKeyDown}
+                  onBlur={commitHpEdit}
+                  onKeyDown={handleHpInputKeyDown}
                   className="w-14 bg-black-500 border border-red-100 rounded px-1.5 text-center text-white-100 text-sm focus:outline-none tabular-nums"
                 />
               ) : (
-                <button onClick={startHpEdit} title="Clique para editar HP"
+                <button
+                  onClick={startHpEdit}
+                  title="Clique para editar HP"
                   className="font-bold tabular-nums hover:opacity-70 transition-opacity"
-                  style={{ color: resolveHpBarColor(hpPercentage) }}>
+                  style={{ color: hpColor }}
+                >
                   {character.currentHP}
                 </button>
               )}
@@ -112,23 +159,35 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
               <span className="text-white-300/30 text-xs ml-1">({hpPercentage}%)</span>
             </div>
           </div>
-          <div className="h-2 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${hpPercentage}%`, backgroundColor: resolveHpBarColor(hpPercentage), transition: 'width 0.35s ease, background-color 0.5s ease' }} />
+
+          <div className="h-2 w-full bg-black-500 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${hpPercentage}%`,
+                backgroundColor: hpColor,
+                transition: 'width 0.35s ease, background-color 0.5s ease',
+              }}
+            />
           </div>
-          <div className="flex gap-1 mt-0.5">
-            {HP_DELTA_OPTIONS.map(delta => {
-              const adjustButtonClass = delta < 0
-                ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
-                : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
-              return (
-                <button key={delta} onClick={() => onHpAdjust(delta)}
-                  className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer ${adjustButtonClass}`}>
-                  {delta > 0 ? `+${delta}` : delta}
-                </button>
-              )
-            })}
+
+          <div className="flex gap-1">
+            {HP_DELTA_OPTIONS.map(delta => (
+              <button
+                key={delta}
+                onClick={() => onHpAdjust(delta)}
+                className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer
+                  ${delta < 0
+                    ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
+                    : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
+                  }`}
+              >
+                {delta > 0 ? `+${delta}` : delta}
+              </button>
+            ))}
           </div>
         </div>
+
         <div className="border-t border-black-200" />
 
         <div className="flex flex-col gap-1.5">
@@ -137,15 +196,25 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
               <span className="text-yellow">✦</span> Experiência
             </span>
             <span className="text-white-300/50 text-xs tabular-nums">
-              {xpProgress.isMaxLevel
-                ? <span className="text-yellow font-semibold">Nível Máximo</span>
-                : `${formatNumber(xpProgress.xpIntoLevel)} / ${formatNumber(xpProgress.xpNeeded)}`
-              }
+              {xpProgress.isMaxLevel ? (
+                <span className="text-yellow font-semibold">Nível Máximo</span>
+              ) : (
+                `${formatNumber(xpProgress.xpIntoLevel)} / ${formatNumber(xpProgress.xpNeeded)}`
+              )}
             </span>
           </div>
-          <div className="h-2 bg-black-500 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${xpProgress.percentage}%`, backgroundColor: '#ECC83B', transition: 'width 0.35s ease' }} />
+
+          <div className="h-2 w-full bg-black-500 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${xpProgress.percentage}%`,
+                backgroundColor: '#ECC83B',
+                transition: 'width 0.35s ease',
+              }}
+            />
           </div>
+
           {!xpProgress.isMaxLevel && (
             <p className="text-white-300/40 text-xs">
               {formatNumber(character.xp)} XP total · Nível {xpProgress.level} → {xpProgress.level + 1}
