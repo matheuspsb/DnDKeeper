@@ -60,7 +60,8 @@ src/
 │   │   ├── GroupHpBar.tsx                  # Barra de HP total do grupo — recebe totalHP, totalMaxHP, percentage
 │   │   ├── ImageCard.tsx                   # Card de imagem com hover, blur e ícone de expandir
 │   │   ├── InitiativeBadge.tsx             # Badge de iniciativa editável inline (clique para editar)
-│   │   └── InitiativeEmpty.tsx             # Estado vazio da página de iniciativa
+│   │   ├── InitiativeEmpty.tsx             # Estado vazio da página de iniciativa
+│   │   └── RandomTableCard.tsx             # Card de tabela aleatória — memoizado, onRoll estável via memo+useCallback
 │   │
 │   └── organisms/                          # Blocos complexos com estado ou múltiplas responsabilidades
 │       ├── CharacterCard.tsx               # Card completo de personagem — HP, XP, notas, ações
@@ -75,6 +76,7 @@ src/
 │   ├── character.ts                        # HP_DELTA_OPTIONS — deltas dos botões de ajuste de HP
 │   ├── dnd.ts                              # XP_THRESHOLDS, getLevel, getXpProgress
 │   ├── initiative.ts                       # HP_DELTAS — deltas dos botões na iniciativa
+│   ├── randomTables.ts                     # RANDOM_TABLES + TABLE_CATEGORIES, TABLES_BY_CATEGORY, TABLES_BY_ID
 │   └── routes.tsx                          # Fonte única das rotas: id, path, label, icon, element
 │
 ├── hooks/
@@ -86,7 +88,7 @@ src/
 │   ├── Artes.tsx                           # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
 │   ├── Characters.tsx                      # Gestão de personagens — HP, XP, modal de criação/edição
 │   ├── Initiative.tsx                      # Controle de turnos de combate — lista ordenada por iniciativa
-│   ├── RandomTables.tsx                    # (em construção)
+│   ├── RandomTables.tsx                    # Tabelas aleatórias — 17 tabelas em 6 categorias, rolar individualmente ou tudo
 │   └── Sounds.tsx                          # (em construção)
 │
 ├── schemas/
@@ -101,12 +103,14 @@ src/
 │   ├── character.ts                        # Character { id, name, playerName, characterClass, race, currentHP, maxHP, xp, imageUrl, notes }
 │   ├── icon.ts                             # IconProps { size, className, strokeWidth }
 │   ├── image.ts                            # DriveImage { id, name, url, fullUrl }
-│   ├── initiative.ts                       # Combatant, CombatantStatus
+│   ├── initiative.ts                       # Combatant { ..., imageUrl? }, CombatantStatus
+│   ├── randomTables.ts                     # RollEntry { result, key }
 │   └── route.ts                            # AppRoute { id, path, label, element, icon }
 │
 ├── utils/
 │   ├── character.ts                        # resolveHpBarColor(percentage) — cor dinâmica da barra de HP
-│   └── number.ts                           # clampNumber, formatNumber
+│   ├── number.ts                           # clampNumber, formatNumber
+│   └── random.ts                           # pickRandom<T>(entries) — sorteia um item de qualquer array
 │
 ├── App.tsx                                 # Layout raiz: Sidebar + Routes
 ├── main.tsx                                # Entry point: BrowserRouter + StrictMode
@@ -202,6 +206,33 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - Hospedado no **Vercel**
 - `vercel.json` na raiz configura rewrite `"/(.*)" → "/index.html"` para SPAs com `BrowserRouter`
 - Sem esse rewrite, rotas acessadas diretamente (ex: `/personagens`) retornam 404
+
+## Tabelas Aleatórias
+
+- **17 tabelas** em 6 categorias: Encontros (Floresta, Dungeon, Cidade), Clima & Ambiente, Nomes de NPCs (Humano, Élfico, Anão, Antagonista), Loot & Tesouros (Comum, Raro/Mágico), NPCs (Personalidade, Aparência, Motivação, Defeito/Segredo), Narrativa (Gancho, Taverna, Complicação, Rumor, Missão Secundária)
+- Dados em `constants/randomTables.ts` com três lookups pré-computados no final do módulo:
+  - `TABLE_CATEGORIES` — array de categorias únicas, calculado uma vez no carregamento
+  - `TABLES_BY_CATEGORY` — `Record<category, RandomTable[]>`, elimina `filter()` no render
+  - `TABLES_BY_ID` — `Record<id, RandomTable>`, lookup O(1) ao rolar
+- Animação de resultado: `@keyframes roll-in` + classe `.roll-result` em `index.css`; `key={roll.key}` no div força re-mount e re-anima sem trocar de elemento
+- Padrão de performance para listas grandes de cards memoizados:
+  - Estado combinado `Record<id, RollEntry>` — um `setState` por rolagem
+  - `handleRoll(id: string)` com `useCallback([], [])` — estável para sempre via atualização funcional
+  - `memo(RandomTableCard)` — re-renderiza apenas o card rolado
+  - `useCallback` interno no card para o `onClick` — deps `[onRoll, table.id]`, ambas estáveis
+
+## Estilo visual dos cards de iniciativa
+
+- Layout **portrait** (vertical): grid `grid-cols-2 md:grid-cols-3 lg:grid-cols-4` em `Initiative.tsx`
+- Estrutura da página: `flex flex-col h-full` — conteúdo em `flex-1 overflow-y-auto`, formulário em `shrink-0` fixo no rodapé com `border-t`; funciona sem alterar `App.tsx` porque `main` é flex child que estica à altura do pai (`min-h-screen`)
+- **Border beam no turno atual**: combatante ativo tem wrapper com `p-0.5 current-turn-border`; os 2px de padding expõem o gradiente animado como "borda"; inner div usa `bg-black-300 rounded-[10px]` para cobrir o gradiente em tudo exceto a borda
+  - Implementado em `index.css` via `@property --border-angle` + `@keyframes border-beam` + `.current-turn-border` com `conic-gradient`
+  - `@property` permite animar custom properties CSS com `transition`/`animation`
+- **Imagem de fundo atmosférica**: `Combatant` tem campo `imageUrl?: string` (opcional); quando presente, renderiza a imagem como camada absoluta com overlay `bg-black-300/82` — os 18% que vazam criam o efeito sem comprometer a legibilidade
+  - Personagens importados herdam `imageUrl` automaticamente; monstros adicionados manualmente ficam sem imagem
+  - Estrutura de duas camadas: `absolute inset-0` para imagem + overlay; `relative z-10` para o conteúdo
+- Botões de ajuste de HP visíveis em **todos** os combatentes (não só o atual)
+- `resolveImageUrl` de `constants/arts.ts` é usada em `CombatantRow` para resolver `local:filename` igual ao `CharacterCard`
 
 ## Estilo visual dos cards de personagem
 
