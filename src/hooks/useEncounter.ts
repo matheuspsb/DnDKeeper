@@ -14,19 +14,19 @@ export function useEncounter() {
   }, [])
 
   const updatePartyMember = useCallback((id: string, data: Partial<Omit<PartyMember, 'id'>>) => {
-    setParty(prev => prev.map(m => (m.id === id ? { ...m, ...data } : m)))
+    setParty(prev => prev.map(member => (member.id === id ? { ...member, ...data } : member)))
   }, [])
 
   const removePartyMember = useCallback((id: string) => {
-    setParty(prev => prev.filter(m => m.id !== id))
+    setParty(prev => prev.filter(member => member.id !== id))
   }, [])
 
   const importFromCharacters = useCallback((characters: Character[]) => {
     setParty(
-      characters.map(c => ({
-        id: c.id,
-        name: c.name,
-        level: getLevel(c.xp),
+      characters.map(character => ({
+        id: character.id,
+        name: character.name,
+        level: getLevel(character.xp),
       })),
     )
   }, [])
@@ -36,11 +36,11 @@ export function useEncounter() {
   }, [])
 
   const updateMonster = useCallback((id: string, data: Partial<Omit<MonsterEntry, 'id'>>) => {
-    setMonsters(prev => prev.map(m => (m.id === id ? { ...m, ...data } : m)))
+    setMonsters(prev => prev.map(monster => (monster.id === id ? { ...monster, ...data } : monster)))
   }, [])
 
   const removeMonster = useCallback((id: string) => {
-    setMonsters(prev => prev.filter(m => m.id !== id))
+    setMonsters(prev => prev.filter(monster => monster.id !== id))
   }, [])
 
   const clearMonsters = useCallback(() => setMonsters([]), [])

@@ -20,8 +20,8 @@ function formatTime(timestamp: number): string {
 }
 
 function EncounterHistoryPanel({ history, onSendXp, onSendAll, onDelete, onClear }: EncounterHistoryPanelProps) {
-  const unsent = history.filter(s => !s.xpSent)
-  const totalPendingXpPerPlayer = unsent.reduce((sum, s) => sum + s.xpPerPlayer, 0)
+  const unsent = history.filter(snapshot => !snapshot.xpSent)
+  const totalPendingXpPerPlayer = unsent.reduce((sum, snapshot) => sum + snapshot.xpPerPlayer, 0)
   const hasUnsent = unsent.length > 0
 
   return (

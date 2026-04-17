@@ -27,7 +27,7 @@ function Encounter() {
 
   const { history, saveEncounter, markAllSent, deleteSnapshot, clearHistory } = useEncounterHistory()
 
-  const monsterCount = monsters.reduce((s, m) => s + m.quantity, 0)
+  const monsterCount = monsters.reduce((total, monster) => total + monster.quantity, 0)
 
   const handleSave = useCallback(() => {
     saveEncounter(party, monsters, result)
@@ -55,10 +55,10 @@ function Encounter() {
   )
 
   const handleSendAll = useCallback(() => {
-    const unsent = history.filter(s => !s.xpSent)
+    const unsent = history.filter(snapshot => !snapshot.xpSent)
     if (unsent.length === 0) return
     distributeXp(unsent)
-    markAllSent(unsent.map(s => s.id))
+    markAllSent(unsent.map(snapshot => snapshot.id))
   }, [history, distributeXp, markAllSent])
 
   return (

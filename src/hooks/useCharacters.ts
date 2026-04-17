@@ -36,14 +36,14 @@ export function useCharacters() {
 
   const updateCharacter = useCallback(
     (id: string, data: Partial<Omit<Character, 'id'>>) => {
-      mutate(prev => prev.map(c => (c.id === id ? { ...c, ...data } : c)))
+      mutate(prev => prev.map(character => (character.id === id ? { ...character, ...data } : character)))
     },
     [mutate],
   )
 
   const deleteCharacter = useCallback(
     (id: string) => {
-      mutate(prev => prev.filter(c => c.id !== id))
+      mutate(prev => prev.filter(character => character.id !== id))
     },
     [mutate],
   )
@@ -53,19 +53,19 @@ export function useCharacters() {
       type: 'application/json',
     })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'personagens-dnd.json'
-    a.click()
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'personagens-dnd.json'
+    link.click()
     URL.revokeObjectURL(url)
   }, [characters])
 
   const importJSON = useCallback(
     (file: File) => {
       const reader = new FileReader()
-      reader.onload = e => {
+      reader.onload = event => {
         try {
-          const parsed = JSON.parse(e.target?.result as string)
+          const parsed = JSON.parse((event.target?.result) as string)
           if (Array.isArray(parsed)) {
             mutate(() => parsed as Character[])
           }
@@ -80,7 +80,7 @@ export function useCharacters() {
 
   const addXp = useCallback(
     (id: string, amount: number) => {
-      mutate(prev => prev.map(c => (c.id === id ? { ...c, xp: c.xp + amount } : c)))
+      mutate(prev => prev.map(character => (character.id === id ? { ...character, xp: character.xp + amount } : character)))
     },
     [mutate],
   )

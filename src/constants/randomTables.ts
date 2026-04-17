@@ -444,16 +444,16 @@ export const RANDOM_TABLES: RandomTable[] = [
 
 /** Categorias únicas na ordem em que aparecem no array. */
 export const TABLE_CATEGORIES: string[] = [
-  ...new Set(RANDOM_TABLES.map(t => t.category)),
+  ...new Set(RANDOM_TABLES.map(table => table.category)),
 ]
 
 /** Tabelas agrupadas por categoria. Evita filter() no render. */
 export const TABLES_BY_CATEGORY: Readonly<Record<string, RandomTable[]>> =
   TABLE_CATEGORIES.reduce<Record<string, RandomTable[]>>((acc, cat) => {
-    acc[cat] = RANDOM_TABLES.filter(t => t.category === cat)
+    acc[cat] = RANDOM_TABLES.filter(table => table.category === cat)
     return acc
   }, {})
 
 /** Mapa id → tabela para lookup O(1) ao rolar. */
 export const TABLES_BY_ID: Readonly<Record<string, RandomTable>> =
-  Object.fromEntries(RANDOM_TABLES.map(t => [t.id, t]))
+  Object.fromEntries(RANDOM_TABLES.map(table => [table.id, table]))

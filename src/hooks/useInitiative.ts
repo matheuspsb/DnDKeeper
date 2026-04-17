@@ -29,8 +29,8 @@ function currentId(state: InitiativeState): string | undefined {
 
 function indexById(combatants: Combatant[], id: string | undefined): number {
   if (!id) return 0
-  const i = combatants.findIndex(c => c.id === id)
-  return i >= 0 ? i : 0
+  const index = combatants.findIndex(combatant => combatant.id === id)
+  return index >= 0 ? index : 0
 }
 
 export function useInitiative() {
@@ -60,7 +60,7 @@ export function useInitiative() {
   const removeCombatant = useCallback(
     (id: string) => {
       setState(prev => {
-        const next = prev.combatants.filter(c => c.id !== id)
+        const next = prev.combatants.filter(combatant => combatant.id !== id)
         const newIndex = Math.min(prev.currentIndex, Math.max(0, next.length - 1))
         const nextState = { ...prev, combatants: next, currentIndex: newIndex }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
@@ -73,9 +73,9 @@ export function useInitiative() {
   const adjustHp = useCallback(
     (id: string, delta: number) => {
       setState(prev => {
-        const next = prev.combatants.map(c => {
-          if (c.id !== id || c.hp === null || c.maxHp === null) return c
-          return { ...c, hp: Math.max(0, Math.min(c.maxHp, c.hp + delta)) }
+        const next = prev.combatants.map(combatant => {
+          if (combatant.id !== id || combatant.hp === null || combatant.maxHp === null) return combatant
+          return { ...combatant, hp: Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta)) }
         })
         const nextState = { ...prev, combatants: next }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
@@ -89,7 +89,7 @@ export function useInitiative() {
     (id: string, initiative: number) => {
       setState(prev => {
         const activeId = currentId(prev)
-        const updated = prev.combatants.map(c => (c.id === id ? { ...c, initiative } : c))
+        const updated = prev.combatants.map(combatant => (combatant.id === id ? { ...combatant, initiative } : combatant))
         const next = sortedByInitiative(updated)
         const nextState = { ...prev, combatants: next, currentIndex: indexById(next, activeId) }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))

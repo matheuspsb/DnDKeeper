@@ -29,7 +29,7 @@ function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMon
           <span className="text-white-100 font-semibold text-sm">Monstros</span>
           {monsters.length > 0 && (
             <span className="text-[10px] bg-black-400 border border-black-100 text-white-300 px-2 py-0.5 rounded-full">
-              {monsters.reduce((s, m) => s + m.quantity, 0)} total
+              {monsters.reduce((total, monster) => total + monster.quantity, 0)} total
             </span>
           )}
         </div>

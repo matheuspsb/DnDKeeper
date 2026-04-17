@@ -33,11 +33,11 @@ export function useEncounterHistory() {
       const snapshot: EncounterSnapshot = {
         id: crypto.randomUUID(),
         savedAt: Date.now(),
-        party: party.map(m => ({ id: m.id, name: m.name })),
+        party: party.map(member => ({ id: member.id, name: member.name })),
         difficulty: result.difficulty,
         rawXp: result.rawXp,
         xpPerPlayer: result.xpPerPlayer,
-        monsterCount: monsters.reduce((s, m) => s + m.quantity, 0),
+        monsterCount: monsters.reduce((total, monster) => total + monster.quantity, 0),
         xpSent: false,
       }
       mutate(prev => [snapshot, ...prev])
@@ -47,14 +47,14 @@ export function useEncounterHistory() {
 
   const markAllSent = useCallback(
     (ids: string[]) => {
-      mutate(prev => prev.map(s => (ids.includes(s.id) ? { ...s, xpSent: true } : s)))
+      mutate(prev => prev.map(snapshot => (ids.includes(snapshot.id) ? { ...snapshot, xpSent: true } : snapshot)))
     },
     [mutate],
   )
 
   const deleteSnapshot = useCallback(
     (id: string) => {
-      mutate(prev => prev.filter(s => s.id !== id))
+      mutate(prev => prev.filter(snapshot => snapshot.id !== id))
     },
     [mutate],
   )
