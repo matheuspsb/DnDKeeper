@@ -38,7 +38,7 @@ function RandomTables() {
         <div>
           <h2 className="text-white-100 text-3xl font-bold">Tabelas Aleatórias</h2>
           <p className="text-white-300/60 text-sm mt-1">
-            Clique em qualquer card para rolar — ou role tudo de uma vez
+            Clique em qualquer card para rolar ou role tudo de uma vez
           </p>
         </div>
         <Button variant="primary" onClick={rollAll} className="w-auto! px-5 gap-2 shrink-0">
@@ -49,7 +49,7 @@ function RandomTables() {
       {TABLE_CATEGORIES.map(category => (
         <section key={category} className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <h3 className="text-white-300/50 text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
+            <h3 className="text-red-100 text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
               {category}
             </h3>
             <div className="flex-1 h-px bg-black-100" />

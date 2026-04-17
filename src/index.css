@@ -2,54 +2,55 @@
 
 @theme {
   /* Red */
-  --color-red-100: #D72334;
-  --color-red-200: #B91324;
-  --color-red-300: #9E1020;
+  --color-red-100: #d72334;
+  --color-red-200: #b91324;
+  --color-red-300: #9e1020;
   --color-red-400: #571623;
-  --color-red-500: #4B0F21;
+  --color-red-500: #4b0f21;
 
   /* Black */
-  --color-black-100: #34353E;
-  --color-black-200: #27282F;
-  --color-black-300: #282A2E;
-  --color-black-400: #1E1F23;
-  --color-black-500: #17181C;
+  --color-black-100: #34353e;
+  --color-black-200: #27282f;
+  --color-black-300: #282a2e;
+  --color-black-400: #1e1f23;
+  --color-black-500: #17181c;
 
   /* White */
-  --color-white-100: #F5F5F5;
-  --color-white-200: #EDEDED;
-  --color-white-300: #C0C0C0;
+  --color-white-100: #f5f5f5;
+  --color-white-200: #ededed;
+  --color-white-300: #c0c0c0;
 
   /* Accent */
-  --color-yellow: #ECC83B;
+  --color-yellow: #ecc83b;
 
   /* Gradient stops */
-  --color-btn-from: #D72334;
+  --color-btn-from: #d72334;
   --color-btn-to: #821325;
-  --color-btn-border: #AA1A2C;
+  --color-btn-border: #aa1a2c;
 
   /* Secondary button */
-  --color-btn-secondary-border: #B11C2D;
-  --color-btn-secondary-text: #CD2132;
+  --color-btn-secondary-border: #b11c2d;
+  --color-btn-secondary-text: #cd2132;
 
-  --font-sans: 'Segoe UI', system-ui, sans-serif;
+  --font-sans: "Segoe UI", system-ui, sans-serif;
 }
 
 @layer base {
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number']::-webkit-outer-spin-button {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  input[type='number'] {
+  input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
   }
 }
 
 body {
-  background-color: #17181C;
-  color: #F5F5F5;
+  background-color: #17181c;
+  color: #f5f5f5;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
@@ -57,8 +58,14 @@ body {
 /* ── Animação de resultado de tabela aleatória ──────────────────────────── */
 
 @keyframes roll-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .roll-result {
@@ -68,13 +75,15 @@ body {
 /* ── Border beam (turno atual na iniciativa) ─────────────────────────────── */
 
 @property --border-angle {
-  syntax: '<angle>';
+  syntax: "<angle>";
   inherits: false;
   initial-value: 0deg;
 }
 
 @keyframes border-beam {
-  to { --border-angle: 360deg; }
+  to {
+    --border-angle: 360deg;
+  }
 }
 
 .current-turn-border {
@@ -83,9 +92,9 @@ body {
     from var(--border-angle),
     transparent 0%,
     transparent 70%,
-    #D72334 80%,
-    #FF5566 87%,
-    #D72334 94%,
+    #d72334 80%,
+    #ff5566 87%,
+    #d72334 94%,
     transparent 100%
   );
 }
