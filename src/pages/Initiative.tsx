@@ -20,7 +20,7 @@ function Initiative() {
     reset,
   } = useInitiative()
 
-  const { characters } = useCharacters()
+  const { characters, updateCharacter } = useCharacters()
 
   function handleImportCharacters() {
     characters.forEach(char => {
@@ -31,8 +31,17 @@ function Initiative() {
         maxHp: char.maxHP,
         isPlayer: true,
         imageUrl: char.imageUrl || undefined,
+        characterId: char.id,
       })
     })
+  }
+
+  function handleAdjustHp(combatant: (typeof combatants)[number], delta: number) {
+    adjustHp(combatant.id, delta)
+    if (combatant.characterId && combatant.hp !== null && combatant.maxHp !== null) {
+      const newHp = Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta))
+      updateCharacter(combatant.characterId, { currentHP: newHp })
+    }
   }
 
   return (
@@ -70,7 +79,7 @@ function Initiative() {
                 combatant={combatant}
                 status={i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'pending'}
                 onRemove={() => removeCombatant(combatant.id)}
-                onAdjustHp={delta => adjustHp(combatant.id, delta)}
+                onAdjustHp={delta => handleAdjustHp(combatant, delta)}
                 onUpdateInitiative={val => updateInitiative(combatant.id, val)}
               />
             ))}
