@@ -5,6 +5,7 @@ export interface Combatant {
   hp: number | null
   maxHp: number | null
   isPlayer: boolean
+  imageUrl?: string
 }
 
 export type CombatantStatus = 'current' | 'pending' | 'done'

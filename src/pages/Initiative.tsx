@@ -30,6 +30,7 @@ function Initiative() {
         hp: char.currentHP,
         maxHp: char.maxHP,
         isPlayer: true,
+        imageUrl: char.imageUrl || undefined,
       })
     })
   }
