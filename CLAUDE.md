@@ -1,6 +1,6 @@
 # DnDKeeper
 
-Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite organizar sons, artes e personagens durante as sessões. Projetada para ser acessada pelo mestre e pelos jogadores em produção.
+Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite organizar sons, artes, personagens e iniciativa durante as sessões. Projetada para ser acessada pelo mestre e pelos jogadores em produção.
 
 ## Stack
 
@@ -8,10 +8,13 @@ Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite or
 |---|---|---|
 | React | 19 | com StrictMode |
 | Vite | 8 | bundler + dev server |
-| TypeScript | 5 | strict mode ativado |
+| TypeScript | 6 | strict mode ativado |
 | Tailwind CSS | v4 | via `@tailwindcss/vite`, sem `tailwind.config.js` |
 | React Router | v7 | com `BrowserRouter` no `main.tsx` |
 | Axios | 1.15.0 | versão segura (1.14.1 e 0.30.4 foram comprometidas em supply chain attack) |
+| React Hook Form | 7 | formulários com validação — sempre com `zodResolver` |
+| Zod | 4 | schemas de validação em `src/schemas/` |
+| @hookform/resolvers | 5 | ponte entre RHF e Zod |
 
 ## Linguagem
 
@@ -22,56 +25,93 @@ Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite or
 ```
 src/
 ├── assets/
-│   └── logo.png
+│   ├── logo.png
+│   └── arts/                               # Imagens locais de personagens
+│       ├── 1_dante.jpeg
+│       ├── 1_samael.jpeg
+│       ├── 3_buff.jpeg
+│       └── 4_boff.jpeg
 │
-├── components/                         # Atomic Design
-│   ├── atoms/                          # Primitivos sem dependência de outros componentes
-│   │   ├── Button.tsx                  # Botão de texto: variantes primary e secondary
-│   │   ├── IconButton.tsx              # Botão quadrado para ícones, com prop active
-│   │   └── icons/                      # SVGs como componentes — props: size, className, strokeWidth
+├── components/                             # Atomic Design
+│   ├── atoms/                              # Primitivos sem dependência de outros componentes
+│   │   ├── Button.tsx                      # Botão de texto: variantes primary e secondary
+│   │   ├── IconButton.tsx                  # Botão quadrado para ícones, com prop active
+│   │   ├── TypeBadge.tsx                   # Badge PC / Monstro para combatentes
+│   │   └── icons/                          # SVGs como componentes — props: size, className, strokeWidth
 │   │       ├── ChevronLeftIcon.tsx
 │   │       ├── ChevronRightIcon.tsx
+│   │       ├── DiceIcon.tsx
 │   │       ├── ExpandIcon.tsx
 │   │       ├── EyeIcon.tsx
 │   │       ├── EyeOffIcon.tsx
 │   │       ├── ImageIcon.tsx
 │   │       ├── MusicIcon.tsx
+│   │       ├── PencilIcon.tsx
+│   │       ├── PlusIcon.tsx
 │   │       ├── RefreshIcon.tsx
+│   │       ├── SwordsIcon.tsx
+│   │       ├── TrashIcon.tsx
 │   │       ├── UsersIcon.tsx
 │   │       └── XIcon.tsx
 │   │
-│   ├── molecules/                      # Combinações de atoms com lógica de apresentação simples
-│   │   ├── GalleryEmpty.tsx            # Estado vazio com ícone e mensagem customizável
-│   │   └── ImageCard.tsx               # Card de imagem com hover, blur e ícone de expandir
+│   ├── molecules/                          # Combinações de atoms com lógica de apresentação simples
+│   │   ├── CharactersEmpty.tsx             # Estado vazio da página de personagens — com ações
+│   │   ├── GalleryEmpty.tsx                # Estado vazio genérico com ícone e mensagem
+│   │   ├── GroupHpBar.tsx                  # Barra de HP total do grupo — recebe totalHP, totalMaxHP, percentage
+│   │   ├── ImageCard.tsx                   # Card de imagem com hover, blur e ícone de expandir
+│   │   ├── InitiativeBadge.tsx             # Badge de iniciativa editável inline (clique para editar)
+│   │   └── InitiativeEmpty.tsx             # Estado vazio da página de iniciativa
 │   │
-│   └── organisms/                      # Blocos complexos com estado ou múltiplas responsabilidades
-│       ├── Lightbox.tsx                # Modal de imagem expandida — navegação por clique e teclado (←→ Esc)
-│       └── Sidebar.tsx                 # Navegação lateral colapsável com logo e rotas
+│   └── organisms/                          # Blocos complexos com estado ou múltiplas responsabilidades
+│       ├── CharacterCard.tsx               # Card completo de personagem — HP, XP, notas, ações
+│       ├── CharacterModal.tsx              # Modal de criação/edição de personagem — usa RHF + Zod
+│       ├── CombatantRow.tsx                # Linha de combatente na iniciativa — status, HP, ajustes
+│       ├── InitiativeAddForm.tsx           # Formulário de adição de combatente — usa RHF + Zod
+│       ├── Lightbox.tsx                    # Modal de imagem expandida — navegação por clique e teclado (←→ Esc)
+│       └── Sidebar.tsx                     # Navegação lateral colapsável com logo e rotas
 │
 ├── constants/
-│   └── routes.tsx                      # Fonte única das rotas: id, path, label, icon, element
+│   ├── arts.ts                             # LOCAL_ARTS (import.meta.glob), resolveImageUrl, toLocalArtUrl
+│   ├── character.ts                        # HP_DELTA_OPTIONS — deltas dos botões de ajuste de HP
+│   ├── dnd.ts                              # XP_THRESHOLDS, getLevel, getXpProgress
+│   ├── initiative.ts                       # HP_DELTAS — deltas dos botões na iniciativa
+│   └── routes.tsx                          # Fonte única das rotas: id, path, label, icon, element
 │
 ├── hooks/
-│   └── useDriveImages.ts               # Retorna { images, loading, error, sync } — sem auto-fetch
+│   ├── useCharacters.ts                    # CRUD de personagens com persistência em localStorage
+│   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
+│   └── useInitiative.ts                    # Estado da iniciativa (combatentes, turno, rodada) + localStorage
 │
 ├── pages/
-│   ├── Artes.tsx                       # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
-│   ├── Sons.tsx                        # (em construção)
-│   └── Personagens.tsx                 # (em construção)
+│   ├── Artes.tsx                           # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
+│   ├── Characters.tsx                      # Gestão de personagens — HP, XP, modal de criação/edição
+│   ├── Initiative.tsx                      # Controle de turnos de combate — lista ordenada por iniciativa
+│   ├── RandomTables.tsx                    # (em construção)
+│   └── Sounds.tsx                          # (em construção)
+│
+├── schemas/
+│   ├── character.ts                        # characterFormSchema — validação do formulário de personagem
+│   └── initiative.ts                       # combatantFormSchema — validação do formulário de combatente
 │
 ├── services/
-│   ├── api.ts                          # Instância base do Axios (baseURL + API key global)
-│   └── googleDrive.ts                  # googleDriveService.getImages() — lista imagens da pasta do Drive
+│   ├── api.ts                              # Instância base do Axios (baseURL + API key global)
+│   └── googleDrive.ts                      # googleDriveService.getImages() — lista imagens da pasta do Drive
 │
 ├── types/
-│   ├── icon.ts                         # IconProps { size, className, strokeWidth }
-│   ├── image.ts                        # DriveImage { id, name, url, fullUrl }
-│   └── route.ts                        # AppRoute { id, path, label, element, icon }
+│   ├── character.ts                        # Character { id, name, playerName, characterClass, race, currentHP, maxHP, xp, imageUrl, notes }
+│   ├── icon.ts                             # IconProps { size, className, strokeWidth }
+│   ├── image.ts                            # DriveImage { id, name, url, fullUrl }
+│   ├── initiative.ts                       # Combatant, CombatantStatus
+│   └── route.ts                            # AppRoute { id, path, label, element, icon }
 │
-├── App.tsx                             # Layout raiz: Sidebar + Routes
-├── main.tsx                            # Entry point: BrowserRouter + StrictMode
-├── index.css                           # Tailwind @import + @theme com paleta de cores
-└── vite-env.d.ts                       # Tipos das variáveis de ambiente (ImportMetaEnv)
+├── utils/
+│   ├── character.ts                        # resolveHpBarColor(percentage) — cor dinâmica da barra de HP
+│   └── number.ts                           # clampNumber, formatNumber
+│
+├── App.tsx                                 # Layout raiz: Sidebar + Routes
+├── main.tsx                                # Entry point: BrowserRouter + StrictMode
+├── index.css                               # Tailwind @import + @theme com paleta de cores
+└── vite-env.d.ts                           # Tipos das variáveis de ambiente (ImportMetaEnv)
 ```
 
 ## Variáveis de ambiente
@@ -95,6 +135,30 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 - Imagens exibidas via URL de thumbnail do Google: `https://drive.google.com/thumbnail?id={id}&sz=w800`
 - Lightbox usa tamanho maior: `sz=w2000`
 
+## Imagens locais de personagens
+
+- Artes ficam em `src/assets/arts/` e são carregadas via `import.meta.glob` em `constants/arts.ts`
+- `LOCAL_ARTS` — array com `{ key, name, url }` onde `key` é o nome do arquivo (estável entre builds)
+- `resolveImageUrl(imageUrl)` — converte qualquer formato para URL real:
+  - `"local:1_dante.jpeg"` → URL com hash do Vite
+  - `"/src/assets/arts/1_dante.jpeg"` → fallback para JSONs exportados antes da correção
+  - qualquer outra string → retorna como está (URL externa)
+- `toLocalArtUrl(key)` — gera a chave estável `"local:<filename>"`
+- **Nunca salvar a URL com hash do Vite** como `imageUrl` — ela muda a cada build. Usar sempre `"local:<filename>"`.
+
+## Formulários
+
+- Todos os formulários usam **React Hook Form** com **`zodResolver`**
+- Schemas ficam em `src/schemas/` — um arquivo por domínio
+- Tipos de input/output são exportados via `z.input<>` e `z.output<>` do próprio schema
+- Para campos numéricos, usar `z.union([z.string(), z.number()]).transform(...).pipe(z.number())` para evitar o tipo `unknown` que `z.coerce` gera no zod v4
+
+## Persistência local
+
+- `useCharacters` — persiste em `localStorage` com chave `dndkeeper_characters`
+- `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
+- Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
+
 ## Paleta de cores
 
 Definida via `@theme` no `index.css` e acessível como classes Tailwind.
@@ -113,7 +177,7 @@ Definida via `@theme` no `index.css` e acessível como classes Tailwind.
 | `white-100` | `#F5F5F5` | Texto principal |
 | `white-200` | `#EDEDED` | Texto secundário |
 | `white-300` | `#C0C0C0` | Texto desabilitado/ícones |
-| `yellow` | `#ECC83B` | Accent (reservado) |
+| `yellow` | `#ECC83B` | Accent — XP, badges PC |
 | `btn-from` | `#D72334` | Gradient início — botão primary |
 | `btn-to` | `#821325` | Gradient fim — botão primary |
 | `btn-border` | `#AA1A2C` | Borda — botão primary |
@@ -127,9 +191,17 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 | Path | Página | Status |
 |---|---|---|
 | `/` | redirect | → `/sons` |
-| `/sons` | Sons | em construção |
-| `/artes` | Artes | funcional |
-| `/personagens` | Personagens | em construção |
+| `/sons` | Sounds | em construção |
+| `/artes` | Artes | funcional — **path não renomear** (configurado na API do Drive) |
+| `/personagens` | Characters | funcional |
+| `/iniciativa` | Initiative | funcional |
+| `/tabelas` | RandomTables | em construção |
+
+## Deploy
+
+- Hospedado no **Vercel**
+- `vercel.json` na raiz configura rewrite `"/(.*)" → "/index.html"` para SPAs com `BrowserRouter`
+- Sem esse rewrite, rotas acessadas diretamente (ex: `/personagens`) retornam 404
 
 ## Convenções
 
@@ -139,4 +211,5 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - **Estilos globais** extras entram dentro de `@layer base {}` no `index.css` — estilos fora de `@layer` sobrescrevem utilities do Tailwind
 - **BrowserRouter** vive no `main.tsx`; `App.tsx` só contém layout e rotas
 - **Serviços REST** usam instância do Axios de `services/api.ts`, nunca `fetch` direto
-- **Hooks** não fazem auto-fetch com `useEffect` — expõem funções de trigger explícitas
+- **Hooks** não fazem auto-fetch com `useEffect` — expõem funções de trigger explícitas ou carregam estado na inicialização
+- **Nomes de arquivo em inglês** — exceto `Artes.tsx` (path da rota está configurado na API)

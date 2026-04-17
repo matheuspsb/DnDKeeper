@@ -11,7 +11,7 @@ import CharacterModal from '../components/organisms/CharacterModal'
 
 // ─── Página ──────────────────────────────────────────────────────────────────
 
-function Personagens() {
+function Characters() {
   const { characters, addCharacter, updateCharacter, deleteCharacter, exportJSON, importJSON } =
     useCharacters()
 
@@ -130,4 +130,4 @@ function Personagens() {
   )
 }
 
-export default Personagens
+export default Characters
