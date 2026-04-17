@@ -35,7 +35,10 @@ function XpResultPanel({ result, partySize, monsterCount }: XpResultPanelProps) 
       <div className="flex items-center justify-between">
         <span className="text-white-100 font-semibold text-sm">Resultado</span>
         {!isEmpty && (
-          <span className={`text-xs font-bold px-3 py-1 rounded-full border ${DIFFICULTY_BG[difficulty]} ${DIFFICULTY_COLOR[difficulty]}`}>
+          <span
+            key={difficulty}
+            className={`difficulty-badge-enter text-xs font-bold px-3 py-1 rounded-full border ${DIFFICULTY_BG[difficulty]} ${DIFFICULTY_COLOR[difficulty]}`}
+          >
             {DIFFICULTY_LABEL[difficulty]}
           </span>
         )}

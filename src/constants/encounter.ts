@@ -76,6 +76,8 @@ export const DIFFICULTY_COLOR: Record<EncounterDifficulty, string> = {
   deadly: 'text-red-100',
 }
 
+export const DIFFICULTY_ORDER: EncounterDifficulty[] = ['trivial', 'easy', 'medium', 'hard', 'deadly']
+
 export const DIFFICULTY_BG: Record<EncounterDifficulty, string> = {
   trivial: 'bg-black-200',
   easy: 'bg-emerald-600/20 border-emerald-600/40',

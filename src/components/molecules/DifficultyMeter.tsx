@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import type { DifficultyThresholds, EncounterDifficulty } from '../../types/encounter'
-import { DIFFICULTY_LABEL } from '../../constants/encounter'
+import { DIFFICULTY_LABEL, DIFFICULTY_ORDER } from '../../constants/encounter'
 import { formatNumber } from '../../utils/number'
+import { spawnParticles, type Particle } from '../../utils/encounter'
 
 interface DifficultyMeterProps {
   thresholds: DifficultyThresholds
@@ -8,15 +10,32 @@ interface DifficultyMeterProps {
   difficulty: EncounterDifficulty
 }
 
-const ZONE_COLORS = [
-  'bg-white-300/10',
-  'bg-emerald-600/50',
-  'bg-yellow/50',
-  'bg-orange-500/50',
-  'bg-red-100/60',
-]
+const ZONE_COLORS: Record<string, string> = {
+  Trivial: 'bg-white-300/10',
+  Fácil: 'bg-emerald-600/50',
+  Médio: 'bg-yellow/50',
+  Difícil: 'bg-orange-500/50',
+  Mortal: 'bg-red-100/60',
+}
+
+const PARTICLE_COLOR: Record<EncounterDifficulty, string> = {
+  trivial: 'bg-white-300/40',
+  easy: 'bg-emerald-400',
+  medium: 'bg-yellow',
+  hard: 'bg-orange-400',
+  deadly: 'bg-red-100',
+}
 
 function DifficultyMeter({ thresholds, adjustedXp, difficulty }: DifficultyMeterProps) {
+  const [prevDifficulty, setPrevDifficulty] = useState<EncounterDifficulty>(difficulty)
+  const [particles, setParticles] = useState<Particle[]>([])
+
+  if (prevDifficulty !== difficulty) {
+    const upgraded = DIFFICULTY_ORDER.indexOf(difficulty) > DIFFICULTY_ORDER.indexOf(prevDifficulty)
+    setPrevDifficulty(difficulty)
+    setParticles(adjustedXp > 0 ? spawnParticles(upgraded ? 10 : 6) : [])
+  }
+
   const hasParty = thresholds.easy > 0
 
   if (!hasParty) {
@@ -29,48 +48,70 @@ function DifficultyMeter({ thresholds, adjustedXp, difficulty }: DifficultyMeter
 
   const cap = thresholds.deadly * 1.5
   const zones = [
-    { label: 'Trivial', xpStart: 0, xpEnd: thresholds.easy },
-    { label: DIFFICULTY_LABEL.easy, xpStart: thresholds.easy, xpEnd: thresholds.medium },
-    { label: DIFFICULTY_LABEL.medium, xpStart: thresholds.medium, xpEnd: thresholds.hard },
-    { label: DIFFICULTY_LABEL.hard, xpStart: thresholds.hard, xpEnd: thresholds.deadly },
-    { label: DIFFICULTY_LABEL.deadly, xpStart: thresholds.deadly, xpEnd: cap },
+    { label: 'Trivial', diff: 'trivial' as EncounterDifficulty, xpStart: 0, xpEnd: thresholds.easy },
+    { label: DIFFICULTY_LABEL.easy, diff: 'easy' as EncounterDifficulty, xpStart: thresholds.easy, xpEnd: thresholds.medium },
+    { label: DIFFICULTY_LABEL.medium, diff: 'medium' as EncounterDifficulty, xpStart: thresholds.medium, xpEnd: thresholds.hard },
+    { label: DIFFICULTY_LABEL.hard, diff: 'hard' as EncounterDifficulty, xpStart: thresholds.hard, xpEnd: thresholds.deadly },
+    { label: DIFFICULTY_LABEL.deadly, diff: 'deadly' as EncounterDifficulty, xpStart: thresholds.deadly, xpEnd: cap },
   ]
 
-  const markerPct = Math.min(100, (adjustedXp / cap) * 100)
-  const isActive = (idx: number) => idx === ['trivial', 'easy', 'medium', 'hard', 'deadly'].indexOf(difficulty)
+  const markerPct = Math.min(99.5, (adjustedXp / cap) * 100)
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative h-8 flex rounded-lg overflow-hidden gap-px">
-        {zones.map((zone, idx) => {
-          const width = ((zone.xpEnd - zone.xpStart) / cap) * 100
-          return (
-            <div
-              key={zone.label}
-              className={`h-full transition-opacity ${ZONE_COLORS[idx]} ${isActive(idx) ? 'opacity-100' : 'opacity-40'}`}
-              style={{ width: `${width}%` }}
-            />
-          )
-        })}
+      <div className="relative h-8">
+        <div className="absolute inset-0 flex rounded-lg overflow-hidden gap-px">
+          {zones.map(zone => {
+            const width = ((zone.xpEnd - zone.xpStart) / cap) * 100
+            const active = zone.diff === difficulty
+            return (
+              <div
+                key={zone.label}
+                className={`relative h-full overflow-hidden transition-opacity duration-400 ${ZONE_COLORS[zone.label]} ${active ? 'opacity-100' : 'opacity-35'}`}
+                style={{ width: `${width}%` }}
+              >
+                {active && <div className="shimmer-child absolute inset-0" />}
+              </div>
+            )
+          })}
+        </div>
 
         {adjustedXp > 0 && (
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-white-100 shadow-[0_0_4px_rgba(255,255,255,0.8)]"
+            className="meter-marker absolute top-0 bottom-0 w-0.5 bg-white-100 rounded-full"
             style={{ left: `${markerPct}%` }}
-          />
+          >
+            {particles.map((particle: Particle) => (
+              <div
+                key={particle.id}
+                className={`encounter-particle absolute rounded-full ${PARTICLE_COLOR[difficulty]}`}
+                style={{
+                  width: particle.size,
+                  height: particle.size,
+                  top: '50%',
+                  left: '50%',
+                  marginLeft: -particle.size / 2,
+                  animationDelay: `${particle.delay}ms`,
+                  '--dx': `${particle.dx}px`,
+                  '--dy': `${particle.dy}px`,
+                } as React.CSSProperties}
+              />
+            ))}
+          </div>
         )}
       </div>
 
-      <div className="flex" style={{ position: 'relative' }}>
-        {zones.map((zone, idx) => {
+      <div className="flex">
+        {zones.map(zone => {
           const width = ((zone.xpEnd - zone.xpStart) / cap) * 100
+          const active = zone.diff === difficulty
           return (
             <div key={zone.label} style={{ width: `${width}%` }} className="flex flex-col items-start">
-              <span className={`text-[10px] font-medium truncate ${isActive(idx) ? 'text-white-100' : 'text-white-300/40'}`}>
+              <span className={`text-[10px] font-medium truncate transition-colors duration-300 ${active ? 'text-white-100' : 'text-white-300/35'}`}>
                 {zone.label}
               </span>
-              {idx > 0 && (
-                <span className="text-[9px] text-white-300/30">
+              {zone.xpStart > 0 && (
+                <span className={`text-[9px] transition-colors duration-300 ${active ? 'text-white-300/60' : 'text-white-300/25'}`}>
                   {formatNumber(zone.xpStart)}
                 </span>
               )}

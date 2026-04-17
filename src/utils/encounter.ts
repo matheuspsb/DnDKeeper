@@ -1,6 +1,28 @@
 import type { EncounterDifficulty, EncounterResult, DifficultyThresholds, PartyMember, MonsterEntry } from '../types/encounter'
 import { CR_XP, THRESHOLDS_PER_LEVEL, getEncounterMultiplier } from '../constants/encounter'
 
+export interface Particle {
+  id: number
+  dx: number
+  dy: number
+  size: number
+  delay: number
+}
+
+export function spawnParticles(count: number): Particle[] {
+  return Array.from({ length: count }, (_, i) => {
+    const angle = ((360 / count) * i + Math.random() * 20 - 10) * (Math.PI / 180)
+    const dist = 18 + Math.random() * 18
+    return {
+      id: Date.now() + i,
+      dx: Math.cos(angle) * dist,
+      dy: Math.sin(angle) * dist,
+      size: 4 + Math.random() * 4,
+      delay: Math.random() * 80,
+    }
+  })
+}
+
 export function getThresholdsForLevel(level: number): [number, number, number, number] {
   return THRESHOLDS_PER_LEVEL[Math.max(1, Math.min(20, level)) - 1]
 }

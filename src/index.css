@@ -55,6 +55,48 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Difficulty meter ───────────────────────────────────────────────────── */
+
+@keyframes marker-pulse {
+  0%, 100% { box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.15); }
+  50%       { box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3); }
+}
+
+.meter-marker {
+  animation: marker-pulse 1.8s ease-in-out infinite;
+  transition: left 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-180%); }
+  100% { transform: translateX(280%); }
+}
+
+.shimmer-child {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%);
+  animation: shimmer-sweep 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes particle-burst {
+  from { transform: translate(0px, -50%); opacity: 1; scale: 1; }
+  to   { transform: translate(var(--dx), calc(-50% + var(--dy))); opacity: 0; scale: 0; }
+}
+
+.encounter-particle {
+  animation: particle-burst 0.65s ease-out forwards;
+}
+
+@keyframes difficulty-badge-enter {
+  0%   { opacity: 0; transform: scale(0.7) translateY(-4px); }
+  60%  { transform: scale(1.08) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.difficulty-badge-enter {
+  animation: difficulty-badge-enter 0.35s ease-out forwards;
+}
+
 /* ── Animação de resultado de tabela aleatória ──────────────────────────── */
 
 @keyframes roll-in {
