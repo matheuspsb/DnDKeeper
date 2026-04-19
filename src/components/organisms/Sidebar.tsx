@@ -19,7 +19,7 @@ function Sidebar() {
   return (
     <aside
       className={`
-        relative flex flex-col bg-black-400 border-r border-black-200 min-h-screen
+        relative flex flex-col bg-black-400 border-r border-black-200 h-full
         transition-all duration-300 ease-in-out shrink-0
         ${open ? 'w-56' : 'w-16'}
       `}

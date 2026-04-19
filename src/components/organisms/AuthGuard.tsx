@@ -16,9 +16,9 @@ function AuthGuard() {
   if (!user) return <Navigate to="/login" replace />
 
   return (
-    <div className="min-h-screen bg-black-500 flex">
+    <div className="h-screen bg-black-500 flex overflow-hidden">
       <Sidebar />
-      <main className="flex-1 min-h-screen flex flex-col">
+      <main className="flex-1 overflow-y-auto flex flex-col">
         <Outlet />
       </main>
     </div>
