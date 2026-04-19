@@ -6,4 +6,5 @@ export interface AppRoute {
   label: string
   element: ReactElement
   icon: ReactElement
+  dmOnly?: boolean
 }

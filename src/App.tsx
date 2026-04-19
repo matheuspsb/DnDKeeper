@@ -1,20 +1,31 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import Sidebar from './components/organisms/Sidebar'
+import type { ReactElement } from 'react'
+import AuthGuard from './components/organisms/AuthGuard'
+import Login from './pages/Login'
 import { ROUTES } from './constants/routes'
+import { useAuth } from './contexts/AuthContext'
+
+function DmOnly({ children }: { children: ReactElement }) {
+  const { user } = useAuth()
+  if (user?.role === 'guest') return <Navigate to="/artes" replace />
+  return children
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-black-500 flex">
-      <Sidebar />
-      <main className="flex-1">
-        <Routes>
-          <Route index element={<Navigate to="/sons" replace />} />
-          {ROUTES.map((route) => (
-            <Route key={route.id} path={route.path} element={route.element} />
-          ))}
-        </Routes>
-      </main>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route element={<AuthGuard />}>
+        <Route index element={<Navigate to="/artes" replace />} />
+        {ROUTES.map((route) => (
+          <Route
+            key={route.id}
+            path={route.path}
+            element={route.dmOnly ? <DmOnly>{route.element}</DmOnly> : route.element}
+          />
+        ))}
+      </Route>
+    </Routes>
   )
 }
 

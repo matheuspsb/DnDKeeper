@@ -19,6 +19,7 @@ export const ROUTES: AppRoute[] = [
     label: 'Sons',
     element: <Sounds />,
     icon: <MusicIcon />,
+    dmOnly: true,
   },
   {
     id: 'artes',
@@ -33,6 +34,7 @@ export const ROUTES: AppRoute[] = [
     label: 'Personagens',
     element: <Characters />,
     icon: <UsersIcon />,
+    dmOnly: true,
   },
   {
     id: 'iniciativa',
@@ -40,6 +42,7 @@ export const ROUTES: AppRoute[] = [
     label: 'Iniciativa',
     element: <Initiative />,
     icon: <SwordsIcon />,
+    dmOnly: true,
   },
   {
     id: 'tabelas',
@@ -47,6 +50,7 @@ export const ROUTES: AppRoute[] = [
     label: 'Tabelas',
     element: <RandomTables />,
     icon: <DiceIcon />,
+    dmOnly: true,
   },
   {
     id: 'encontro',
@@ -54,5 +58,6 @@ export const ROUTES: AppRoute[] = [
     label: 'Encontro',
     element: <Encounter />,
     icon: <StarIcon />,
+    dmOnly: true,
   },
 ]

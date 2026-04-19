@@ -1,11 +1,20 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
+import LogOutIcon from '../atoms/icons/LogOutIcon'
 import { ROUTES } from '../../constants/routes'
+import { useAuth } from '../../contexts/AuthContext'
 
 function Sidebar() {
   const [open, setOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <aside
@@ -25,7 +34,7 @@ function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 p-2 mt-2">
-        {ROUTES.map((route) => (
+        {ROUTES.filter(route => !route.dmOnly || user?.role === 'dm').map((route) => (
           <NavLink
             key={route.id}
             to={route.path}
@@ -55,6 +64,19 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="mt-auto p-2 border-t border-black-200">
+        <button
+          onClick={handleLogout}
+          title={!open ? 'Sair' : undefined}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-white-300 hover:bg-black-300 hover:text-red-100 transition-colors duration-150 overflow-hidden"
+        >
+          <LogOutIcon size={18} className="shrink-0" />
+          {open && (
+            <span className="text-sm font-medium whitespace-nowrap">Sair</span>
+          )}
+        </button>
+      </div>
 
       <button
         onClick={() => setOpen(!open)}
