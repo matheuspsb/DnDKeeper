@@ -54,6 +54,19 @@
     background: #b91324;
   }
 
+  input {
+    transition: background-color 9999s ease-in-out, color 9999s ease-in-out;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #1e1f23 inset;
+    -webkit-text-fill-color: #f5f5f5;
+    caret-color: #f5f5f5;
+    border-color: #34353e !important;
+  }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -76,8 +89,13 @@ body {
 /* ── Difficulty meter ───────────────────────────────────────────────────── */
 
 @keyframes marker-pulse {
-  0%, 100% { box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.15); }
-  50%       { box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3); }
+  0%,
+  100% {
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3);
+  }
 }
 
 .meter-marker {
@@ -86,19 +104,36 @@ body {
 }
 
 @keyframes shimmer-sweep {
-  0%   { transform: translateX(-180%); }
-  100% { transform: translateX(280%); }
+  0% {
+    transform: translateX(-180%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
 }
 
 .shimmer-child {
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
   animation: shimmer-sweep 2.2s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes particle-burst {
-  from { transform: translate(0px, -50%); opacity: 1; scale: 1; }
-  to   { transform: translate(var(--dx), calc(-50% + var(--dy))); opacity: 0; scale: 0; }
+  from {
+    transform: translate(0px, -50%);
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    transform: translate(var(--dx), calc(-50% + var(--dy)));
+    opacity: 0;
+    scale: 0;
+  }
 }
 
 .encounter-particle {
@@ -106,9 +141,17 @@ body {
 }
 
 @keyframes difficulty-badge-enter {
-  0%   { opacity: 0; transform: scale(0.7) translateY(-4px); }
-  60%  { transform: scale(1.08) translateY(0); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-4px);
+  }
+  60% {
+    transform: scale(1.08) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .difficulty-badge-enter {
