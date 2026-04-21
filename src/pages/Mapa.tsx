@@ -3,11 +3,17 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import GalleryEmpty from '../components/molecules/GalleryEmpty'
 import { useMapRuler } from '../hooks/useMapRuler'
-import type { Point } from '../hooks/useMapRuler'
+import { useMapInteraction } from '../hooks/useMapInteraction'
 import { toImageUrl } from '../services/googleDrive'
 
 const MAP_FILE_ID = import.meta.env.VITE_GOOGLE_DRIVE_MAP_FILE_ID as string
 const MAP_SIZE = 'w6000'
+
+const SVG_MARKER_PX = 7
+const SVG_STROKE_PX = 2
+const SVG_DASH_PX = 16
+const SVG_GAP_PX = 8
+const SVG_FONT_PX = 26
 
 function Mapa() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -18,7 +24,7 @@ function Mapa() {
   const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
 
   const ruler = useMapRuler()
-  const [mousePos, setMousePos] = useState<Point | null>(null)
+  const interaction = useMapInteraction(transformRef, currentScale)
 
   function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.currentTarget
@@ -38,50 +44,29 @@ function Mapa() {
     setImageReady(true)
   }
 
-  function getImageCoords(e: React.MouseEvent<HTMLDivElement>): Point {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const scale = transformRef.current?.state.scale ?? currentScale
-    return {
-      x: (e.clientX - rect.left) / scale,
-      y: (e.clientY - rect.top) / scale,
-    }
-  }
-
   function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
     if (ruler.mode === 'idle') return
-    ruler.addPoint(getImageCoords(e))
-    setMousePos(null)
+    ruler.addPoint(interaction.getImageCoords(e))
+    interaction.clearMousePos()
   }
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (ruler.mode === 'idle' || ruler.points.length !== 1) return
-    setMousePos(getImageCoords(e))
-  }
+  // SVG sizes scale inversely with zoom to stay visually constant
+  const markerRadius = SVG_MARKER_PX / currentScale
+  const strokeWidth = SVG_STROKE_PX / currentScale
+  const strokeDasharray = `${SVG_DASH_PX / currentScale} ${SVG_GAP_PX / currentScale}`
+  const fontSize = SVG_FONT_PX / currentScale
 
-  function handleMouseLeave() {
-    setMousePos(null)
-  }
-
-  function getPreviewDistance(from: Point, to: Point): string | null {
-    if (ruler.pixelsPerMile === null || ruler.mode !== 'measuring') return null
-    const pixels = Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2)
-    const miles = pixels / ruler.pixelsPerMile
-    if (miles < 1) return `${(miles * 5280).toFixed(0)} ft`
-    if (miles < 10) return `${miles.toFixed(1)} mi`
-    return `${Math.round(miles)} mi`
-  }
-
-  // SVG element sizes stay visually constant regardless of zoom
-  const markerRadius = 7 / currentScale
-  const strokeWidth = 2 / currentScale
-  const dashLen = 16 / currentScale
-  const gapLen = 8 / currentScale
-  const fontSize = 26 / currentScale
+  const rulerColor = ruler.mode === 'calibrating' ? '#ECC83B' : '#D72334'
+  const rulerColorFill = ruler.mode === 'calibrating' ? '#ECC83B33' : '#D7233433'
 
   const distance = ruler.getDistance()
   const midpoint = ruler.getMidpoint()
+  const previewLabel = interaction.mousePos !== null
+    ? ruler.getPreviewDistance(interaction.mousePos)
+    : null
 
   const inRulerMode = ruler.mode !== 'idle'
+  const showPreviewLine = ruler.points.length === 1 && interaction.mousePos !== null
 
   if (!MAP_FILE_ID) {
     return (
@@ -108,7 +93,6 @@ function Mapa() {
           </div>
         )}
 
-        {/* Hint bar */}
         {inRulerMode && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-black-300/90 border border-black-100 text-white-300 text-xs pointer-events-none">
             {ruler.mode === 'calibrating' && ruler.points.length === 0 && 'Clique no ponto inicial da distância de referência'}
@@ -131,14 +115,10 @@ function Mapa() {
         >
           {({ zoomIn, zoomOut }) => (
             <>
-              {/* Zoom + ruler controls */}
               <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
-                {/* Ruler tools */}
                 <div className="flex items-center gap-1.5 pr-2 border-r border-black-100">
                   {ruler.pixelsPerMile !== null && (
-                    <span className="text-xs text-white-300 mr-1">
-                      Calibrado ✓
-                    </span>
+                    <span className="text-xs text-white-300 mr-1">Calibrado ✓</span>
                   )}
                   <button
                     onClick={ruler.mode === 'calibrating' ? ruler.exitRuler : ruler.enterCalibrate}
@@ -165,7 +145,6 @@ function Mapa() {
                   </button>
                 </div>
 
-                {/* Zoom controls */}
                 <button
                   onClick={() => zoomOut()}
                   className="w-8 h-8 rounded bg-black-300 border border-black-100 text-white-100 text-lg leading-none hover:bg-black-200 transition-colors cursor-pointer"
@@ -193,8 +172,8 @@ function Mapa() {
                 <div
                   style={{ position: 'relative', display: 'inline-block' }}
                   onClick={handleMapClick}
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
+                  onMouseMove={interaction.handleMouseMove}
+                  onMouseLeave={interaction.handleMouseLeave}
                 >
                   <img
                     src={toImageUrl(MAP_FILE_ID, MAP_SIZE)}
@@ -205,7 +184,6 @@ function Mapa() {
                     className={`select-none max-w-none transition-opacity duration-500 ${imageReady ? 'opacity-100' : 'opacity-0'}`}
                   />
 
-                  {/* SVG overlay — visuals only, pointerEvents none so drag-to-pan still works */}
                   {imgSize && (
                     <svg
                       width={imgSize.width}
@@ -213,71 +191,55 @@ function Mapa() {
                       viewBox={`0 0 ${imgSize.width} ${imgSize.height}`}
                       style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', userSelect: 'none' }}
                     >
-                      {/* Preview line following the mouse before second point is placed */}
-                      {ruler.points.length === 1 && mousePos && (
+                      {showPreviewLine && (
                         <>
                           <line
                             x1={ruler.points[0].x} y1={ruler.points[0].y}
-                            x2={mousePos.x} y2={mousePos.y}
-                            stroke={ruler.mode === 'calibrating' ? '#ECC83B' : '#D72334'}
+                            x2={interaction.mousePos!.x} y2={interaction.mousePos!.y}
+                            stroke={rulerColor}
                             strokeWidth={strokeWidth * 2}
-                            strokeDasharray={`${dashLen} ${gapLen}`}
+                            strokeDasharray={strokeDasharray}
                             strokeLinecap="round"
                             opacity={0.6}
                           />
-                          {(() => {
-                            const label = getPreviewDistance(ruler.points[0], mousePos)
-                            if (!label) return null
-                            return (
-                              <text
-                                x={(ruler.points[0].x + mousePos.x) / 2}
-                                y={(ruler.points[0].y + mousePos.y) / 2 - markerRadius * 2.5}
-                                fontSize={fontSize}
-                                textAnchor="middle"
-                                dominantBaseline="auto"
-                                fill="white"
-                                stroke="#17181C"
-                                strokeWidth={fontSize * 0.18}
-                                paintOrder="stroke"
-                                fontWeight="600"
-                                opacity={0.7}
-                              >
-                                {label}
-                              </text>
-                            )
-                          })()}
+                          {previewLabel && (
+                            <text
+                              x={(ruler.points[0].x + interaction.mousePos!.x) / 2}
+                              y={(ruler.points[0].y + interaction.mousePos!.y) / 2 - markerRadius * 2.5}
+                              fontSize={fontSize}
+                              textAnchor="middle"
+                              dominantBaseline="auto"
+                              fill="white"
+                              stroke="#17181C"
+                              strokeWidth={fontSize * 0.18}
+                              paintOrder="stroke"
+                              fontWeight="600"
+                              opacity={0.7}
+                            >
+                              {previewLabel}
+                            </text>
+                          )}
                         </>
                       )}
 
-                      {/* Line between points */}
                       {ruler.points.length === 2 && (
                         <line
                           x1={ruler.points[0].x} y1={ruler.points[0].y}
                           x2={ruler.points[1].x} y2={ruler.points[1].y}
-                          stroke={ruler.mode === 'calibrating' ? '#ECC83B' : '#D72334'}
+                          stroke={rulerColor}
                           strokeWidth={strokeWidth * 2}
-                          strokeDasharray={`${dashLen} ${gapLen}`}
+                          strokeDasharray={strokeDasharray}
                           strokeLinecap="round"
                         />
                       )}
 
-                      {/* Endpoint markers */}
                       {ruler.points.map((point, index) => (
                         <g key={index}>
-                          <circle
-                            cx={point.x} cy={point.y} r={markerRadius * 1.8}
-                            fill={ruler.mode === 'calibrating' ? '#ECC83B33' : '#D7233433'}
-                          />
-                          <circle
-                            cx={point.x} cy={point.y} r={markerRadius}
-                            fill={ruler.mode === 'calibrating' ? '#ECC83B' : '#D72334'}
-                            stroke="white"
-                            strokeWidth={strokeWidth}
-                          />
+                          <circle cx={point.x} cy={point.y} r={markerRadius * 1.8} fill={rulerColorFill} />
+                          <circle cx={point.x} cy={point.y} r={markerRadius} fill={rulerColor} stroke="white" strokeWidth={strokeWidth} />
                         </g>
                       ))}
 
-                      {/* Distance label */}
                       {distance && midpoint && (
                         <text
                           x={midpoint.x}
@@ -302,7 +264,6 @@ function Mapa() {
           )}
         </TransformWrapper>
 
-        {/* Calibration input modal */}
         {ruler.showCalibInput && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black-500/70">
             <div className="bg-black-300 border border-black-100 rounded-xl p-6 flex flex-col gap-4 w-80">

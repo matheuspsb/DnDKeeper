@@ -84,6 +84,11 @@ export function useMapRuler() {
     return formatMiles(pixelDist(points[0], points[1]) / pixelsPerMile)
   }
 
+  function getPreviewDistance(to: Point): string | null {
+    if (pixelsPerMile === null || mode !== 'measuring' || points.length !== 1) return null
+    return formatMiles(pixelDist(points[0], to) / pixelsPerMile)
+  }
+
   function getMidpoint(): Point | null {
     if (points.length < 2) return null
     return {
@@ -97,6 +102,6 @@ export function useMapRuler() {
     showCalibInput, calibMiles, setCalibMiles,
     enterCalibrate, enterMeasure, exitRuler,
     addPoint, confirmCalibration, cancelCalibration,
-    getDistance, getMidpoint,
+    getDistance, getPreviewDistance, getMidpoint,
   }
 }
