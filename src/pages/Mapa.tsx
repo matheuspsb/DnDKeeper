@@ -18,6 +18,7 @@ function Mapa() {
   const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
 
   const ruler = useMapRuler()
+  const [mousePos, setMousePos] = useState<Point | null>(null)
 
   function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.currentTarget
@@ -37,15 +38,37 @@ function Mapa() {
     setImageReady(true)
   }
 
-  function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (ruler.mode === 'idle') return
+  function getImageCoords(e: React.MouseEvent<HTMLDivElement>): Point {
     const rect = e.currentTarget.getBoundingClientRect()
     const scale = transformRef.current?.state.scale ?? currentScale
-    const point: Point = {
+    return {
       x: (e.clientX - rect.left) / scale,
       y: (e.clientY - rect.top) / scale,
     }
-    ruler.addPoint(point)
+  }
+
+  function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (ruler.mode === 'idle') return
+    ruler.addPoint(getImageCoords(e))
+    setMousePos(null)
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (ruler.mode === 'idle' || ruler.points.length !== 1) return
+    setMousePos(getImageCoords(e))
+  }
+
+  function handleMouseLeave() {
+    setMousePos(null)
+  }
+
+  function getPreviewDistance(from: Point, to: Point): string | null {
+    if (ruler.pixelsPerMile === null || ruler.mode !== 'measuring') return null
+    const pixels = Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2)
+    const miles = pixels / ruler.pixelsPerMile
+    if (miles < 1) return `${(miles * 5280).toFixed(0)} ft`
+    if (miles < 10) return `${miles.toFixed(1)} mi`
+    return `${Math.round(miles)} mi`
   }
 
   // SVG element sizes stay visually constant regardless of zoom
@@ -170,6 +193,8 @@ function Mapa() {
                 <div
                   style={{ position: 'relative', display: 'inline-block' }}
                   onClick={handleMapClick}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <img
                     src={toImageUrl(MAP_FILE_ID, MAP_SIZE)}
@@ -188,6 +213,42 @@ function Mapa() {
                       viewBox={`0 0 ${imgSize.width} ${imgSize.height}`}
                       style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', userSelect: 'none' }}
                     >
+                      {/* Preview line following the mouse before second point is placed */}
+                      {ruler.points.length === 1 && mousePos && (
+                        <>
+                          <line
+                            x1={ruler.points[0].x} y1={ruler.points[0].y}
+                            x2={mousePos.x} y2={mousePos.y}
+                            stroke={ruler.mode === 'calibrating' ? '#ECC83B' : '#D72334'}
+                            strokeWidth={strokeWidth * 2}
+                            strokeDasharray={`${dashLen} ${gapLen}`}
+                            strokeLinecap="round"
+                            opacity={0.6}
+                          />
+                          {(() => {
+                            const label = getPreviewDistance(ruler.points[0], mousePos)
+                            if (!label) return null
+                            return (
+                              <text
+                                x={(ruler.points[0].x + mousePos.x) / 2}
+                                y={(ruler.points[0].y + mousePos.y) / 2 - markerRadius * 2.5}
+                                fontSize={fontSize}
+                                textAnchor="middle"
+                                dominantBaseline="auto"
+                                fill="white"
+                                stroke="#17181C"
+                                strokeWidth={fontSize * 0.18}
+                                paintOrder="stroke"
+                                fontWeight="600"
+                                opacity={0.7}
+                              >
+                                {label}
+                              </text>
+                            )
+                          })()}
+                        </>
+                      )}
+
                       {/* Line between points */}
                       {ruler.points.length === 2 && (
                         <line
