@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { DriveImage } from '../../types/image'
+import { stripImageFlags } from '../../utils/image'
 import ChevronLeftIcon from '../atoms/icons/ChevronLeftIcon'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
 import XIcon from '../atoms/icons/XIcon'
@@ -55,7 +56,7 @@ function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
           className="max-h-[88vh] max-w-full object-contain rounded-lg shadow-2xl"
         />
         {image.name && (
-          <p className="text-center text-white-300 text-sm mt-3">{image.name}</p>
+          <p className="text-center text-white-300 text-sm mt-3">{stripImageFlags(image.name)}</p>
         )}
       </div>
 

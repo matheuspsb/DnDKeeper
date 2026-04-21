@@ -73,6 +73,7 @@ function Artes() {
               key={img.id}
               image={img}
               blurred={blurred}
+              dead={img.name.includes('_dead')}
               onClick={setSelected}
             />
           ))}
