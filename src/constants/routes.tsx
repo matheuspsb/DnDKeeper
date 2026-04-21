@@ -1,11 +1,13 @@
 import MusicIcon from '../components/atoms/icons/MusicIcon'
 import ImageIcon from '../components/atoms/icons/ImageIcon'
+import MapIcon from '../components/atoms/icons/MapIcon'
 import UsersIcon from '../components/atoms/icons/UsersIcon'
 import SwordsIcon from '../components/atoms/icons/SwordsIcon'
 import DiceIcon from '../components/atoms/icons/DiceIcon'
 import StarIcon from '../components/atoms/icons/StarIcon'
 import Sounds from '../pages/Sounds'
 import Artes from '../pages/Artes'
+import Mapa from '../pages/Mapa'
 import Characters from '../pages/Characters'
 import Initiative from '../pages/Initiative'
 import RandomTables from '../pages/RandomTables'
@@ -27,6 +29,13 @@ export const ROUTES: AppRoute[] = [
     label: 'Artes',
     element: <Artes />,
     icon: <ImageIcon />,
+  },
+  {
+    id: 'mapa',
+    path: '/mapa',
+    label: 'Mapa',
+    element: <Mapa />,
+    icon: <MapIcon />,
   },
   {
     id: 'personagens',

@@ -21,24 +21,26 @@ function toImageUrl(id: string, size: string): string {
   return `${base}?id=${id}&sz=${size}`
 }
 
-function toImage(file: DriveFile): DriveImage {
-  return {
+
+async function fetchImages(folderId: string, thumbSize: string, fullSize: string): Promise<DriveImage[]> {
+  const { data } = await api.get<DriveFilesResponse>('/files', {
+    params: {
+      q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
+      fields: 'files(id,name)',
+      pageSize: 100,
+    },
+  })
+  return data.files.map((file) => ({
     id: file.id,
     name: file.name.replace(/\.[^.]+$/, ''),
-    url: toImageUrl(file.id, THUMBNAIL_SIZE),
-    fullUrl: toImageUrl(file.id, FULLSIZE),
-  }
+    url: toImageUrl(file.id, thumbSize),
+    fullUrl: toImageUrl(file.id, fullSize),
+  }))
 }
 
 export const googleDriveService = {
   async getImages(): Promise<DriveImage[]> {
-    const { data } = await api.get<DriveFilesResponse>('/files', {
-      params: {
-        q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
-        fields: 'files(id,name)',
-        pageSize: 100,
-      },
-    })
-    return data.files.map(toImage)
+    return fetchImages(FOLDER_ID, THUMBNAIL_SIZE, FULLSIZE)
   },
+
 }
