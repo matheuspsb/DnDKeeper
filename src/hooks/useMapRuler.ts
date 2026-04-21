@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export type RulerMode = 'idle' | 'calibrating' | 'measuring'
 export type Point = { x: number; y: number }
@@ -25,23 +25,30 @@ export function useMapRuler() {
   const [showCalibInput, setShowCalibInput] = useState(false)
   const [calibMiles, setCalibMiles] = useState('')
 
-  function enterCalibrate() {
+  const enterCalibrate = useCallback(() => {
     setMode('calibrating')
     setPoints([])
     setShowCalibInput(false)
-  }
+  }, [])
 
-  function enterMeasure() {
+  const enterMeasure = useCallback(() => {
     setMode('measuring')
     setPoints([])
-  }
+  }, [])
 
-  function exitRuler() {
+  const exitRuler = useCallback(() => {
     setMode('idle')
     setPoints([])
     setShowCalibInput(false)
     setCalibMiles('')
-  }
+  }, [])
+
+  const cancelCalibration = useCallback(() => {
+    setShowCalibInput(false)
+    setCalibMiles('')
+    setPoints([])
+    setMode('idle')
+  }, [])
 
   function addPoint(point: Point) {
     if (mode === 'calibrating') {
@@ -66,13 +73,6 @@ export function useMapRuler() {
     const newPixelsPerMile = pixelDist(points[0], points[1]) / miles
     setPixelsPerMile(newPixelsPerMile)
     localStorage.setItem(CALIBRATION_KEY, String(newPixelsPerMile))
-    setShowCalibInput(false)
-    setCalibMiles('')
-    setPoints([])
-    setMode('idle')
-  }
-
-  function cancelCalibration() {
     setShowCalibInput(false)
     setCalibMiles('')
     setPoints([])
