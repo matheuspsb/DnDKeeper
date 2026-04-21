@@ -14,7 +14,7 @@ interface DriveFilesResponse {
   files: DriveFile[]
 }
 
-function toImageUrl(id: string, size: string): string {
+export function toImageUrl(id: string, size: string): string {
   const base = import.meta.env.DEV
     ? '/drive-img'
     : 'https://drive.google.com/thumbnail'
