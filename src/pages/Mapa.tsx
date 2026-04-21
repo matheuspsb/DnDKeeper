@@ -51,6 +51,13 @@ function Mapa() {
       </div>
 
       <div ref={containerRef} className="flex-1 overflow-hidden relative bg-black-500">
+        {!imageReady && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
+            <div className="w-10 h-10 rounded-full border-2 border-black-100 border-t-red-100 animate-spin" />
+            <span className="text-white-300 text-sm">Carregando mapa...</span>
+          </div>
+        )}
+
         <TransformWrapper
           ref={transformRef}
           initialScale={0.01}
