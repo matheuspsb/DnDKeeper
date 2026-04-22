@@ -5,7 +5,7 @@ import UsersIcon from '../components/atoms/icons/UsersIcon'
 import SwordsIcon from '../components/atoms/icons/SwordsIcon'
 import DiceIcon from '../components/atoms/icons/DiceIcon'
 import StarIcon from '../components/atoms/icons/StarIcon'
-import ScrollIcon from '../components/atoms/icons/ScrollIcon'
+import MaskIcon from '../components/atoms/icons/MaskIcon'
 import NetworkIcon from '../components/atoms/icons/NetworkIcon'
 import Sounds from '../pages/Sounds'
 import Artes from '../pages/Artes'
@@ -78,7 +78,7 @@ export const ROUTES: AppRoute[] = [
     path: '/npcs',
     label: 'NPCs',
     element: <Npcs />,
-    icon: <ScrollIcon />,
+    icon: <MaskIcon />,
   },
   {
     id: 'arvore',
