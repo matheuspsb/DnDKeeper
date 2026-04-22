@@ -5,6 +5,8 @@ import UsersIcon from '../components/atoms/icons/UsersIcon'
 import SwordsIcon from '../components/atoms/icons/SwordsIcon'
 import DiceIcon from '../components/atoms/icons/DiceIcon'
 import StarIcon from '../components/atoms/icons/StarIcon'
+import ScrollIcon from '../components/atoms/icons/ScrollIcon'
+import NetworkIcon from '../components/atoms/icons/NetworkIcon'
 import Sounds from '../pages/Sounds'
 import Artes from '../pages/Artes'
 import Mapa from '../pages/Mapa'
@@ -12,6 +14,8 @@ import Characters from '../pages/Characters'
 import Initiative from '../pages/Initiative'
 import RandomTables from '../pages/RandomTables'
 import Encounter from '../pages/Encounter'
+import Npcs from '../pages/Npcs'
+import ArvoreGenealogica from '../pages/ArvoreGenealogica'
 import type { AppRoute } from '../types/route'
 
 export const ROUTES: AppRoute[] = [
@@ -68,5 +72,19 @@ export const ROUTES: AppRoute[] = [
     element: <Encounter />,
     icon: <StarIcon />,
     dmOnly: true,
+  },
+  {
+    id: 'npcs',
+    path: '/npcs',
+    label: 'NPCs',
+    element: <Npcs />,
+    icon: <ScrollIcon />,
+  },
+  {
+    id: 'arvore',
+    path: '/arvore',
+    label: 'Conexões',
+    element: <ArvoreGenealogica />,
+    icon: <NetworkIcon />,
   },
 ]
