@@ -17,12 +17,6 @@ export const LOCAL_ARTS: LocalArt[] = Object.entries(modules).map(([path, mod]) 
 
 export const LOCAL_ART_PREFIX = 'local:'
 
-/**
- * Resolve imageUrl para a URL real usada no <img src>.
- * - "local:1_dante.jpeg"         → URL com hash do Vite
- * - "/src/assets/arts/1_dante.jpeg" → fallback para JSONs exportados antes da correção
- * - qualquer outra string        → retorna como está (URL externa)
- */
 export function resolveImageUrl(imageUrl: string): string {
   if (imageUrl.startsWith(LOCAL_ART_PREFIX)) {
     const key = imageUrl.slice(LOCAL_ART_PREFIX.length)
@@ -39,4 +33,17 @@ export function resolveImageUrl(imageUrl: string): string {
 
 export function toLocalArtUrl(key: string): string {
   return `${LOCAL_ART_PREFIX}${key}`
+}
+
+/**
+ * Converts a Google Drive share URL to the thumbnail format used in <img>.
+ * https://drive.google.com/file/d/{ID}/view?... → https://drive.google.com/thumbnail?id={ID}&sz=w800
+ * Returns the input unchanged if it's not a Drive share URL.
+ */
+export function resolveDriveUrl(url: string): string {
+  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+  if (match) {
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`
+  }
+  return url
 }

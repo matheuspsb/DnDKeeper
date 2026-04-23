@@ -77,7 +77,7 @@ function Npcs() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 px-8 pt-8 pb-4 flex flex-col gap-4">
+      <div className="shrink-0 px-8 pt-4 pb-4 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-white-100 text-3xl font-bold">NPCs</h2>
