@@ -6,6 +6,7 @@ import { FACTIONS } from '../../constants/npc.constants'
 import Button from '../atoms/Button'
 import NpcModalHeader from './NpcModalHeader'
 import NpcImagePicker from './NpcImagePicker'
+import SelectArrow from '../atoms/SelectArrow'
 
 interface NpcModalProps {
   initialNpc: Npc | null
@@ -14,7 +15,7 @@ interface NpcModalProps {
 }
 
 const inputClass = `
-  w-full bg-black-500 border border-black-100 rounded-lg px-3 py-2
+  w-full bg-black-500 border border-black-100 rounded-lg px-2 py-2
   text-white-100 text-sm placeholder:text-white-300/30
   focus:outline-none focus:border-red-100 transition-colors
 `
@@ -23,6 +24,7 @@ const inputErrorClass = `
   text-white-100 text-sm placeholder:text-white-300/30
   focus:outline-none focus:border-red-100 transition-colors
 `
+const selectClass = `${inputClass} appearance-none`
 const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 const errorClass = 'text-red-100 text-xs mt-1'
 
@@ -87,20 +89,26 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Facção</label>
-              <select {...register('faction')} className={inputClass}>
-                {FACTIONS.map(f => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select {...register('faction')} className={selectClass}>
+                  {FACTIONS.map(faction => (
+                    <option key={faction} value={faction}>{faction}</option>
+                  ))}
+                </select>
+                <SelectArrow />
+              </div>
             </div>
             <div>
               <label className={labelClass}>Status</label>
-              <select {...register('status')} className={inputClass}>
-                <option value="vivo">Vivo</option>
-                <option value="morto">Morto</option>
-                <option value="desaparecido">Desaparecido</option>
-                <option value="desconhecido">Desconhecido</option>
-              </select>
+              <div className="relative">
+                <select {...register('status')} className={selectClass}>
+                  <option value="vivo">Vivo</option>
+                  <option value="morto">Morto</option>
+                  <option value="desaparecido">Desaparecido</option>
+                  <option value="desconhecido">Desconhecido</option>
+                </select>
+                <SelectArrow />
+              </div>
             </div>
           </div>
 
