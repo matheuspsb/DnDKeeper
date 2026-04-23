@@ -34,23 +34,23 @@ function NpcGraph({ npcs, relations, onDeleteRelation }: NpcGraphProps) {
   }, [relations, onDeleteRelation, setEdges])
 
   useEffect(() => {
-    setNodes(prev => {
-      const prevMap = new Map(prev.map(n => [n.id, n]))
-      const activeIds = new Set(npcs.map(n => n.id))
+    setNodes((prev) => {
+      const prevMap = new Map(prev.map((n) => [n.id, n]))
+      const activeIds = new Set(npcs.map((n) => n.id))
       const updated = prev
-        .filter(n => activeIds.has(n.id))
-        .map(n => {
-          const npc = npcs.find(p => p.id === n.id)
+        .filter((n) => activeIds.has(n.id))
+        .map((n) => {
+          const npc = npcs.find((p) => p.id === n.id)
           return npc ? { ...n, data: { npc } } : n
         })
       const existingIds = new Set(prevMap.keys())
-      const added = buildNodes(npcs).filter(n => !existingIds.has(n.id))
+      const added = buildNodes(npcs).filter((n) => !existingIds.has(n.id))
       return [...updated, ...added]
     })
   }, [npcs, setNodes])
 
   const onConnect = useCallback<OnConnect>(
-    (connection) => setEdges(eds => addEdge(connection, eds)),
+    (connection) => setEdges((eds) => addEdge(connection, eds)),
     [setEdges],
   )
 
@@ -78,8 +78,8 @@ function NpcGraph({ npcs, relations, onDeleteRelation }: NpcGraphProps) {
         <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#34353E" />
         <Controls className="[&>button]:bg-black-300 [&>button]:border-black-100 [&>button]:text-white-300 [&>button:hover]:bg-black-200" />
         <MiniMap
-          nodeColor={node => {
-            const npc = npcs.find(n => n.id === node.id)
+          nodeColor={(node) => {
+            const npc = npcs.find((n) => n.id === node.id)
             return npc ? FACTION_COLOR[npc.faction] : '#34353E'
           }}
           className="bg-black-400! border border-black-100 rounded-lg overflow-hidden"

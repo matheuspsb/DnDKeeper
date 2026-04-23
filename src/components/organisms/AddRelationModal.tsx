@@ -1,7 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Npc } from '../../types/npc.types'
-import { npcRelationFormSchema, type NpcRelationFormInput, type NpcRelationFormOutput } from '../../schemas/npcRelation.schema'
+import {
+  npcRelationFormSchema,
+  type NpcRelationFormInput,
+  type NpcRelationFormOutput,
+} from '../../schemas/npcRelation.schema'
 import { RELATION_TYPE_LABEL } from '../../constants/npc.constants'
 import Button from '../atoms/Button'
 import XIcon from '../atoms/icons/XIcon'
@@ -57,7 +61,11 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
       <div className="bg-black-400 border border-black-100 rounded-2xl w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-black-200">
           <h2 className="text-white-100 font-bold text-lg">Nova Conexão</h2>
-          <button type="button" onClick={onClose} className="text-white-300 hover:text-white-100 transition-colors p-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-white-300 hover:text-white-100 transition-colors p-1"
+          >
             <XIcon size={20} />
           </button>
         </div>
@@ -65,10 +73,15 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 flex flex-col gap-4">
           <div>
             <label className={labelClass}>NPC de Origem *</label>
-            <select {...register('sourceId')} className={errors.sourceId ? inputErrorClass : inputClass}>
+            <select
+              {...register('sourceId')}
+              className={errors.sourceId ? inputErrorClass : inputClass}
+            >
               <option value="">Selecione um NPC...</option>
-              {npcs.map(npc => (
-                <option key={npc.id} value={npc.id}>{npc.name}</option>
+              {npcs.map((npc) => (
+                <option key={npc.id} value={npc.id}>
+                  {npc.name}
+                </option>
               ))}
             </select>
             {errors.sourceId && <p className={errorClass}>{errors.sourceId.message}</p>}
@@ -78,17 +91,24 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
             <label className={labelClass}>Tipo de Relação</label>
             <select {...register('type')} className={inputClass}>
               {(Object.entries(RELATION_TYPE_LABEL) as [string, string][]).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+                <option key={value} value={value}>
+                  {label}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
             <label className={labelClass}>NPC de Destino *</label>
-            <select {...register('targetId')} className={errors.targetId ? inputErrorClass : inputClass}>
+            <select
+              {...register('targetId')}
+              className={errors.targetId ? inputErrorClass : inputClass}
+            >
               <option value="">Selecione um NPC...</option>
-              {npcs.map(npc => (
-                <option key={npc.id} value={npc.id}>{npc.name}</option>
+              {npcs.map((npc) => (
+                <option key={npc.id} value={npc.id}>
+                  {npc.name}
+                </option>
               ))}
             </select>
             {errors.targetId && <p className={errorClass}>{errors.targetId.message}</p>}
@@ -104,8 +124,12 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
           </div>
 
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">Cancelar</Button>
-            <Button type="submit" variant="primary" className="w-auto! flex-1">Conectar</Button>
+            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" className="w-auto! flex-1">
+              Conectar
+            </Button>
           </div>
         </form>
       </div>

@@ -72,12 +72,16 @@ function EncounterResultPanel({ result, partySize, monsterCount }: EncounterResu
           </div>
 
           <div className="grid grid-cols-4 gap-2">
-            {(['easy', 'medium', 'hard', 'deadly'] as const).map(level => (
+            {(['easy', 'medium', 'hard', 'deadly'] as const).map((level) => (
               <div key={level} className="flex flex-col gap-0.5">
-                <span className={`text-[10px] font-semibold ${difficulty === level ? DIFFICULTY_COLOR[level] : 'text-white-300/30'}`}>
+                <span
+                  className={`text-[10px] font-semibold ${difficulty === level ? DIFFICULTY_COLOR[level] : 'text-white-300/30'}`}
+                >
                   {DIFFICULTY_LABEL[level]}
                 </span>
-                <span className={`text-xs tabular-nums ${difficulty === level ? 'text-white-100' : 'text-white-300/40'}`}>
+                <span
+                  className={`text-xs tabular-nums ${difficulty === level ? 'text-white-100' : 'text-white-300/40'}`}
+                >
                   {formatNumber(thresholds[level])} xp
                 </span>
               </div>

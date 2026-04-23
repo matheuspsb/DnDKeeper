@@ -23,7 +23,7 @@ export const RANDOM_TABLES: RandomTable[] = [
       'Acampamento destruído — rastros indicam fuga em pânico em várias direções',
       'Um druida com flecha no ombro pede ajuda urgente, não explica de quem fugiu',
       'Sons de batalha à distância — coluna de fumaça sobe entre as copas',
-      'Uma poça d\'água reflete um céu estrelado mesmo sob sol pleno',
+      "Uma poça d'água reflete um céu estrelado mesmo sob sol pleno",
       '1d6 bandidos preparam emboscada no estreitamento do caminho à frente',
       'Uma planta carnívora gigante disfarçada de arbusto colorido',
       'Uma criança nobre sozinha, desorientada, sem saber como chegou aqui',
@@ -129,12 +129,30 @@ export const RANDOM_TABLES: RandomTable[] = [
     category: 'Nomes de NPCs',
     title: 'Nome — Humano',
     entries: [
-      'Aldric Fontaine', 'Mira Soldado', 'Tomas Bravel', 'Sera Dunmore',
-      'Edwyn Ashford', 'Nora Castelo', 'Gareth Holm', 'Lena Farrow',
-      'Osman Drak', 'Isla Mercer', 'Percival Stone', 'Dara Wynne',
-      'Roland Finch', 'Sable Crowe', 'Corvin Marsh', 'Aine Dunbar',
-      'Leoric Voss', 'Brynn Hale', 'Mattis Colter', 'Wren Aldgate',
-      'Caelan Frost', 'Rhea Emberton', 'Dorian Vale', 'Seren Blackwood',
+      'Aldric Fontaine',
+      'Mira Soldado',
+      'Tomas Bravel',
+      'Sera Dunmore',
+      'Edwyn Ashford',
+      'Nora Castelo',
+      'Gareth Holm',
+      'Lena Farrow',
+      'Osman Drak',
+      'Isla Mercer',
+      'Percival Stone',
+      'Dara Wynne',
+      'Roland Finch',
+      'Sable Crowe',
+      'Corvin Marsh',
+      'Aine Dunbar',
+      'Leoric Voss',
+      'Brynn Hale',
+      'Mattis Colter',
+      'Wren Aldgate',
+      'Caelan Frost',
+      'Rhea Emberton',
+      'Dorian Vale',
+      'Seren Blackwood',
     ],
   },
   {
@@ -142,13 +160,26 @@ export const RANDOM_TABLES: RandomTable[] = [
     category: 'Nomes de NPCs',
     title: 'Nome — Élfico',
     entries: [
-      'Aelindra Silvathorn', 'Caelith Moonwhisper', 'Sylara Dawnweave',
-      'Erindel Starfall', 'Thalion Greyleaf', 'Mirae Windveil',
-      'Aldanis Brightwood', 'Seraniel Evensong', 'Liriel Ashbough',
-      'Faendrel Sunshard', 'Arannis Duskwalker', 'Yrael Emberveil',
-      'Cylara Moonsong', 'Galadhor Swiftbranch', 'Naeris Starweave',
-      'Fenriel Goldenleaf', 'Sariel Nightbloom', 'Theren Clearwater',
-      'Quelenna Dawnpetal', 'Adran Misthollow',
+      'Aelindra Silvathorn',
+      'Caelith Moonwhisper',
+      'Sylara Dawnweave',
+      'Erindel Starfall',
+      'Thalion Greyleaf',
+      'Mirae Windveil',
+      'Aldanis Brightwood',
+      'Seraniel Evensong',
+      'Liriel Ashbough',
+      'Faendrel Sunshard',
+      'Arannis Duskwalker',
+      'Yrael Emberveil',
+      'Cylara Moonsong',
+      'Galadhor Swiftbranch',
+      'Naeris Starweave',
+      'Fenriel Goldenleaf',
+      'Sariel Nightbloom',
+      'Theren Clearwater',
+      'Quelenna Dawnpetal',
+      'Adran Misthollow',
     ],
   },
   {
@@ -156,13 +187,26 @@ export const RANDOM_TABLES: RandomTable[] = [
     category: 'Nomes de NPCs',
     title: 'Nome — Anão',
     entries: [
-      'Throdin Ironmantle', 'Brega Stonefist', 'Kordak Hammerfall',
-      'Dugra Ashbeard', 'Vondal Coppervein', 'Thora Goldpick',
-      'Barendd Deepdelve', 'Marta Ironbrew', 'Harbek Coalforge',
-      'Rikka Stonehew', 'Gundren Runeaxe', 'Helga Deepstone',
-      'Orsik Boulderback', 'Nora Ironsong', 'Adrik Gravelwarden',
-      'Vistra Coppercloak', 'Travok Stonehammer', 'Dagnal Ironfoot',
-      'Bruenor Cragback', 'Tordek Deepvein',
+      'Throdin Ironmantle',
+      'Brega Stonefist',
+      'Kordak Hammerfall',
+      'Dugra Ashbeard',
+      'Vondal Coppervein',
+      'Thora Goldpick',
+      'Barendd Deepdelve',
+      'Marta Ironbrew',
+      'Harbek Coalforge',
+      'Rikka Stonehew',
+      'Gundren Runeaxe',
+      'Helga Deepstone',
+      'Orsik Boulderback',
+      'Nora Ironsong',
+      'Adrik Gravelwarden',
+      'Vistra Coppercloak',
+      'Travok Stonehammer',
+      'Dagnal Ironfoot',
+      'Bruenor Cragback',
+      'Tordek Deepvein',
     ],
   },
   {
@@ -170,12 +214,24 @@ export const RANDOM_TABLES: RandomTable[] = [
     category: 'Nomes de NPCs',
     title: 'Nome — Antagonista / Misterioso',
     entries: [
-      'Malachar o Silêncio', 'Syreth das Cinzas', 'Valdris Noite-Funda',
-      'A Senhora sem Rosto', 'Kethris o Vermelho', 'Zorra do Abismo',
-      'O Arconte Pálido', 'Sevryn Corrompido', 'Nythara a Dívida',
-      'Drath Osso-Negro', 'Elara Sombra-do-Amanhecer', 'Mordecai Venenosa',
-      'O Vigésimo Terceiro', 'Thrax o Faminento', 'Isera Chama-Morta',
-      'Valoren o Esquecido', 'Korrath do Crepúsculo', 'A Mão que Não Sangra',
+      'Malachar o Silêncio',
+      'Syreth das Cinzas',
+      'Valdris Noite-Funda',
+      'A Senhora sem Rosto',
+      'Kethris o Vermelho',
+      'Zorra do Abismo',
+      'O Arconte Pálido',
+      'Sevryn Corrompido',
+      'Nythara a Dívida',
+      'Drath Osso-Negro',
+      'Elara Sombra-do-Amanhecer',
+      'Mordecai Venenosa',
+      'O Vigésimo Terceiro',
+      'Thrax o Faminento',
+      'Isera Chama-Morta',
+      'Valoren o Esquecido',
+      'Korrath do Crepúsculo',
+      'A Mão que Não Sangra',
     ],
   },
 
@@ -443,17 +499,17 @@ export const RANDOM_TABLES: RandomTable[] = [
 // ── Lookups pré-computados (calculados uma única vez no carregamento do módulo) ──
 
 /** Categorias únicas na ordem em que aparecem no array. */
-export const TABLE_CATEGORIES: string[] = [
-  ...new Set(RANDOM_TABLES.map(table => table.category)),
-]
+export const TABLE_CATEGORIES: string[] = [...new Set(RANDOM_TABLES.map((table) => table.category))]
 
 /** Tabelas agrupadas por categoria. Evita filter() no render. */
-export const TABLES_BY_CATEGORY: Readonly<Record<string, RandomTable[]>> =
-  TABLE_CATEGORIES.reduce<Record<string, RandomTable[]>>((acc, cat) => {
-    acc[cat] = RANDOM_TABLES.filter(table => table.category === cat)
-    return acc
-  }, {})
+export const TABLES_BY_CATEGORY: Readonly<Record<string, RandomTable[]>> = TABLE_CATEGORIES.reduce<
+  Record<string, RandomTable[]>
+>((acc, cat) => {
+  acc[cat] = RANDOM_TABLES.filter((table) => table.category === cat)
+  return acc
+}, {})
 
 /** Mapa id → tabela para lookup O(1) ao rolar. */
-export const TABLES_BY_ID: Readonly<Record<string, RandomTable>> =
-  Object.fromEntries(RANDOM_TABLES.map(table => [table.id, table]))
+export const TABLES_BY_ID: Readonly<Record<string, RandomTable>> = Object.fromEntries(
+  RANDOM_TABLES.map((table) => [table.id, table]),
+)

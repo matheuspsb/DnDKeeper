@@ -23,7 +23,7 @@ function Npcs() {
   const [factionFilter, setFactionFilter] = useState<FactionFilter>('todas')
 
   const filtered = useMemo(() => {
-    return npcs.filter(npc => {
+    return npcs.filter((npc) => {
       if (statusFilter !== 'todos' && npc.status !== statusFilter) return false
       if (factionFilter !== 'todas' && npc.faction !== factionFilter) return false
       return true
@@ -52,15 +52,18 @@ function Npcs() {
   function renderContent() {
     if (npcs.length === 0) return <NpcEmpty onAdd={openAdd} />
 
-    if (filtered.length === 0) return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-white-300/60 text-sm">Nenhum NPC encontrado com os filtros selecionados.</p>
-      </div>
-    )
+    if (filtered.length === 0)
+      return (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <p className="text-white-300/60 text-sm">
+            Nenhum NPC encontrado com os filtros selecionados.
+          </p>
+        </div>
+      )
 
     return (
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map(npc => (
+        {filtered.map((npc) => (
           <NpcCard
             key={npc.id}
             npc={npc}
@@ -80,7 +83,8 @@ function Npcs() {
             <h2 className="text-white-100 text-3xl font-bold">NPCs</h2>
             <p className="text-white-300/60 text-sm mt-1">
               {npcs.length === 0 ? 'Nenhum NPC' : `${npcs.length} NPC${npcs.length > 1 ? 's' : ''}`}
-              {filtered.length !== npcs.length && ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
+              {filtered.length !== npcs.length &&
+                ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
             </p>
           </div>
           {user?.role === 'dm' && (
@@ -97,21 +101,18 @@ function Npcs() {
             factionFilter={factionFilter}
             onStatusChange={setStatusFilter}
             onFactionChange={setFactionFilter}
-            onClear={() => { setStatusFilter('todos'); setFactionFilter('todas') }}
+            onClear={() => {
+              setStatusFilter('todos')
+              setFactionFilter('todas')
+            }}
           />
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-8">
-        {renderContent()}
-      </div>
+      <div className="flex-1 overflow-y-auto px-8 pb-8">{renderContent()}</div>
 
       {modalOpen && (
-        <NpcModal
-          initialNpc={editingNpc}
-          onSave={handleSave}
-          onClose={() => setModalOpen(false)}
-        />
+        <NpcModal initialNpc={editingNpc} onSave={handleSave} onClose={() => setModalOpen(false)} />
       )}
     </div>
   )

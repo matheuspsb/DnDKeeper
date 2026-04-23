@@ -67,11 +67,11 @@ function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMon
           </div>
         )}
 
-        {monsters.map(monster => (
+        {monsters.map((monster) => (
           <div key={monster.id} className="flex items-center gap-2">
             <input
               value={monster.name}
-              onChange={e => onUpdate(monster.id, { name: e.target.value })}
+              onChange={(e) => onUpdate(monster.id, { name: e.target.value })}
               placeholder="Nome do monstro..."
               className={`flex-1 min-w-0 ${inputClass}`}
             />
@@ -79,22 +79,26 @@ function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMon
             <div className="relative shrink-0">
               <select
                 value={monster.cr}
-                onChange={e => onUpdate(monster.id, { cr: e.target.value as CR })}
+                onChange={(e) => onUpdate(monster.id, { cr: e.target.value as CR })}
                 className={`w-20 appearance-none pr-6 ${inputClass} cursor-pointer`}
               >
-                {CR_OPTIONS.map(cr => (
+                {CR_OPTIONS.map((cr) => (
                   <option key={cr} value={cr} className="bg-black-500">
                     CR {cr}
                   </option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white-300/40 text-[10px]">▾</span>
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white-300/40 text-[10px]">
+                ▾
+              </span>
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
-                onClick={() => onUpdate(monster.id, { quantity: Math.max(1, monster.quantity - 1) })}
+                onClick={() =>
+                  onUpdate(monster.id, { quantity: Math.max(1, monster.quantity - 1) })
+                }
                 className="w-7 h-8 flex items-center justify-center rounded-l-lg bg-black-500 border border-black-100 text-white-300 hover:text-white-100 hover:border-black-200 transition-colors text-base leading-none"
               >
                 −

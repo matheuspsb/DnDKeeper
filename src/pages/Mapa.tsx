@@ -34,7 +34,7 @@ function Mapa() {
 
     const scale = Math.min(
       container.clientWidth / img.naturalWidth,
-      container.clientHeight / img.naturalHeight
+      container.clientHeight / img.naturalHeight,
     )
     setMinScale(scale)
     setCurrentScale(scale)
@@ -66,9 +66,8 @@ function Mapa() {
     ruler.exitRuler()
   }, [minScale, ruler.exitRuler])
 
-  const previewLabel = interaction.mousePos !== null
-    ? ruler.getPreviewDistance(interaction.mousePos)
-    : null
+  const previewLabel =
+    interaction.mousePos !== null ? ruler.getPreviewDistance(interaction.mousePos) : null
 
   const showPreviewLine = ruler.points.length === 1 && interaction.mousePos !== null
   const inRulerMode = ruler.mode !== 'idle'

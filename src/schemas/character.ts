@@ -3,13 +3,8 @@ import { z } from 'zod'
 const intField = (min: number, message: string) =>
   z
     .union([z.string(), z.number()])
-    .transform(val => (val === '' ? NaN : Number(val)))
-    .pipe(
-      z
-        .number({ error: message })
-        .int()
-        .min(min, `Mínimo ${min}`),
-    )
+    .transform((val) => (val === '' ? NaN : Number(val)))
+    .pipe(z.number({ error: message }).int().min(min, `Mínimo ${min}`))
 
 export const characterFormSchema = z
   .object({
@@ -21,7 +16,7 @@ export const characterFormSchema = z
     maxHP: intField(1, 'Informe um valor'),
     currentHP: z
       .union([z.string(), z.number()])
-      .transform(val => (val === '' ? null : Number(val)))
+      .transform((val) => (val === '' ? null : Number(val)))
       .pipe(z.number().int().min(0, 'Mínimo 0').nullable()),
     xp: intField(0, 'Informe um valor'),
     notes: z.string().trim(),

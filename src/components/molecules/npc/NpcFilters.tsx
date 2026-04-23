@@ -18,30 +18,40 @@ const selectClass = `
   transition-colors cursor-pointer
 `
 
-function NpcFilters({ statusFilter, factionFilter, onStatusChange, onFactionChange, onClear }: NpcFiltersProps) {
+function NpcFilters({
+  statusFilter,
+  factionFilter,
+  onStatusChange,
+  onFactionChange,
+  onClear,
+}: NpcFiltersProps) {
   const hasActiveFilters = statusFilter !== 'todos' || factionFilter !== 'todas'
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <select
         value={statusFilter}
-        onChange={e => onStatusChange(e.target.value as StatusFilter)}
+        onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
         className={selectClass}
       >
         <option value="todos">Todos os status</option>
         {(Object.entries(NPC_STATUS_LABEL) as [NpcStatus, string][]).map(([value, label]) => (
-          <option key={value} value={value}>{label}</option>
+          <option key={value} value={value}>
+            {label}
+          </option>
         ))}
       </select>
 
       <select
         value={factionFilter}
-        onChange={e => onFactionChange(e.target.value as FactionFilter)}
+        onChange={(e) => onFactionChange(e.target.value as FactionFilter)}
         className={selectClass}
       >
         <option value="todas">Todas as facções</option>
-        {FACTIONS.map(f => (
-          <option key={f} value={f}>{f}</option>
+        {FACTIONS.map((f) => (
+          <option key={f} value={f}>
+            {f}
+          </option>
         ))}
       </select>
 

@@ -54,11 +54,7 @@ function ArvoreGenealogica() {
           </div>
         </div>
       ) : (
-        <NpcGraph
-          npcs={npcs}
-          relations={relations}
-          onDeleteRelation={deleteRelation}
-        />
+        <NpcGraph npcs={npcs} relations={relations} onDeleteRelation={deleteRelation} />
       )}
 
       {modalOpen && (

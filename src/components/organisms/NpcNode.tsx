@@ -20,14 +20,14 @@ function NpcNode({ data }: NpcNodeProps) {
 
   return (
     <>
-      <Handle type="source" id="s-top"    position={Position.Top}    style={{ opacity: 0 }} />
+      <Handle type="source" id="s-top" position={Position.Top} style={{ opacity: 0 }} />
       <Handle type="source" id="s-bottom" position={Position.Bottom} style={{ opacity: 0 }} />
-      <Handle type="source" id="s-left"   position={Position.Left}   style={{ opacity: 0 }} />
-      <Handle type="source" id="s-right"  position={Position.Right}  style={{ opacity: 0 }} />
-      <Handle type="target" id="t-top"    position={Position.Top}    style={{ opacity: 0 }} />
+      <Handle type="source" id="s-left" position={Position.Left} style={{ opacity: 0 }} />
+      <Handle type="source" id="s-right" position={Position.Right} style={{ opacity: 0 }} />
+      <Handle type="target" id="t-top" position={Position.Top} style={{ opacity: 0 }} />
       <Handle type="target" id="t-bottom" position={Position.Bottom} style={{ opacity: 0 }} />
-      <Handle type="target" id="t-left"   position={Position.Left}   style={{ opacity: 0 }} />
-      <Handle type="target" id="t-right"  position={Position.Right}  style={{ opacity: 0 }} />
+      <Handle type="target" id="t-left" position={Position.Left} style={{ opacity: 0 }} />
+      <Handle type="target" id="t-right" position={Position.Right} style={{ opacity: 0 }} />
       <div
         className="bg-black-300 border-2 rounded-xl overflow-hidden shadow-xl w-36"
         style={{ borderColor: factionColor }}

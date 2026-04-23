@@ -9,7 +9,11 @@ interface RandomTableCardProps {
   onRoll: (id: string) => void
 }
 
-const RandomTableCard = memo(function RandomTableCard({ table, roll, onRoll }: RandomTableCardProps) {
+const RandomTableCard = memo(function RandomTableCard({
+  table,
+  roll,
+  onRoll,
+}: RandomTableCardProps) {
   const handleClick = useCallback(() => onRoll(table.id), [onRoll, table.id])
 
   return (
@@ -20,7 +24,9 @@ const RandomTableCard = memo(function RandomTableCard({ table, roll, onRoll }: R
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="min-w-0">
           <span className="text-white-300/40 text-xs">{table.category}</span>
-          <h3 className="text-white-100 font-semibold text-sm mt-0.5 leading-snug">{table.title}</h3>
+          <h3 className="text-white-100 font-semibold text-sm mt-0.5 leading-snug">
+            {table.title}
+          </h3>
         </div>
         <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/20 border border-red-400/30 text-red-100/70 group-hover:bg-red-100 group-hover:border-red-100 group-hover:text-white-100 transition-all duration-150">
           <DiceIcon size={15} />

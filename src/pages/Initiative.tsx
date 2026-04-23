@@ -23,7 +23,7 @@ function Initiative() {
   const { characters, updateCharacter } = useCharacters()
 
   function handleImportCharacters() {
-    characters.forEach(char => {
+    characters.forEach((char) => {
       addCombatant({
         name: char.name,
         initiative: 0,
@@ -79,8 +79,8 @@ function Initiative() {
                 combatant={combatant}
                 status={i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'pending'}
                 onRemove={() => removeCombatant(combatant.id)}
-                onAdjustHp={delta => handleAdjustHp(combatant, delta)}
-                onUpdateInitiative={val => updateInitiative(combatant.id, val)}
+                onAdjustHp={(delta) => handleAdjustHp(combatant, delta)}
+                onUpdateInitiative={(val) => updateInitiative(combatant.id, val)}
               />
             ))}
           </div>

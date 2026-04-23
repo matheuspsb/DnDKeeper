@@ -10,7 +10,7 @@ function RandomTables() {
   const [rolls, setRolls] = useState<Record<string, RollEntry>>({})
 
   const handleRoll = useCallback((tableId: string) => {
-    setRolls(prev => ({
+    setRolls((prev) => ({
       ...prev,
       [tableId]: {
         result: pickRandom(TABLES_BY_ID[tableId].entries),
@@ -20,7 +20,7 @@ function RandomTables() {
   }, [])
 
   const rollAll = useCallback(() => {
-    setRolls(prev => {
+    setRolls((prev) => {
       const next: Record<string, RollEntry> = {}
       for (const tableId in TABLES_BY_ID) {
         next[tableId] = {
@@ -46,7 +46,7 @@ function RandomTables() {
         </Button>
       </div>
 
-      {TABLE_CATEGORIES.map(category => (
+      {TABLE_CATEGORIES.map((category) => (
         <section key={category} className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <h3 className="text-red-100 text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
@@ -56,7 +56,7 @@ function RandomTables() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-            {TABLES_BY_CATEGORY[category].map(table => (
+            {TABLES_BY_CATEGORY[category].map((table) => (
               <RandomTableCard
                 key={table.id}
                 table={table}

@@ -72,7 +72,7 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 flex flex-col gap-4">
           <NpcImagePicker
             imageUrl={imageUrl}
-            onSelect={url => setValue('imageUrl', url, { shouldValidate: true })}
+            onSelect={(url) => setValue('imageUrl', url, { shouldValidate: true })}
             registration={register('imageUrl')}
           />
 
@@ -91,8 +91,10 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
               <label className={labelClass}>Facção</label>
               <div className="relative">
                 <select {...register('faction')} className={selectClass}>
-                  {FACTIONS.map(faction => (
-                    <option key={faction} value={faction}>{faction}</option>
+                  {FACTIONS.map((faction) => (
+                    <option key={faction} value={faction}>
+                      {faction}
+                    </option>
                   ))}
                 </select>
                 <SelectArrow />
@@ -131,7 +133,9 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
           </div>
 
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">Cancelar</Button>
+            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
+              Cancelar
+            </Button>
             <Button type="submit" variant="primary" className="w-auto! flex-1">
               {initialNpc ? 'Salvar Alterações' : 'Adicionar NPC'}
             </Button>

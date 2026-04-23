@@ -12,8 +12,11 @@ function NpcRelationPanel({ edges, onDeleteRelation }: NpcRelationPanelProps) {
   return (
     <div className="absolute top-3 right-3 bg-black-400/90 backdrop-blur-sm border border-black-100 rounded-xl p-2 max-h-48 overflow-y-auto flex flex-col gap-1">
       <p className="text-white-300/50 text-xs px-1 mb-0.5">Conexões</p>
-      {edges.map(edge => (
-        <div key={edge.id} className="flex items-center justify-between gap-3 px-1 py-0.5 hover:bg-black-300 rounded group/edge">
+      {edges.map((edge) => (
+        <div
+          key={edge.id}
+          className="flex items-center justify-between gap-3 px-1 py-0.5 hover:bg-black-300 rounded group/edge"
+        >
           <span className="text-xs text-white-300/70 truncate max-w-36">{String(edge.label)}</span>
           <button
             onClick={() => {

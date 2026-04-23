@@ -27,10 +27,10 @@ const MapCalibrationModal = memo(function MapCalibrationModal({
           min="0.1"
           step="any"
           value={calibMiles}
-          onChange={e => onCalibMilesChange(e.target.value)}
+          onChange={(e) => onCalibMilesChange(e.target.value)}
           placeholder="Ex: 50"
           autoFocus
-          onKeyDown={e => {
+          onKeyDown={(e) => {
             if (e.key === 'Enter') onConfirm()
             if (e.key === 'Escape') onCancel()
           }}

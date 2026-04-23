@@ -20,7 +20,7 @@ export function useNpcs() {
   const [npcs, setNpcs] = useState<Npc[]>(load)
 
   const mutate = useCallback((updater: (prev: Npc[]) => Npc[]) => {
-    setNpcs(prev => {
+    setNpcs((prev) => {
       const next = updater(prev)
       persist(next)
       return next
@@ -29,21 +29,21 @@ export function useNpcs() {
 
   const addNpc = useCallback(
     (data: Omit<Npc, 'id'>) => {
-      mutate(prev => [...prev, { ...data, id: crypto.randomUUID() }])
+      mutate((prev) => [...prev, { ...data, id: crypto.randomUUID() }])
     },
     [mutate],
   )
 
   const updateNpc = useCallback(
     (id: string, data: Partial<Omit<Npc, 'id'>>) => {
-      mutate(prev => prev.map(npc => (npc.id === id ? { ...npc, ...data } : npc)))
+      mutate((prev) => prev.map((npc) => (npc.id === id ? { ...npc, ...data } : npc)))
     },
     [mutate],
   )
 
   const deleteNpc = useCallback(
     (id: string) => {
-      mutate(prev => prev.filter(npc => npc.id !== id))
+      mutate((prev) => prev.filter((npc) => npc.id !== id))
     },
     [mutate],
   )

@@ -56,7 +56,6 @@ function Login() {
   return (
     <div className="min-h-screen bg-black-500 flex items-center justify-center p-4">
       <div className="w-full max-w-sm flex flex-col gap-6">
-
         <div className="flex flex-col items-center gap-3">
           <img src={logo} alt="DnDKeeper" className="h-16 w-16" />
           <h1 className="text-white-100 text-2xl font-bold tracking-wide">DnDKeeper</h1>
@@ -75,7 +74,9 @@ function Login() {
                 className={inputClass}
               />
               {dmForm.formState.errors.username && (
-                <span className="text-red-100 text-xs">{dmForm.formState.errors.username.message}</span>
+                <span className="text-red-100 text-xs">
+                  {dmForm.formState.errors.username.message}
+                </span>
               )}
             </div>
 
@@ -88,13 +89,13 @@ function Login() {
                 className={inputClass}
               />
               {dmForm.formState.errors.password && (
-                <span className="text-red-100 text-xs">{dmForm.formState.errors.password.message}</span>
+                <span className="text-red-100 text-xs">
+                  {dmForm.formState.errors.password.message}
+                </span>
               )}
             </div>
 
-            {dmError && (
-              <p className="text-red-100 text-xs text-center">{dmError}</p>
-            )}
+            {dmError && <p className="text-red-100 text-xs text-center">{dmError}</p>}
 
             <button
               type="submit"
@@ -123,13 +124,13 @@ function Login() {
               className={inputClass}
             />
             {guestForm.formState.errors.name && (
-              <span className="text-red-100 text-xs">{guestForm.formState.errors.name.message}</span>
+              <span className="text-red-100 text-xs">
+                {guestForm.formState.errors.name.message}
+              </span>
             )}
           </div>
 
-          {guestError && (
-            <p className="text-red-100 text-xs text-center">{guestError}</p>
-          )}
+          {guestError && <p className="text-red-100 text-xs text-center">{guestError}</p>}
 
           <button
             type="submit"
@@ -139,7 +140,6 @@ function Login() {
             {guestForm.formState.isSubmitting ? 'Entrando…' : 'Entrar como Convidado'}
           </button>
         </form>
-
       </div>
     </div>
   )

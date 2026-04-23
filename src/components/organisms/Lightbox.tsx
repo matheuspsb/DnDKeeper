@@ -38,7 +38,10 @@ function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
 
       {onPrev && (
         <button
-          onClick={(e) => { e.stopPropagation(); onPrev() }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onPrev()
+          }}
           className="absolute left-4 text-white-300 hover:text-white-100 transition-colors p-2"
           aria-label="Anterior"
         >
@@ -46,10 +49,7 @@ function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
         </button>
       )}
 
-      <div
-        className="relative max-w-5xl max-h-screen px-16"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative max-w-5xl max-h-screen px-16" onClick={(e) => e.stopPropagation()}>
         <img
           src={image.url}
           alt={image.name}
@@ -62,7 +62,10 @@ function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
 
       {onNext && (
         <button
-          onClick={(e) => { e.stopPropagation(); onNext() }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onNext()
+          }}
           className="absolute right-4 text-white-300 hover:text-white-100 transition-colors p-2"
           aria-label="Próximo"
         >

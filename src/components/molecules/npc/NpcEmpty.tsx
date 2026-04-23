@@ -12,7 +12,9 @@ function NpcEmpty({ onAdd }: NpcEmptyProps) {
       </div>
       <div>
         <p className="text-white-300 font-medium">Nenhum NPC cadastrado</p>
-        <p className="text-white-300/50 text-sm mt-1">Adicione personagens não-jogáveis da sua campanha</p>
+        <p className="text-white-300/50 text-sm mt-1">
+          Adicione personagens não-jogáveis da sua campanha
+        </p>
       </div>
       <button
         onClick={onAdd}

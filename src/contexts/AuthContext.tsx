@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     backendApi
       .get<JwtPayload>('/api/auth/me')
-      .then(res => {
+      .then((res) => {
         const data = res.data
         if (data?.role === 'dm' || data?.role === 'guest') {
           setUser(data)

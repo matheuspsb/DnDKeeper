@@ -34,7 +34,7 @@ function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 p-2 mt-2">
-        {ROUTES.filter(route => !route.dmOnly || user?.role === 'dm').map((route) => (
+        {ROUTES.filter((route) => !route.dmOnly || user?.role === 'dm').map((route) => (
           <NavLink
             key={route.id}
             to={route.path}
@@ -42,9 +42,10 @@ function Sidebar() {
             className={({ isActive }) => `
               flex items-center gap-3 px-3 py-2.5 rounded-lg w-full
               transition-colors duration-150 overflow-hidden
-              ${isActive
-                ? 'bg-red-100/20 text-white'
-                : 'text-white-300 hover:bg-black-300 hover:text-white-100'
+              ${
+                isActive
+                  ? 'bg-red-100/20 text-white'
+                  : 'text-white-300 hover:bg-black-300 hover:text-white-100'
               }
             `}
           >
@@ -52,13 +53,9 @@ function Sidebar() {
               <>
                 <span className="shrink-0">{route.icon}</span>
                 {open && (
-                  <span className="text-sm font-medium whitespace-nowrap">
-                    {route.label}
-                  </span>
+                  <span className="text-sm font-medium whitespace-nowrap">{route.label}</span>
                 )}
-                {isActive && (
-                  <span className="ml-auto w-1 h-4 rounded-full bg-red-100 shrink-0" />
-                )}
+                {isActive && <span className="ml-auto w-1 h-4 rounded-full bg-red-100 shrink-0" />}
               </>
             )}
           </NavLink>
@@ -72,9 +69,7 @@ function Sidebar() {
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-white-300 hover:bg-black-300 hover:text-red-100 transition-colors duration-150 overflow-hidden"
         >
           <LogOutIcon size={18} className="shrink-0" />
-          {open && (
-            <span className="text-sm font-medium whitespace-nowrap">Sair</span>
-          )}
+          {open && <span className="text-sm font-medium whitespace-nowrap">Sair</span>}
         </button>
       </div>
 

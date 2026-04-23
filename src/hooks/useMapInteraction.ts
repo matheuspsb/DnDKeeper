@@ -5,7 +5,7 @@ import type { Point } from './useMapRuler'
 
 export function useMapInteraction(
   transformRef: RefObject<ReactZoomPanPinchRef | null>,
-  currentScale: number
+  currentScale: number,
 ) {
   const [mousePos, setMousePos] = useState<Point | null>(null)
 

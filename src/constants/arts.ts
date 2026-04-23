@@ -26,12 +26,12 @@ export const LOCAL_ART_PREFIX = 'local:'
 export function resolveImageUrl(imageUrl: string): string {
   if (imageUrl.startsWith(LOCAL_ART_PREFIX)) {
     const key = imageUrl.slice(LOCAL_ART_PREFIX.length)
-    return LOCAL_ARTS.find(a => a.key === key)?.url ?? ''
+    return LOCAL_ARTS.find((a) => a.key === key)?.url ?? ''
   }
 
   if (imageUrl.startsWith('/src/assets/arts/')) {
     const filename = imageUrl.split('/').pop()!
-    return LOCAL_ARTS.find(a => a.key === filename)?.url ?? ''
+    return LOCAL_ARTS.find((a) => a.key === filename)?.url ?? ''
   }
 
   return imageUrl

@@ -48,8 +48,10 @@ const MapSvgOverlay = memo(function MapSvgOverlay({
       {showPreviewLine && mousePos && (
         <>
           <line
-            x1={points[0].x} y1={points[0].y}
-            x2={mousePos.x} y2={mousePos.y}
+            x1={points[0].x}
+            y1={points[0].y}
+            x2={mousePos.x}
+            y2={mousePos.y}
             stroke={rulerColor}
             strokeWidth={strokeWidth * 2}
             strokeDasharray={strokeDasharray}
@@ -78,8 +80,10 @@ const MapSvgOverlay = memo(function MapSvgOverlay({
 
       {points.length === 2 && (
         <line
-          x1={points[0].x} y1={points[0].y}
-          x2={points[1].x} y2={points[1].y}
+          x1={points[0].x}
+          y1={points[0].y}
+          x2={points[1].x}
+          y2={points[1].y}
           stroke={rulerColor}
           strokeWidth={strokeWidth * 2}
           strokeDasharray={strokeDasharray}
@@ -90,7 +94,14 @@ const MapSvgOverlay = memo(function MapSvgOverlay({
       {points.map((point, index) => (
         <g key={index}>
           <circle cx={point.x} cy={point.y} r={markerRadius * 1.8} fill={rulerColorFill} />
-          <circle cx={point.x} cy={point.y} r={markerRadius} fill={rulerColor} stroke="white" strokeWidth={strokeWidth} />
+          <circle
+            cx={point.x}
+            cy={point.y}
+            r={markerRadius}
+            fill={rulerColor}
+            stroke="white"
+            strokeWidth={strokeWidth}
+          />
         </g>
       ))}
 

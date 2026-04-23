@@ -30,20 +30,20 @@ export const NPC_STATUS_COLOR: Record<NpcStatus, string> = {
 }
 
 export const FACTION_IMAGE: Partial<Record<Faction, string>> = {
-  'Zhentarim': zhentarimImg,
+  Zhentarim: zhentarimImg,
   'Culto do Dragão': cultoImg,
   'Irmandade Carmesim': irmandadeImg,
-  'Harpers': harperImg,
+  Harpers: harperImg,
   'Confraria da Lâmina Velada': confrariImg,
 }
 
 export const FACTION_COLOR: Record<Faction, string> = {
-  'Zhentarim': '#eab308',
+  Zhentarim: '#eab308',
   'Culto do Dragão': '#7c3aed',
   'Irmandade Carmesim': '#D72334',
-  'Harpers': '#3b82f6',
+  Harpers: '#3b82f6',
   'Confraria da Lâmina Velada': '#64748b',
-  'Independente': '#6b7280',
+  Independente: '#6b7280',
 }
 
 export const RELATION_TYPE_LABEL: Record<RelationType, string> = {

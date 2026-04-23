@@ -60,7 +60,7 @@ export function useMapRuler() {
       }
     } else if (mode === 'measuring') {
       if (points.length < 2) {
-        setPoints(prev => [...prev, point])
+        setPoints((prev) => [...prev, point])
       } else {
         setPoints([point])
       }
@@ -98,10 +98,20 @@ export function useMapRuler() {
   }
 
   return {
-    mode, points, pixelsPerMile,
-    showCalibInput, calibMiles, setCalibMiles,
-    enterCalibrate, enterMeasure, exitRuler,
-    addPoint, confirmCalibration, cancelCalibration,
-    getDistance, getPreviewDistance, getMidpoint,
+    mode,
+    points,
+    pixelsPerMile,
+    showCalibInput,
+    calibMiles,
+    setCalibMiles,
+    enterCalibrate,
+    enterMeasure,
+    exitRuler,
+    addPoint,
+    confirmCalibration,
+    cancelCalibration,
+    getDistance,
+    getPreviewDistance,
+    getMidpoint,
   }
 }

@@ -44,7 +44,7 @@ function Characters() {
   }
 
   function handleHpAdjust(characterId: string, delta: number) {
-    const character = characters.find(c => c.id === characterId)
+    const character = characters.find((c) => c.id === characterId)
     if (!character) return
     updateCharacter(characterId, {
       currentHP: clampNumber(character.currentHP + delta, 0, character.maxHP),
@@ -73,10 +73,20 @@ function Characters() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <input ref={importInputRef} type="file" accept=".json" onChange={handleImportFileChange} className="hidden" />
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportFileChange}
+            className="hidden"
+          />
           {characters.length > 0 && (
             <>
-              <Button variant="secondary" onClick={() => importInputRef.current?.click()} className="w-auto! px-4 text-xs">
+              <Button
+                variant="secondary"
+                onClick={() => importInputRef.current?.click()}
+                className="w-auto! px-4 text-xs"
+              >
                 Importar JSON
               </Button>
               <Button variant="secondary" onClick={exportJSON} className="w-auto! px-4 text-xs">
@@ -107,13 +117,13 @@ function Characters() {
 
       {characters.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {characters.map(character => (
+          {characters.map((character) => (
             <CharacterCard
               key={character.id}
               character={character}
               onEdit={() => openEditCharacterModal(character)}
               onDelete={() => deleteCharacter(character.id)}
-              onHpAdjust={delta => handleHpAdjust(character.id, delta)}
+              onHpAdjust={(delta) => handleHpAdjust(character.id, delta)}
             />
           ))}
         </div>

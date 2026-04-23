@@ -19,7 +19,7 @@ function NpcImagePicker({ imageUrl, onSelect, registration }: NpcImagePickerProp
     <div className="flex flex-col gap-2">
       <label className={labelClass}>Imagem</label>
       <div className="flex gap-2 flex-wrap">
-        {LOCAL_ARTS.map(art => {
+        {LOCAL_ARTS.map((art) => {
           const artKey = toLocalArtUrl(art.key)
           return (
             <button
@@ -32,22 +32,20 @@ function NpcImagePicker({ imageUrl, onSelect, registration }: NpcImagePickerProp
             </button>
           )
         })}
-        {imageUrl && !LOCAL_ARTS.some(a => toLocalArtUrl(a.key) === imageUrl) && (
+        {imageUrl && !LOCAL_ARTS.some((a) => toLocalArtUrl(a.key) === imageUrl) && (
           <div className="w-14 h-18 rounded-lg overflow-hidden border-2 border-red-100 shrink-0">
             <img
               src={resolveImageUrl(imageUrl)}
               alt="preview"
               className="w-full h-full object-cover"
-              onError={e => { e.currentTarget.style.display = 'none' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
             />
           </div>
         )}
       </div>
-      <input
-        {...registration}
-        className={inputClass}
-        placeholder="ou cole uma URL externa..."
-      />
+      <input {...registration} className={inputClass} placeholder="ou cole uma URL externa..." />
     </div>
   )
 }

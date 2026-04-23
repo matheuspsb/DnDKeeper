@@ -15,14 +15,15 @@ interface DriveFilesResponse {
 }
 
 export function toImageUrl(id: string, size: string): string {
-  const base = import.meta.env.DEV
-    ? '/drive-img'
-    : 'https://drive.google.com/thumbnail'
+  const base = import.meta.env.DEV ? '/drive-img' : 'https://drive.google.com/thumbnail'
   return `${base}?id=${id}&sz=${size}`
 }
 
-
-async function fetchImages(folderId: string, thumbSize: string, fullSize: string): Promise<DriveImage[]> {
+async function fetchImages(
+  folderId: string,
+  thumbSize: string,
+  fullSize: string,
+): Promise<DriveImage[]> {
   const { data } = await api.get<DriveFilesResponse>('/files', {
     params: {
       q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
@@ -42,5 +43,4 @@ export const googleDriveService = {
   async getImages(): Promise<DriveImage[]> {
     return fetchImages(FOLDER_ID, THUMBNAIL_SIZE, FULLSIZE)
   },
-
 }

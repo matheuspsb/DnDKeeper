@@ -24,7 +24,9 @@ function NpcCardBody({ npc }: NpcCardBodyProps) {
 
       {npc.notes && (
         <div className="border-t border-black-200 pt-2.5">
-          <p className="text-white-300/40 text-xs leading-relaxed line-clamp-2 italic">{npc.notes}</p>
+          <p className="text-white-300/40 text-xs leading-relaxed line-clamp-2 italic">
+            {npc.notes}
+          </p>
         </div>
       )}
     </div>

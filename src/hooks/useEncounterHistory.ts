@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react'
-import type { EncounterSnapshot, EncounterResult, PartyMember, MonsterEntry } from '../types/encounter'
+import type {
+  EncounterSnapshot,
+  EncounterResult,
+  PartyMember,
+  MonsterEntry,
+} from '../types/encounter'
 
 const STORAGE_KEY = 'dndkeeper_encounter_history'
 
@@ -20,7 +25,7 @@ export function useEncounterHistory() {
   const [history, setHistory] = useState<EncounterSnapshot[]>(load)
 
   const mutate = useCallback((updater: (prev: EncounterSnapshot[]) => EncounterSnapshot[]) => {
-    setHistory(prev => {
+    setHistory((prev) => {
       const next = updater(prev)
       persist(next)
       return next
@@ -33,28 +38,32 @@ export function useEncounterHistory() {
       const snapshot: EncounterSnapshot = {
         id: crypto.randomUUID(),
         savedAt: Date.now(),
-        party: party.map(member => ({ id: member.id, name: member.name })),
+        party: party.map((member) => ({ id: member.id, name: member.name })),
         difficulty: result.difficulty,
         rawXp: result.rawXp,
         xpPerPlayer: result.xpPerPlayer,
         monsterCount: monsters.reduce((total, monster) => total + monster.quantity, 0),
         xpSent: false,
       }
-      mutate(prev => [snapshot, ...prev])
+      mutate((prev) => [snapshot, ...prev])
     },
     [mutate],
   )
 
   const markAllSent = useCallback(
     (ids: string[]) => {
-      mutate(prev => prev.map(snapshot => (ids.includes(snapshot.id) ? { ...snapshot, xpSent: true } : snapshot)))
+      mutate((prev) =>
+        prev.map((snapshot) =>
+          ids.includes(snapshot.id) ? { ...snapshot, xpSent: true } : snapshot,
+        ),
+      )
     },
     [mutate],
   )
 
   const deleteSnapshot = useCallback(
     (id: string) => {
-      mutate(prev => prev.filter(snapshot => snapshot.id !== id))
+      mutate((prev) => prev.filter((snapshot) => snapshot.id !== id))
     },
     [mutate],
   )

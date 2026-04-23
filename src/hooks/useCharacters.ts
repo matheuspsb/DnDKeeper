@@ -20,7 +20,7 @@ export function useCharacters() {
   const [characters, setCharacters] = useState<Character[]>(load)
 
   const mutate = useCallback((updater: (prev: Character[]) => Character[]) => {
-    setCharacters(prev => {
+    setCharacters((prev) => {
       const next = updater(prev)
       persist(next)
       return next
@@ -29,21 +29,23 @@ export function useCharacters() {
 
   const addCharacter = useCallback(
     (data: Omit<Character, 'id'>) => {
-      mutate(prev => [...prev, { ...data, id: crypto.randomUUID() }])
+      mutate((prev) => [...prev, { ...data, id: crypto.randomUUID() }])
     },
     [mutate],
   )
 
   const updateCharacter = useCallback(
     (id: string, data: Partial<Omit<Character, 'id'>>) => {
-      mutate(prev => prev.map(character => (character.id === id ? { ...character, ...data } : character)))
+      mutate((prev) =>
+        prev.map((character) => (character.id === id ? { ...character, ...data } : character)),
+      )
     },
     [mutate],
   )
 
   const deleteCharacter = useCallback(
     (id: string) => {
-      mutate(prev => prev.filter(character => character.id !== id))
+      mutate((prev) => prev.filter((character) => character.id !== id))
     },
     [mutate],
   )
@@ -63,9 +65,9 @@ export function useCharacters() {
   const importJSON = useCallback(
     (file: File) => {
       const reader = new FileReader()
-      reader.onload = event => {
+      reader.onload = (event) => {
         try {
-          const parsed = JSON.parse((event.target?.result) as string)
+          const parsed = JSON.parse(event.target?.result as string)
           if (Array.isArray(parsed)) {
             mutate(() => parsed as Character[])
           }
@@ -80,10 +82,22 @@ export function useCharacters() {
 
   const addXp = useCallback(
     (id: string, amount: number) => {
-      mutate(prev => prev.map(character => (character.id === id ? { ...character, xp: character.xp + amount } : character)))
+      mutate((prev) =>
+        prev.map((character) =>
+          character.id === id ? { ...character, xp: character.xp + amount } : character,
+        ),
+      )
     },
     [mutate],
   )
 
-  return { characters, addCharacter, updateCharacter, deleteCharacter, exportJSON, importJSON, addXp }
+  return {
+    characters,
+    addCharacter,
+    updateCharacter,
+    deleteCharacter,
+    exportJSON,
+    importJSON,
+    addXp,
+  }
 }

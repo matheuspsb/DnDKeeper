@@ -1,4 +1,10 @@
-import type { EncounterDifficulty, EncounterResult, DifficultyThresholds, PartyMember, MonsterEntry } from '../types/encounter'
+import type {
+  EncounterDifficulty,
+  EncounterResult,
+  DifficultyThresholds,
+  PartyMember,
+  MonsterEntry,
+} from '../types/encounter'
 import { CR_XP, THRESHOLDS_PER_LEVEL, getEncounterMultiplier } from '../constants/encounter'
 
 export interface Particle {
@@ -42,7 +48,10 @@ export function calculatePartyThresholds(party: PartyMember[]): DifficultyThresh
   )
 }
 
-export function getDifficulty(adjustedXp: number, thresholds: DifficultyThresholds): EncounterDifficulty {
+export function getDifficulty(
+  adjustedXp: number,
+  thresholds: DifficultyThresholds,
+): EncounterDifficulty {
   if (adjustedXp <= 0 || thresholds.easy === 0) return 'trivial'
   if (adjustedXp < thresholds.easy) return 'trivial'
   if (adjustedXp < thresholds.medium) return 'easy'
@@ -51,7 +60,10 @@ export function getDifficulty(adjustedXp: number, thresholds: DifficultyThreshol
   return 'deadly'
 }
 
-export function calculateEncounter(party: PartyMember[], monsters: MonsterEntry[]): EncounterResult {
+export function calculateEncounter(
+  party: PartyMember[],
+  monsters: MonsterEntry[],
+): EncounterResult {
   const rawXp = monsters.reduce((sum, m) => sum + CR_XP[m.cr] * m.quantity, 0)
   const totalMonsters = monsters.reduce((sum, m) => sum + m.quantity, 0)
   const multiplier = getEncounterMultiplier(totalMonsters, party.length)

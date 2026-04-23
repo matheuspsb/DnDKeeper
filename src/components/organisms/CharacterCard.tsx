@@ -21,9 +21,8 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
   const [isEditingHp, setIsEditingHp] = useState(false)
   const [hpInputValue, setHpInputValue] = useState('')
 
-  const hpPercentage = character.maxHP > 0
-    ? Math.round((character.currentHP / character.maxHP) * 100)
-    : 0
+  const hpPercentage =
+    character.maxHP > 0 ? Math.round((character.currentHP / character.maxHP) * 100) : 0
 
   const xpProgress = getXpProgress(character.xp)
   const isCharacterDead = character.currentHP === 0
@@ -118,9 +117,10 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-3 min-w-0">
-
         <div className="min-w-0">
-          <h3 className="text-white-100 font-bold text-base leading-tight truncate">{character.name}</h3>
+          <h3 className="text-white-100 font-bold text-base leading-tight truncate">
+            {character.name}
+          </h3>
           <p className="text-white-300/60 text-xs mt-0.5 truncate">
             {[character.characterClass, character.race].filter(Boolean).join(' · ')}
             {character.playerName && (
@@ -140,7 +140,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
                   autoFocus
                   type="number"
                   value={hpInputValue}
-                  onChange={e => setHpInputValue(e.target.value)}
+                  onChange={(e) => setHpInputValue(e.target.value)}
                   onBlur={commitHpEdit}
                   onKeyDown={handleHpInputKeyDown}
                   className="w-14 bg-black-500 border border-red-100 rounded px-1.5 text-center text-white-100 text-sm focus:outline-none tabular-nums"
@@ -172,14 +172,15 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
           </div>
 
           <div className="flex gap-1">
-            {HP_DELTA_OPTIONS.map(delta => (
+            {HP_DELTA_OPTIONS.map((delta) => (
               <button
                 key={delta}
                 onClick={() => onHpAdjust(delta)}
                 className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer
-                  ${delta < 0
-                    ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
-                    : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
+                  ${
+                    delta < 0
+                      ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
+                      : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
                   }`}
               >
                 {delta > 0 ? `+${delta}` : delta}
@@ -217,14 +218,17 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
 
           {!xpProgress.isMaxLevel && (
             <p className="text-white-300/40 text-xs">
-              {formatNumber(character.xp)} XP total · Nível {xpProgress.level} → {xpProgress.level + 1}
+              {formatNumber(character.xp)} XP total · Nível {xpProgress.level} →{' '}
+              {xpProgress.level + 1}
             </p>
           )}
         </div>
 
         {character.notes && (
           <div className="border-t border-black-200 pt-2.5">
-            <p className="text-white-300/50 text-xs leading-relaxed line-clamp-2">{character.notes}</p>
+            <p className="text-white-300/50 text-xs leading-relaxed line-clamp-2">
+              {character.notes}
+            </p>
           </div>
         )}
       </div>

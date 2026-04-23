@@ -25,7 +25,8 @@ function Encounter() {
     clearMonsters,
   } = useEncounter()
 
-  const { history, saveEncounter, markAllSent, deleteSnapshot, clearHistory } = useEncounterHistory()
+  const { history, saveEncounter, markAllSent, deleteSnapshot, clearHistory } =
+    useEncounterHistory()
 
   const monsterCount = monsters.reduce((total, monster) => total + monster.quantity, 0)
 
@@ -35,8 +36,8 @@ function Encounter() {
 
   const distributeXp = useCallback(
     (snapshots: EncounterSnapshot[]) => {
-      snapshots.forEach(snapshot => {
-        snapshot.party.forEach(member => {
+      snapshots.forEach((snapshot) => {
+        snapshot.party.forEach((member) => {
           addXp(member.id, snapshot.xpPerPlayer)
         })
       })
@@ -46,7 +47,7 @@ function Encounter() {
 
   const handleSendXp = useCallback(
     (id: string) => {
-      const snapshot = history.find(s => s.id === id)
+      const snapshot = history.find((s) => s.id === id)
       if (!snapshot || snapshot.xpSent) return
       distributeXp([snapshot])
       markAllSent([id])
@@ -55,10 +56,10 @@ function Encounter() {
   )
 
   const handleSendAll = useCallback(() => {
-    const unsent = history.filter(snapshot => !snapshot.xpSent)
+    const unsent = history.filter((snapshot) => !snapshot.xpSent)
     if (unsent.length === 0) return
     distributeXp(unsent)
-    markAllSent(unsent.map(snapshot => snapshot.id))
+    markAllSent(unsent.map((snapshot) => snapshot.id))
   }, [history, distributeXp, markAllSent])
 
   return (
@@ -95,11 +96,7 @@ function Encounter() {
         />
       </div>
 
-      <EncounterResultPanel
-        result={result}
-        partySize={party.length}
-        monsterCount={monsterCount}
-      />
+      <EncounterResultPanel result={result} partySize={party.length} monsterCount={monsterCount} />
 
       <EncounterHistoryPanel
         history={history}

@@ -21,7 +21,14 @@ const inputClass = `
 
 const LEVELS = Array.from({ length: 20 }, (_, i) => i + 1)
 
-function XpPartyPanel({ party, onAdd, onUpdate, onRemove, onImportCharacters, hasCharacters }: XpPartyPanelProps) {
+function XpPartyPanel({
+  party,
+  onAdd,
+  onUpdate,
+  onRemove,
+  onImportCharacters,
+  hasCharacters,
+}: XpPartyPanelProps) {
   return (
     <div className="bg-black-300 border border-black-100 rounded-xl flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-black-100">
@@ -68,27 +75,29 @@ function XpPartyPanel({ party, onAdd, onUpdate, onRemove, onImportCharacters, ha
           </div>
         )}
 
-        {party.map(member => (
+        {party.map((member) => (
           <div key={member.id} className="flex items-center gap-2">
             <input
               value={member.name}
-              onChange={e => onUpdate(member.id, { name: e.target.value })}
+              onChange={(e) => onUpdate(member.id, { name: e.target.value })}
               placeholder="Nome do jogador..."
               className={`flex-1 min-w-0 ${inputClass}`}
             />
             <div className="relative shrink-0">
               <select
                 value={member.level}
-                onChange={e => onUpdate(member.id, { level: Number(e.target.value) })}
+                onChange={(e) => onUpdate(member.id, { level: Number(e.target.value) })}
                 className={`w-20 appearance-none pr-6 ${inputClass} cursor-pointer`}
               >
-                {LEVELS.map(lvl => (
+                {LEVELS.map((lvl) => (
                   <option key={lvl} value={lvl} className="bg-black-500">
                     Nv {lvl}
                   </option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white-300/40 text-[10px]">▾</span>
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-white-300/40 text-[10px]">
+                ▾
+              </span>
             </div>
             <button
               type="button"

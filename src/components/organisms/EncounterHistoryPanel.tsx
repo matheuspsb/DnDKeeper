@@ -16,11 +16,22 @@ function formatTime(timestamp: number): string {
   const date = new Date(timestamp)
   const isToday = date.toDateString() === new Date().toDateString()
   if (isToday) return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
-function EncounterHistoryPanel({ history, onSendXp, onSendAll, onDelete, onClear }: EncounterHistoryPanelProps) {
-  const unsent = history.filter(snapshot => !snapshot.xpSent)
+function EncounterHistoryPanel({
+  history,
+  onSendXp,
+  onSendAll,
+  onDelete,
+  onClear,
+}: EncounterHistoryPanelProps) {
+  const unsent = history.filter((snapshot) => !snapshot.xpSent)
   const totalPendingXpPerPlayer = unsent.reduce((sum, snapshot) => sum + snapshot.xpPerPlayer, 0)
   const hasUnsent = unsent.length > 0
 
@@ -71,7 +82,7 @@ function EncounterHistoryPanel({ history, onSendXp, onSendAll, onDelete, onClear
           </div>
         )}
 
-        {history.map(snapshot => (
+        {history.map((snapshot) => (
           <div key={snapshot.id} className="flex items-center gap-4 px-5 py-3 flex-wrap">
             <div className="flex items-center gap-2 shrink-0">
               <span
@@ -85,7 +96,7 @@ function EncounterHistoryPanel({ history, onSendXp, onSendAll, onDelete, onClear
             </div>
 
             <div className="flex items-center gap-1 flex-wrap flex-1 min-w-0">
-              {snapshot.party.map(member => (
+              {snapshot.party.map((member) => (
                 <span
                   key={member.id}
                   className="text-[10px] bg-black-400 border border-black-100 text-white-300/70 px-2 py-0.5 rounded-full"

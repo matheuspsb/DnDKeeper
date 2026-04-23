@@ -35,11 +35,7 @@ function Artes() {
           )}
 
           {hasImages ? (
-            <IconButton
-              title="Sincronizar com Drive"
-              onClick={sync}
-              disabled={loading}
-            >
+            <IconButton title="Sincronizar com Drive" onClick={sync} disabled={loading}>
               <RefreshIcon className={loading ? 'animate-spin' : ''} />
             </IconButton>
           ) : (
@@ -85,7 +81,9 @@ function Artes() {
           image={{ ...selected, url: selected.fullUrl }}
           onClose={() => setSelected(null)}
           onPrev={selectedIndex > 0 ? () => setSelected(images[selectedIndex - 1]) : null}
-          onNext={selectedIndex < images.length - 1 ? () => setSelected(images[selectedIndex + 1]) : null}
+          onNext={
+            selectedIndex < images.length - 1 ? () => setSelected(images[selectedIndex + 1]) : null
+          }
         />
       )}
     </div>

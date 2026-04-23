@@ -20,7 +20,7 @@ export function useNpcRelations() {
   const [relations, setRelations] = useState<NpcRelation[]>(load)
 
   const mutate = useCallback((updater: (prev: NpcRelation[]) => NpcRelation[]) => {
-    setRelations(prev => {
+    setRelations((prev) => {
       const next = updater(prev)
       persist(next)
       return next
@@ -29,7 +29,7 @@ export function useNpcRelations() {
 
   const addRelation = useCallback(
     (data: { sourceId: string; targetId: string; type: RelationType; label?: string }) => {
-      mutate(prev => {
+      mutate((prev) => {
         const id = crypto.randomUUID()
         const mirrorId = crypto.randomUUID()
         const forward: NpcRelation = { ...data, id }
@@ -48,13 +48,17 @@ export function useNpcRelations() {
 
   const deleteRelation = useCallback(
     (id: string) => {
-      mutate(prev => {
-        const target = prev.find(r => r.id === id)
+      mutate((prev) => {
+        const target = prev.find((r) => r.id === id)
         if (!target) return prev
         return prev.filter(
-          r =>
+          (r) =>
             r.id !== id &&
-            !(r.sourceId === target.targetId && r.targetId === target.sourceId && r.type === target.type),
+            !(
+              r.sourceId === target.targetId &&
+              r.targetId === target.sourceId &&
+              r.type === target.type
+            ),
         )
       })
     },
@@ -63,7 +67,7 @@ export function useNpcRelations() {
 
   const deleteRelationsForNpc = useCallback(
     (npcId: string) => {
-      mutate(prev => prev.filter(r => r.sourceId !== npcId && r.targetId !== npcId))
+      mutate((prev) => prev.filter((r) => r.sourceId !== npcId && r.targetId !== npcId))
     },
     [mutate],
   )
