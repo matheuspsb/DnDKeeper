@@ -7,10 +7,8 @@ import AddRelationModal from '../components/organisms/AddRelationModal'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
 import NetworkIcon from '../components/atoms/icons/NetworkIcon'
-import { useAuth } from '../contexts/AuthContext'
 
 function ArvoreGenealogica() {
-  const { user } = useAuth()
   const { npcs } = useNpcs()
   const { relations, addRelation, deleteRelation } = useNpcRelations()
   const [modalOpen, setModalOpen] = useState(false)
@@ -32,18 +30,16 @@ function ArvoreGenealogica() {
           </p>
         </div>
 
-        {user?.role === 'dm' && (
-          <Button
-            variant="primary"
-            onClick={() => setModalOpen(true)}
-            disabled={npcs.length < 2}
-            title={npcs.length < 2 ? 'Cadastre ao menos 2 NPCs para conectar' : undefined}
-            className="flex items-center gap-2"
-          >
-            <PlusIcon size={16} />
-            Nova Conexão
-          </Button>
-        )}
+        <Button
+          variant="primary"
+          onClick={() => setModalOpen(true)}
+          disabled={npcs.length < 2}
+          title={npcs.length < 2 ? 'Cadastre ao menos 2 NPCs para conectar' : undefined}
+          className="flex items-center gap-2"
+        >
+          <PlusIcon size={16} />
+          Nova Conexão
+        </Button>
       </div>
 
       {npcs.length < 2 ? (
