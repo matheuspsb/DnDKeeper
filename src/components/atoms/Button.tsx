@@ -23,7 +23,7 @@ const variants: Record<ButtonVariant, string> = {
 
 const base = `
   inline-flex items-center justify-center
-  h-[42px] w-[299px] px-6 py-2
+  h-[42px] w-[280px] px-6 py-2
   rounded-full font-medium text-sm
   transition-all cursor-pointer
 `
