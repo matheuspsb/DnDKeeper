@@ -1,8 +1,8 @@
 import type { EncounterResult } from '../../types/encounter'
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR, DIFFICULTY_BG } from '../../constants/encounter'
 import { formatNumber } from '../../utils/number'
-import DifficultyMeter from '../molecules/DifficultyMeter'
-import StatCard from '../molecules/StatCard'
+import DifficultyMeter from '../molecules/encounter/DifficultyMeter'
+import StatCard from '../molecules/encounter/StatCard'
 
 interface EncounterResultPanelProps {
   result: EncounterResult

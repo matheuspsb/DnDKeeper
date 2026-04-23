@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
-import GalleryEmpty from '../components/molecules/GalleryEmpty'
+import GalleryEmpty from '../components/molecules/gallery/GalleryEmpty'
 import MapHintBar from '../components/molecules/MapHintBar'
 import MapToolbar from '../components/organisms/MapToolbar'
 import MapSvgOverlay from '../components/organisms/MapSvgOverlay'

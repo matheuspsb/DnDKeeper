@@ -3,7 +3,7 @@ import { useCharacters } from '../hooks/useCharacters'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
-import InitiativeEmpty from '../components/molecules/InitiativeEmpty'
+import InitiativeEmpty from '../components/molecules/initiative/InitiativeEmpty'
 import CombatantRow from '../components/organisms/CombatantRow'
 import InitiativeAddForm from '../components/organisms/InitiativeAddForm'
 
