@@ -2,6 +2,7 @@ import type { Npc } from '../../../types/npc.types'
 import NpcCardImage from './NpcCardImage'
 import NpcCardActions from './NpcCardActions'
 import NpcCardBody from './NpcCardBody'
+import { useAuth } from '../../../contexts/AuthContext'
 
 interface NpcCardProps {
   npc: Npc
@@ -10,6 +11,7 @@ interface NpcCardProps {
 }
 
 function NpcCard({ npc, onEdit, onDelete }: NpcCardProps) {
+  const { user } = useAuth()
   const isDead = npc.status === 'morto'
 
   return (
@@ -19,7 +21,7 @@ function NpcCard({ npc, onEdit, onDelete }: NpcCardProps) {
     >
       <div className="relative">
         <NpcCardImage npc={npc} />
-        <NpcCardActions onEdit={onEdit} onDelete={onDelete} />
+        {user?.role === 'dm' && <NpcCardActions onEdit={onEdit} onDelete={onDelete} />}
       </div>
       <NpcCardBody npc={npc} />
     </div>

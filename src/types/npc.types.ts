@@ -8,6 +8,8 @@ export type Faction =
   | 'Confraria da Lâmina Velada'
   | 'Independente'
 
+export type NpcImagePosition = 'top' | 'center' | 'bottom'
+
 export type Npc = {
   id: string
   name: string
@@ -16,4 +18,5 @@ export type Npc = {
   description: string
   notes: string
   imageUrl?: string
+  imagePosition?: NpcImagePosition
 }

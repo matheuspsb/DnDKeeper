@@ -12,6 +12,7 @@ export const npcFormSchema = z.object({
   description: z.string().trim(),
   notes: z.string().trim(),
   imageUrl: z.string().trim(),
+  imagePosition: z.enum(['top', 'center', 'bottom']).optional(),
 })
 
 export type NpcFormInput = z.input<typeof npcFormSchema>

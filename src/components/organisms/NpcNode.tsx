@@ -37,7 +37,8 @@ function NpcNode({ data }: NpcNodeProps) {
             <img
               src={resolveImageUrl(npc.imageUrl)}
               alt={npc.name}
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: npc.imagePosition ?? 'top' }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white-300/20">

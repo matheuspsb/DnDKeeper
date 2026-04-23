@@ -18,7 +18,8 @@ function NpcCardImage({ npc }: NpcCardImageProps) {
           <img
             src={resolveImageUrl(npc.imageUrl)}
             alt={npc.name}
-            className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            style={{ objectPosition: npc.imagePosition ?? 'top' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-white-300/20">

@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Npc } from '../../types/npc.types'
+import NpcImagePositionPicker from './NpcImagePositionPicker'
 import { npcFormSchema, type NpcFormInput, type NpcFormOutput } from '../../schemas/npc.schema'
 import { FACTIONS } from '../../constants/npc.constants'
 import Button from '../atoms/Button'
@@ -37,6 +38,7 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
         description: initialNpc.description,
         notes: initialNpc.notes,
         imageUrl: initialNpc.imageUrl ?? '',
+        imagePosition: initialNpc.imagePosition ?? 'top',
       }
     : {
         name: '',
@@ -45,6 +47,7 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
         description: '',
         notes: '',
         imageUrl: '',
+        imagePosition: 'top',
       }
 
   const {
@@ -59,6 +62,7 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
   })
 
   const imageUrl = watch('imageUrl')
+  const imagePosition = watch('imagePosition')
 
   function onSubmit(data: NpcFormOutput) {
     onSave({ ...data, imageUrl: data.imageUrl || undefined })
@@ -75,6 +79,13 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
             onSelect={(url) => setValue('imageUrl', url, { shouldValidate: true })}
             registration={register('imageUrl')}
           />
+
+          {imageUrl && (
+            <NpcImagePositionPicker
+              value={imagePosition ?? 'top'}
+              onChange={(pos) => setValue('imagePosition', pos)}
+            />
+          )}
 
           <div>
             <label className={labelClass}>Nome *</label>
