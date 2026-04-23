@@ -62,15 +62,8 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
     onSave({ ...data, imageUrl: data.imageUrl || undefined })
   }
 
-  function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === e.currentTarget) onClose()
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-      onClick={handleBackdropClick}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div className="bg-black-400 border border-black-100 rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl">
         <NpcModalHeader isEditing={!!initialNpc} onClose={onClose} />
 
