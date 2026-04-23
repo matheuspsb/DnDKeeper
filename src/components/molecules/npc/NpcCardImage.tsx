@@ -1,4 +1,5 @@
 import type { Npc } from '../../../types/npc.types'
+import deadWatermark from '../../../assets/watermarks/dead.png'
 import { resolveImageUrl } from '../../../constants/arts'
 import { FACTION_IMAGE } from '../../../constants/npc.constants'
 import MaskIcon from '../../atoms/icons/MaskIcon'
@@ -34,13 +35,17 @@ function NpcCardImage({ npc }: NpcCardImageProps) {
         <img
           src={factionImg}
           alt={npc.faction}
-          className="absolute -top-2 -left-3 w-24 h-24 object-contain pointer-events-none"
+          className="absolute -top-2 -left-3 w-24 h-24 object-contain pointer-events-none z-10"
         />
       )}
 
       {isDead && (
-        <div className="absolute inset-0 bg-black-500/50 flex items-end justify-center pb-3 pointer-events-none">
-          <span className="text-white-300/60 text-xs font-bold tracking-widest">MORTO</span>
+        <div className="absolute inset-0 bg-black-500/70 flex items-end justify-center pb-3 pointer-events-none">
+          <img
+            src={deadWatermark}
+            alt="morto"
+            className="absolute -top-4 right-1 w-40 h-40 object-contain pointer-events-none rotate-45"
+          />
         </div>
       )}
     </div>
