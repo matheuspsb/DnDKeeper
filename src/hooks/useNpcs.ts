@@ -1,14 +1,17 @@
 import { useState, useCallback } from 'react'
 import type { Npc } from '../types/npc.types'
+import { NPC_SEED } from '../constants/npcSeed'
 
 const STORAGE_KEY = 'dndkeeper_npcs'
 
 function load(): Npc[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Npc[]) : []
+    if (raw) return JSON.parse(raw) as Npc[]
+    persist(NPC_SEED)
+    return NPC_SEED
   } catch {
-    return []
+    return NPC_SEED
   }
 }
 
