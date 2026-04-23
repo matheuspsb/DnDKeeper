@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { Faction, NpcStatus } from '../types/npc.types'
 import { useNpcs } from '../hooks/useNpcs'
@@ -16,11 +17,29 @@ type FactionFilter = Faction | 'todas'
 function Npcs() {
   const { user } = useAuth()
   const { npcs, addNpc, updateNpc, deleteNpc } = useNpcs()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingNpc, setEditingNpc] = useState<Npc | null>(null)
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
-  const [factionFilter, setFactionFilter] = useState<FactionFilter>('todas')
+
+  const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
+  const factionFilter = (searchParams.get('faction') ?? 'todas') as FactionFilter
+
+  function setStatusFilter(value: StatusFilter) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      value === 'todos' ? next.delete('status') : next.set('status', value)
+      return next
+    })
+  }
+
+  function setFactionFilter(value: FactionFilter) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      value === 'todas' ? next.delete('faction') : next.set('faction', value)
+      return next
+    })
+  }
 
   const filtered = useMemo(() => {
     return npcs.filter((npc) => {
@@ -102,8 +121,12 @@ function Npcs() {
             onStatusChange={setStatusFilter}
             onFactionChange={setFactionFilter}
             onClear={() => {
-              setStatusFilter('todos')
-              setFactionFilter('todas')
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev)
+                next.delete('status')
+                next.delete('faction')
+                return next
+              })
             }}
           />
         )}
