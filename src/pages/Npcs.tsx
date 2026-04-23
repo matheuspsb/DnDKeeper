@@ -8,12 +8,15 @@ import NpcFilters from '../components/molecules/npc/NpcFilters'
 import NpcModal from '../components/organisms/NpcModal'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
+import { useAuth } from '../contexts/AuthContext'
 
 type StatusFilter = NpcStatus | 'todos'
 type FactionFilter = Faction | 'todas'
 
 function Npcs() {
+  const { user } = useAuth()
   const { npcs, addNpc, updateNpc, deleteNpc } = useNpcs()
+
   const [modalOpen, setModalOpen] = useState(false)
   const [editingNpc, setEditingNpc] = useState<Npc | null>(null)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
@@ -80,10 +83,12 @@ function Npcs() {
               {filtered.length !== npcs.length && ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
             </p>
           </div>
-          <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
-            <PlusIcon size={16} />
-            Novo NPC
-          </Button>
+          {user?.role === 'dm' && (
+            <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
+              <PlusIcon size={16} />
+              Novo NPC
+            </Button>
+          )}
         </div>
 
         {npcs.length > 0 && (

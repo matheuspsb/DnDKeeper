@@ -15,6 +15,7 @@ Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite or
 | React Hook Form | 7 | formulários com validação — sempre com `zodResolver` |
 | Zod | 4 | schemas de validação em `src/schemas/` |
 | @hookform/resolvers | 5 | ponte entre RHF e Zod |
+| @xyflow/react | latest | grafo de relações entre NPCs (Conexões) |
 
 ## Linguagem
 
@@ -35,7 +36,10 @@ src/
 ├── components/                             # Atomic Design
 │   ├── atoms/                              # Primitivos sem dependência de outros componentes
 │   │   ├── Button.tsx                      # Botão de texto: variantes primary e secondary
+│   │   ├── FactionBadge.tsx                # Badge colorido de facção usando FACTION_COLOR
 │   │   ├── IconButton.tsx                  # Botão quadrado para ícones, com prop active
+│   │   ├── SelectArrow.tsx                 # Seta customizada para selects (appearance-none + SVG absoluto)
+│   │   ├── StatusDot.tsx                   # Bolinha colorida + label de status do NPC
 │   │   ├── TypeBadge.tsx                   # Badge PC / Monstro para combatentes
 │   │   └── icons/                          # SVGs como componentes — props: size, className, strokeWidth
 │   │       ├── ChevronLeftIcon.tsx
@@ -45,27 +49,47 @@ src/
 │   │       ├── EyeIcon.tsx
 │   │       ├── EyeOffIcon.tsx
 │   │       ├── ImageIcon.tsx
+│   │       ├── LogOutIcon.tsx
+│   │       ├── MapIcon.tsx
+│   │       ├── MaskIcon.tsx                # Máscara teatral — ícone de NPC
 │   │       ├── MusicIcon.tsx
+│   │       ├── NetworkIcon.tsx             # Grafo de rede — ícone de Conexões
 │   │       ├── PencilIcon.tsx
 │   │       ├── PlusIcon.tsx
 │   │       ├── RefreshIcon.tsx
+│   │       ├── ScrollIcon.tsx
+│   │       ├── StarIcon.tsx
 │   │       ├── SwordsIcon.tsx
 │   │       ├── TrashIcon.tsx
 │   │       ├── UsersIcon.tsx
 │   │       └── XIcon.tsx
 │   │
 │   ├── molecules/                          # Combinações de atoms com lógica de apresentação simples
-│   │   ├── CharactersEmpty.tsx             # Estado vazio da página de personagens — com ações
-│   │   ├── DifficultyMeter.tsx             # Medidor de dificuldade do encontro — zonas coloridas + animação de partículas
-│   │   ├── GalleryEmpty.tsx                # Estado vazio genérico com ícone e mensagem
-│   │   ├── GroupHpBar.tsx                  # Barra de HP total do grupo — recebe totalHP, totalMaxHP, percentage
-│   │   ├── ImageCard.tsx                   # Card de imagem com hover, blur e ícone de expandir
-│   │   ├── InitiativeBadge.tsx             # Badge de iniciativa editável inline (clique para editar)
-│   │   ├── InitiativeEmpty.tsx             # Estado vazio da página de iniciativa
-│   │   ├── RandomTableCard.tsx             # Card de tabela aleatória — memoizado, onRoll estável via memo+useCallback
-│   │   └── StatCard.tsx                    # Card de stat genérico — label, value, sub opcional
+│   │   ├── characters/
+│   │   │   ├── CharactersEmpty.tsx         # Estado vazio da página de personagens — com ações
+│   │   │   └── GroupHpBar.tsx              # Barra de HP total do grupo — recebe totalHP, totalMaxHP, percentage
+│   │   ├── encounter/
+│   │   │   ├── DifficultyMeter.tsx         # Medidor de dificuldade do encontro — zonas coloridas + animação de partículas
+│   │   │   └── StatCard.tsx                # Card de stat genérico — label, value, sub opcional
+│   │   ├── gallery/
+│   │   │   ├── GalleryEmpty.tsx            # Estado vazio genérico com ícone e mensagem
+│   │   │   └── ImageCard.tsx              # Card de imagem com hover, blur e ícone de expandir
+│   │   ├── initiative/
+│   │   │   ├── InitiativeBadge.tsx         # Badge de iniciativa editável inline (clique para editar)
+│   │   │   └── InitiativeEmpty.tsx         # Estado vazio da página de iniciativa
+│   │   ├── npc/
+│   │   │   ├── NpcCard.tsx                 # Card de NPC — compõe Image + Body + Actions
+│   │   │   ├── NpcCardActions.tsx          # Botões editar/deletar com estado de confirmação
+│   │   │   ├── NpcCardBody.tsx             # Nome, StatusDot, FactionBadge, descrição e notas
+│   │   │   ├── NpcCardImage.tsx            # Área de imagem com watermark de facção e overlay de morto
+│   │   │   ├── NpcEmpty.tsx                # Estado vazio da página de NPCs — com ações
+│   │   │   └── NpcFilters.tsx              # Filtros de status e facção com "Limpar filtros"
+│   │   ├── MapHintBar.tsx                  # Barra de dicas do mapa
+│   │   └── RandomTableCard.tsx             # Card de tabela aleatória — memoizado, onRoll estável via memo+useCallback
 │   │
 │   └── organisms/                          # Blocos complexos com estado ou múltiplas responsabilidades
+│       ├── AddRelationModal.tsx            # Modal para criar conexão entre dois NPCs — usa RHF + Zod
+│       ├── AuthGuard.tsx                   # Guarda de autenticação — redireciona para /login se não autenticado
 │       ├── CharacterCard.tsx               # Card completo de personagem — HP, XP, notas, ações
 │       ├── CharacterModal.tsx              # Modal de criação/edição de personagem — usa RHF + Zod
 │       ├── CombatantRow.tsx                # Linha de combatente na iniciativa — status, HP, ajustes
@@ -75,6 +99,15 @@ src/
 │       ├── EncounterResultPanel.tsx        # Resultado do encontro — dificuldade, XP total, XP por jogador
 │       ├── InitiativeAddForm.tsx           # Formulário de adição de combatente — usa RHF + Zod
 │       ├── Lightbox.tsx                    # Modal de imagem expandida — navegação por clique e teclado (←→ Esc)
+│       ├── MapCalibrationModal.tsx         # Modal de calibração da régua do mapa
+│       ├── MapSvgOverlay.tsx               # Overlay SVG do mapa — linhas de régua
+│       ├── MapToolbar.tsx                  # Toolbar do mapa — ferramentas de interação
+│       ├── NpcGraph.tsx                    # Canvas de grafo de relações — @xyflow/react; ver seção "NPCs e Conexões"
+│       ├── NpcImagePicker.tsx              # Seletor de imagem para NPCs — thumbnails LOCAL_ARTS + input de URL
+│       ├── NpcModal.tsx                    # Modal de criação/edição de NPC — usa RHF + Zod
+│       ├── NpcModalHeader.tsx              # Cabeçalho do NpcModal com título (isEditing) e botão fechar
+│       ├── NpcRelationLegend.tsx           # Legenda de cores dos tipos de relação (rodapé do grafo)
+│       ├── NpcRelationPanel.tsx            # Painel de conexões com botão deletar (canto superior direito do grafo)
 │       └── Sidebar.tsx                     # Navegação lateral colapsável com logo e rotas
 │
 ├── constants/
@@ -83,6 +116,7 @@ src/
 │   ├── dnd.ts                              # XP_THRESHOLDS, getLevel, getXpProgress
 │   ├── encounter.ts                        # CR_XP, THRESHOLDS_PER_LEVEL, DIFFICULTY_LABEL/COLOR/BG/ORDER, getEncounterMultiplier
 │   ├── initiative.ts                       # HP_DELTAS — deltas dos botões na iniciativa
+│   ├── npc.constants.ts                    # FACTIONS, NPC_STATUS_LABEL/COLOR, FACTION_COLOR, FACTION_IMAGE, RELATION_TYPE_LABEL/COLOR
 │   ├── randomTables.ts                     # RANDOM_TABLES + TABLE_CATEGORIES, TABLES_BY_CATEGORY, TABLES_BY_ID
 │   └── routes.tsx                          # Fonte única das rotas: id, path, label, icon, element
 │
@@ -91,19 +125,30 @@ src/
 │   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
 │   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
 │   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
-│   └── useInitiative.ts                    # Estado da iniciativa (combatentes, turno, rodada) + localStorage
+│   ├── useInitiative.ts                    # Estado da iniciativa (combatentes, turno, rodada) + localStorage
+│   ├── useMapInteraction.ts                # Hook de interação com o mapa (pan, zoom, drag)
+│   ├── useMapRuler.ts                      # Hook de régua do mapa — calibração e medição em milhas
+│   ├── useNpcRelations.ts                  # CRUD de relações entre NPCs + localStorage `dndkeeper_npc_relations`
+│   └── useNpcs.ts                          # CRUD de NPCs + localStorage `dndkeeper_npcs`
 │
 ├── pages/
 │   ├── Artes.tsx                           # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
+│   ├── ArvoreGenealogica.tsx               # Grafo de conexões entre NPCs — @xyflow/react
 │   ├── Characters.tsx                      # Gestão de personagens — HP, XP, modal de criação/edição
 │   ├── Encounter.tsx                       # Calculadora de XP de encontro — party, monstros, resultado e histórico
 │   ├── Initiative.tsx                      # Controle de turnos de combate — lista ordenada por iniciativa
+│   ├── Login.tsx                           # Tela de login
+│   ├── Mapa.tsx                            # Visualização de mapa com régua e ferramentas
+│   ├── Npcs.tsx                            # Gestão de NPCs — filtros, grid de cards, modal de criação/edição
 │   ├── RandomTables.tsx                    # Tabelas aleatórias — 17 tabelas em 6 categorias, rolar individualmente ou tudo
 │   └── Sounds.tsx                          # (em construção)
 │
 ├── schemas/
+│   ├── auth.ts                             # authFormSchema — validação do formulário de login
 │   ├── character.ts                        # characterFormSchema — validação do formulário de personagem
-│   └── initiative.ts                       # combatantFormSchema — validação do formulário de combatente
+│   ├── initiative.ts                       # combatantFormSchema — validação do formulário de combatente
+│   ├── npc.schema.ts                       # npcFormSchema — usa z.enum(FACTIONS as [Faction, ...Faction[]]) para preservar literal union
+│   └── npcRelation.schema.ts               # npcRelationFormSchema — tipo e label da conexão
 │
 ├── services/
 │   ├── api.ts                              # Instância base do Axios (baseURL + API key global)
@@ -115,6 +160,8 @@ src/
 │   ├── icon.ts                             # IconProps { size, className, strokeWidth }
 │   ├── image.ts                            # DriveImage { id, name, url, fullUrl }
 │   ├── initiative.ts                       # Combatant { ..., imageUrl? }, CombatantStatus
+│   ├── npc.types.ts                        # Npc { id, name, faction, status, description, notes, imageUrl? }, Faction, NpcStatus
+│   ├── npcRelation.types.ts                # NpcRelation { id, sourceId, targetId, type, label? }
 │   ├── randomTables.ts                     # RollEntry { result, key }
 │   └── route.ts                            # AppRoute { id, path, label, element, icon }
 │
@@ -168,12 +215,15 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 - Schemas ficam em `src/schemas/` — um arquivo por domínio
 - Tipos de input/output são exportados via `z.input<>` e `z.output<>` do próprio schema
 - Para campos numéricos, usar `z.union([z.string(), z.number()]).transform(...).pipe(z.number())` para evitar o tipo `unknown` que `z.coerce` gera no zod v4
+- Para enums derivados de arrays de constantes, usar `z.enum(ARRAY as [Literal, ...Literal[]])` para preservar o union literal — nunca `as [string, ...string[]]` que descarta os tipos
 
 ## Persistência local
 
 - `useCharacters` — persiste em `localStorage` com chave `dndkeeper_characters`
 - `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
 - `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
+- `useNpcs` — persiste em `localStorage` com chave `dndkeeper_npcs`
+- `useNpcRelations` — persiste em `localStorage` com chave `dndkeeper_npc_relations`
 - Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
 
 ## Paleta de cores
@@ -208,12 +258,16 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 | Path | Página | Status |
 |---|---|---|
 | `/` | redirect | → `/sons` |
+| `/login` | Login | funcional |
 | `/sons` | Sounds | em construção |
 | `/artes` | Artes | funcional — **path não renomear** (configurado na API do Drive) |
 | `/personagens` | Characters | funcional |
 | `/iniciativa` | Initiative | funcional |
 | `/encontro` | Encounter | funcional |
 | `/tabelas` | RandomTables | em construção |
+| `/npcs` | Npcs | funcional |
+| `/arvore` | ArvoreGenealogica | funcional |
+| `/mapa` | Mapa | funcional |
 
 ## Deploy
 
@@ -272,6 +326,19 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - **`DifficultyMeter`**: detecta mudança de dificuldade durante o render (comparação com estado anterior via `useState`), chama `spawnParticles` de `utils/encounter.ts` e anima partículas via CSS custom properties `--dx`/`--dy` + classe `.encounter-particle` em `index.css`
   - `DIFFICULTY_ORDER` em `constants/encounter.ts` é usado para determinar se a dificuldade subiu ou desceu (quantidade de partículas difere)
 - A página de encontro **não usa RHF** — os painéis de party e monstros usam inputs controlados diretamente
+
+## NPCs e Conexões
+
+- `/npcs` — CRUD de NPCs com filtros por status e facção; grid de cards com imagem, facção, status e notas
+- `/arvore` — grafo de relações entre NPCs usando `@xyflow/react` (`NpcGraph`)
+- **Facções** (6): Zhentarim, Culto do Dragão, Irmandade Carmesim, Harpers, Confraria da Lâmina Velada, Independente — definidas em `FACTIONS` (`constants/npc.constants.ts`)
+- **Relações bidirecionais**: `addRelation` cria dois registros (A→B e B→A); `deleteRelation` remove os dois — o grafo deduplica via `seen` set antes de criar as edges
+- **NpcGraph — armadilhas do @xyflow/react**:
+  - Nodes customizados precisam de handles `type="source"` **e** `type="target"` com IDs únicos; sem handles `target`, nenhuma edge programática é renderizada
+  - `useNodesState`/`useEdgesState` só usam o valor inicial — mudanças de prop precisam de `useEffect` com `setNodes`/`setEdges`
+  - O container do ReactFlow precisa de altura explícita; `flex-1` sozinho colapsa — usar `style={{ minHeight: 0 }}`
+  - Edge type `smoothstep` roteia pelo par de handles mais próximo automaticamente
+- **Select customizado**: usar `appearance-none` no `<select>` + `<SelectArrow />` posicionado absolutamente — nunca confiar na seta nativa do browser
 
 ## Convenções
 
