@@ -1,11 +1,7 @@
 import type { UseFormRegisterReturn } from 'react-hook-form'
 import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
+import Input from '../../atoms/Input'
 
-const inputClass = `
-  w-full bg-black-500 border border-black-100 rounded-lg px-3 py-2
-  text-white-100 text-sm placeholder:text-white-300/30
-  focus:outline-none focus:border-red-100 transition-colors
-`
 const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 
 interface NpcImagePickerProps {
@@ -45,7 +41,7 @@ function NpcImagePicker({ imageUrl, onSelect, registration }: NpcImagePickerProp
           </div>
         )}
       </div>
-      <input {...registration} className={inputClass} placeholder="ou cole uma URL externa..." />
+      <Input {...registration} className="w-full bg-black-500 rounded-lg px-3 py-2" placeholder="ou cole uma URL externa..." />
     </div>
   )
 }
