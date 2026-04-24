@@ -1,12 +1,8 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import type { Npc } from '../../../types/npc.types'
-import {
-  npcRelationFormSchema,
-  type NpcRelationFormInput,
-  type NpcRelationFormOutput,
-} from '../../../schemas/npcRelation.schema'
+import type { NpcRelationFormOutput } from '../../../schemas/npcRelation.schema'
 import { RELATION_TYPE_LABEL } from '../../../constants/npc.constants'
+import { useAddRelationForm } from '../../../hooks/useAddRelationForm'
+import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import XIcon from '../../atoms/icons/XIcon'
 
@@ -17,37 +13,14 @@ interface AddRelationModalProps {
   onClose: () => void
 }
 
-const inputClass = `
-  w-full bg-black-500 border border-black-100 rounded-lg px-3 py-2
-  text-white-100 text-sm placeholder:text-white-300/30
-  focus:outline-none focus:border-red-100 transition-colors
-`
-const inputErrorClass = `
-  w-full bg-black-500 border border-red-200 rounded-lg px-3 py-2
-  text-white-100 text-sm placeholder:text-white-300/30
-  focus:outline-none focus:border-red-100 transition-colors
-`
+const fieldClass = 'w-full bg-black-500 rounded-lg px-3 py-2'
+const selectClass = `${fieldClass} border border-black-100 text-white-100 text-sm focus:outline-none focus:border-red-100 transition-colors`
+const selectErrorClass = `${fieldClass} border border-red-200 text-white-100 text-sm focus:outline-none focus:border-red-100 transition-colors`
 const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRelationModalProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<NpcRelationFormInput, unknown, NpcRelationFormOutput>({
-    resolver: zodResolver(npcRelationFormSchema),
-    defaultValues: {
-      sourceId: preselectedSourceId ?? '',
-      targetId: '',
-      type: 'neutro',
-      label: '',
-    },
-  })
-
-  function onSubmit(data: NpcRelationFormOutput) {
-    onSave(data)
-  }
+  const { register, handleSubmit, errors } = useAddRelationForm(preselectedSourceId, onSave)
 
   function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) onClose()
@@ -70,12 +43,12 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
           <div>
             <label className={labelClass}>NPC de Origem *</label>
             <select
               {...register('sourceId')}
-              className={errors.sourceId ? inputErrorClass : inputClass}
+              className={errors.sourceId ? selectErrorClass : selectClass}
             >
               <option value="">Selecione um NPC...</option>
               {npcs.map((npc) => (
@@ -89,7 +62,7 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
 
           <div>
             <label className={labelClass}>Tipo de Relação</label>
-            <select {...register('type')} className={inputClass}>
+            <select {...register('type')} className={selectClass}>
               {(Object.entries(RELATION_TYPE_LABEL) as [string, string][]).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
@@ -102,7 +75,7 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
             <label className={labelClass}>NPC de Destino *</label>
             <select
               {...register('targetId')}
-              className={errors.targetId ? inputErrorClass : inputClass}
+              className={errors.targetId ? selectErrorClass : selectClass}
             >
               <option value="">Selecione um NPC...</option>
               {npcs.map((npc) => (
@@ -116,9 +89,9 @@ function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRel
 
           <div>
             <label className={labelClass}>Descrição (opcional)</label>
-            <input
+            <Input
               {...register('label')}
-              className={inputClass}
+              className={fieldClass}
               placeholder="ex: pai de, lidera, traiu..."
             />
           </div>
