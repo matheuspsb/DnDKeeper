@@ -2,6 +2,7 @@ import type { MonsterEntry } from '../../../types/encounter'
 import type { CR } from '../../../types/encounter'
 import { CR_OPTIONS, CR_XP } from '../../../constants/encounter'
 import { formatNumber } from '../../../utils/number'
+import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import PlusIcon from '../../atoms/icons/PlusIcon'
 import TrashIcon from '../../atoms/icons/TrashIcon'
@@ -14,12 +15,6 @@ interface XpMonstersPanelProps {
   onRemove: (id: string) => void
   onClear: () => void
 }
-
-const inputClass = `
-  bg-black-500 border border-black-100 rounded-lg px-3 py-2
-  text-white-100 text-sm placeholder:text-white-300/30
-  focus:outline-none focus:border-red-100 transition-colors
-`
 
 function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMonstersPanelProps) {
   return (
@@ -69,18 +64,18 @@ function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMon
 
         {monsters.map((monster) => (
           <div key={monster.id} className="flex items-center gap-2">
-            <input
+            <Input
               value={monster.name}
               onChange={(e) => onUpdate(monster.id, { name: e.target.value })}
               placeholder="Nome do monstro..."
-              className={`flex-1 min-w-0 ${inputClass}`}
+              className="flex-1 min-w-0 bg-black-500 rounded-lg px-3 py-2"
             />
 
             <div className="relative shrink-0">
               <select
                 value={monster.cr}
                 onChange={(e) => onUpdate(monster.id, { cr: e.target.value as CR })}
-                className={`w-20 appearance-none pr-6 ${inputClass} cursor-pointer`}
+                className="w-20 bg-black-500 border border-black-100 rounded-lg px-3 py-2 text-white-100 text-sm appearance-none pr-6 focus:outline-none focus:border-red-100 transition-colors cursor-pointer"
               >
                 {CR_OPTIONS.map((cr) => (
                   <option key={cr} value={cr} className="bg-black-500">
