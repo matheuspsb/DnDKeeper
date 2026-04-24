@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { Faction, NpcStatus } from '../types/npc.types'
 import { useNpcs } from '../hooks/useNpcs'
+import { FACTIONS, FACTION_COLOR } from '../constants/npc.constants'
 import NpcCard from '../components/molecules/npc/NpcCard'
 import NpcEmpty from '../components/molecules/npc/NpcEmpty'
 import NpcFilters from '../components/molecules/npc/NpcFilters'
@@ -49,6 +50,13 @@ function Npcs() {
     })
   }, [npcs, statusFilter, factionFilter])
 
+  const groupedByFaction = useMemo(() => {
+    return FACTIONS.map((faction) => ({
+      faction,
+      npcs: filtered.filter((npc) => npc.faction === faction),
+    })).filter(({ npcs }) => npcs.length > 0)
+  }, [filtered])
+
   function openAdd() {
     setEditingNpc(null)
     setModalOpen(true)
@@ -81,14 +89,33 @@ function Npcs() {
       )
 
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((npc) => (
-          <NpcCard
-            key={npc.id}
-            npc={npc}
-            onEdit={() => openEdit(npc)}
-            onDelete={() => deleteNpc(npc.id)}
-          />
+      <div className="flex flex-col gap-10">
+        {groupedByFaction.map(({ faction, npcs: factionNpcs }) => (
+          <div key={faction}>
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                className="text-lg font-semibold tracking-wide"
+                style={{ color: FACTION_COLOR[faction] }}
+              >
+                {faction}
+              </span>
+              <div
+                className="flex-1 h-px"
+                style={{ backgroundColor: FACTION_COLOR[faction] + '33' }}
+              />
+              <span className="text-white-300/40 text-xs">{factionNpcs.length}</span>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {factionNpcs.map((npc) => (
+                <NpcCard
+                  key={npc.id}
+                  npc={npc}
+                  onEdit={() => openEdit(npc)}
+                  onDelete={() => deleteNpc(npc.id)}
+                />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     )

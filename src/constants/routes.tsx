@@ -20,19 +20,11 @@ import type { AppRoute } from '../types/route'
 
 export const ROUTES: AppRoute[] = [
   {
-    id: 'sons',
-    path: '/sons',
-    label: 'Sons',
-    element: <Sounds />,
-    icon: <MusicIcon />,
-    dmOnly: true,
-  },
-  {
-    id: 'artes',
-    path: '/artes',
-    label: 'Artes',
-    element: <Artes />,
-    icon: <ImageIcon />,
+    id: 'npcs',
+    path: '/npcs',
+    label: 'NPCs',
+    element: <Npcs />,
+    icon: <MaskIcon />,
   },
   {
     id: 'mapa',
@@ -40,6 +32,13 @@ export const ROUTES: AppRoute[] = [
     label: 'Mapa',
     element: <Mapa />,
     icon: <MapIcon />,
+  },
+  {
+    id: 'artes',
+    path: '/artes',
+    label: 'Artes',
+    element: <Artes />,
+    icon: <ImageIcon />,
   },
   {
     id: 'personagens',
@@ -74,17 +73,18 @@ export const ROUTES: AppRoute[] = [
     dmOnly: true,
   },
   {
-    id: 'npcs',
-    path: '/npcs',
-    label: 'NPCs',
-    element: <Npcs />,
-    icon: <MaskIcon />,
-  },
-  {
     id: 'arvore',
     path: '/arvore',
     label: 'Conexões',
     element: <ArvoreGenealogica />,
     icon: <NetworkIcon />,
+  },
+  {
+    id: 'sons',
+    path: '/sons',
+    label: 'Sons',
+    element: <Sounds />,
+    icon: <MusicIcon />,
+    dmOnly: true,
   },
 ]
