@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { dmLoginSchema, guestSchema } from '../schemas/auth'
 import type { DmLoginInput, GuestInput } from '../schemas/auth'
 import logo from '../assets/logo.png'
+import Input from '../components/atoms/Input'
 
 function Login() {
   const { user, isLoading, dmLogin, guestLogin } = useAuth()
@@ -47,12 +48,6 @@ function Login() {
     }
   }
 
-  const inputClass = `
-    w-full bg-black-400 border border-black-100 rounded-lg px-4 py-2.5
-    text-white-100 text-sm placeholder:text-white-300/30
-    focus:outline-none focus:border-red-100 transition-colors
-  `
-
   return (
     <div className="min-h-screen bg-black-500 flex items-center justify-center p-4">
       <div className="w-full max-w-sm flex flex-col gap-6">
@@ -67,11 +62,11 @@ function Login() {
 
           <form onSubmit={dmForm.handleSubmit(handleDmLogin)} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <input
+              <Input
                 {...dmForm.register('username')}
                 placeholder="Usuário"
                 autoComplete="username"
-                className={inputClass}
+                className="w-full bg-black-400 rounded-lg px-4 py-2.5"
               />
               {dmForm.formState.errors.username && (
                 <span className="text-red-100 text-xs">
@@ -81,12 +76,12 @@ function Login() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <input
+              <Input
                 {...dmForm.register('password')}
                 type="password"
                 placeholder="Senha"
                 autoComplete="current-password"
-                className={inputClass}
+                className="w-full bg-black-400 rounded-lg px-4 py-2.5"
               />
               {dmForm.formState.errors.password && (
                 <span className="text-red-100 text-xs">
@@ -117,11 +112,11 @@ function Login() {
         {/* Guest Login */}
         <form onSubmit={guestForm.handleSubmit(handleGuestLogin)} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
-            <input
+            <Input
               {...guestForm.register('name')}
               placeholder="Seu nome"
               autoComplete="nickname"
-              className={inputClass}
+              className="w-full bg-black-400 rounded-lg px-4 py-2.5"
             />
             {guestForm.formState.errors.name && (
               <span className="text-red-100 text-xs">
