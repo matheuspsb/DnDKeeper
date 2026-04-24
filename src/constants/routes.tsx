@@ -8,14 +8,14 @@ import StarIcon from '../components/atoms/icons/StarIcon'
 import MaskIcon from '../components/atoms/icons/MaskIcon'
 import NetworkIcon from '../components/atoms/icons/NetworkIcon'
 import Sounds from '../pages/Sounds'
-import Artes from '../pages/Artes'
-import Mapa from '../pages/Mapa'
+import Arts from '../pages/Arts'
+import Map from '../pages/Map'
 import Characters from '../pages/Characters'
 import Initiative from '../pages/Initiative'
 import RandomTables from '../pages/RandomTables'
 import Encounter from '../pages/Encounter'
 import Npcs from '../pages/Npcs'
-import ArvoreGenealogica from '../pages/ArvoreGenealogica'
+import Connections from '../pages/Connections'
 import type { AppRoute } from '../types/route.types'
 
 export const ROUTES: AppRoute[] = [
@@ -30,14 +30,14 @@ export const ROUTES: AppRoute[] = [
     id: 'mapa',
     path: '/mapa',
     label: 'Mapa',
-    element: <Mapa />,
+    element: <Map />,
     icon: <MapIcon />,
   },
   {
     id: 'artes',
     path: '/artes',
     label: 'Artes',
-    element: <Artes />,
+    element: <Arts />,
     icon: <ImageIcon />,
   },
   {
@@ -76,7 +76,7 @@ export const ROUTES: AppRoute[] = [
     id: 'arvore',
     path: '/arvore',
     label: 'Conexões',
-    element: <ArvoreGenealogica />,
+    element: <Connections />,
     icon: <NetworkIcon />,
   },
   {
