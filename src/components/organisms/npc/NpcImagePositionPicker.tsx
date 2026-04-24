@@ -1,4 +1,5 @@
 import type { NpcImagePosition } from '../../../types/npc.types'
+import { labelClass } from '../../../styles/form'
 
 const positions: { value: NpcImagePosition; label: string }[] = [
   { value: 'top', label: 'Topo' },
@@ -14,7 +15,7 @@ interface NpcImagePositionPickerProps {
 function NpcImagePositionPicker({ value, onChange }: NpcImagePositionPickerProps) {
   return (
     <div>
-      <label className="block text-white-300 text-xs font-medium mb-1.5">Enquadramento</label>
+      <label className={labelClass}>Enquadramento</label>
       <div className="flex gap-2">
         {positions.map((p) => (
           <button

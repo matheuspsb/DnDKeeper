@@ -2,6 +2,7 @@ import type { UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import type { CharacterFormInput } from '../../../schemas/character'
 import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
 import Input from '../../atoms/Input'
+import { labelClass } from '../../../styles/form'
 
 interface CharacterImagePickerProps {
   imageUrl: string
@@ -12,7 +13,7 @@ interface CharacterImagePickerProps {
 function CharacterImagePicker({ imageUrl, register, setValue }: CharacterImagePickerProps) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="block text-white-300 text-xs font-medium mb-1.5">
+      <label className={labelClass}>
         Imagem do Personagem
       </label>
       <div className="flex gap-2">

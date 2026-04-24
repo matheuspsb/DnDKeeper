@@ -1,8 +1,7 @@
 import type { UseFormRegisterReturn } from 'react-hook-form'
 import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
 import Input from '../../atoms/Input'
-
-const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
+import { labelClass } from '../../../styles/form'
 
 interface NpcImagePickerProps {
   imageUrl: string

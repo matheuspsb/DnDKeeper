@@ -2,6 +2,7 @@ import type { Npc } from '../../../types/npc.types'
 import type { NpcRelationFormOutput } from '../../../schemas/npcRelation.schema'
 import { RELATION_TYPE_LABEL } from '../../../constants/npc.constants'
 import { useAddRelationForm } from '../../../hooks/useAddRelationForm'
+import { labelClass } from '../../../styles/form'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import XIcon from '../../atoms/icons/XIcon'
@@ -16,7 +17,6 @@ interface AddRelationModalProps {
 const fieldClass = 'w-full bg-black-500 rounded-lg px-3 py-2'
 const selectClass = `${fieldClass} border border-black-100 text-white-100 text-sm focus:outline-none focus:border-red-100 transition-colors`
 const selectErrorClass = `${fieldClass} border border-red-200 text-white-100 text-sm focus:outline-none focus:border-red-100 transition-colors`
-const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function AddRelationModal({ npcs, preselectedSourceId, onSave, onClose }: AddRelationModalProps) {

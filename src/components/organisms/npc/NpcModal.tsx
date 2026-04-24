@@ -1,6 +1,7 @@
 import type { Npc } from '../../../types/npc.types'
 import { FACTIONS } from '../../../constants/npc.constants'
 import { useNpcForm } from '../../../hooks/useNpcForm'
+import { labelClass } from '../../../styles/form'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import SelectArrow from '../../atoms/SelectArrow'
@@ -17,7 +18,6 @@ interface NpcModalProps {
 const fieldClass = 'w-full bg-black-500 rounded-lg px-3 py-2'
 const selectClass = `${fieldClass} border border-black-100 text-white-100 text-sm focus:outline-none focus:border-red-100 transition-colors appearance-none`
 const textareaClass = `${fieldClass} border border-black-100 text-white-100 text-sm placeholder:text-white-300/30 focus:outline-none focus:border-red-100 transition-colors resize-none h-20`
-const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {

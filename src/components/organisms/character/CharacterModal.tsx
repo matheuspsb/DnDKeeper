@@ -4,6 +4,7 @@ import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import CharacterModalHeader from './CharacterModalHeader'
 import CharacterImagePicker from './CharacterImagePicker'
+import { labelClass } from '../../../styles/form'
 
 interface CharacterModalProps {
   initialCharacter: Character | null
@@ -12,7 +13,6 @@ interface CharacterModalProps {
 }
 
 const fieldClass = 'w-full bg-black-500 rounded-lg px-3 py-2'
-const labelClass = 'block text-white-300 text-xs font-medium mb-1.5'
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalProps) {
