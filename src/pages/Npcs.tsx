@@ -3,9 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { Faction, NpcStatus } from '../types/npc.types'
 import { useNpcs } from '../hooks/useNpcs'
-import { FACTIONS, FACTION_COLOR } from '../constants/npc.constants'
-import NpcCard from '../components/molecules/npc/NpcCard'
-import NpcEmpty from '../components/molecules/npc/NpcEmpty'
+import { FACTIONS } from '../constants/npc.constants'
+import NpcContent from '../components/molecules/npc/NpcContent'
 import NpcFilters from '../components/molecules/npc/NpcFilters'
 import NpcModal from '../components/organisms/npc/NpcModal'
 import Button from '../components/atoms/Button'
@@ -26,18 +25,10 @@ function Npcs() {
   const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
   const factionFilter = (searchParams.get('faction') ?? 'todas') as FactionFilter
 
-  function setStatusFilter(value: StatusFilter) {
+  function setFilter(key: 'status' | 'faction', value: string, emptyValue: string) {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
-      value === 'todos' ? next.delete('status') : next.set('status', value)
-      return next
-    })
-  }
-
-  function setFactionFilter(value: FactionFilter) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev)
-      value === 'todas' ? next.delete('faction') : next.set('faction', value)
+      value === emptyValue ? next.delete(key) : next.set(key, value)
       return next
     })
   }
@@ -76,51 +67,6 @@ function Npcs() {
     setModalOpen(false)
   }
 
-  function renderContent() {
-    if (npcs.length === 0) return <NpcEmpty onAdd={openAdd} />
-
-    if (filtered.length === 0)
-      return (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-white-300/60 text-sm">
-            Nenhum NPC encontrado com os filtros selecionados.
-          </p>
-        </div>
-      )
-
-    return (
-      <div className="flex flex-col gap-10">
-        {groupedByFaction.map(({ faction, npcs: factionNpcs }) => (
-          <div key={faction}>
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                className="text-lg font-semibold tracking-wide"
-                style={{ color: FACTION_COLOR[faction] }}
-              >
-                {faction}
-              </span>
-              <div
-                className="flex-1 h-px"
-                style={{ backgroundColor: FACTION_COLOR[faction] + '33' }}
-              />
-              <span className="text-white-300/40 text-xs">{factionNpcs.length}</span>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {factionNpcs.map((npc) => (
-                <NpcCard
-                  key={npc.id}
-                  npc={npc}
-                  onEdit={() => openEdit(npc)}
-                  onDelete={() => deleteNpc(npc.id)}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 px-8 pt-4 pb-4 flex flex-col gap-4">
@@ -145,21 +91,22 @@ function Npcs() {
           <NpcFilters
             statusFilter={statusFilter}
             factionFilter={factionFilter}
-            onStatusChange={setStatusFilter}
-            onFactionChange={setFactionFilter}
-            onClear={() => {
-              setSearchParams((prev) => {
-                const next = new URLSearchParams(prev)
-                next.delete('status')
-                next.delete('faction')
-                return next
-              })
-            }}
+            onStatusChange={(v) => setFilter('status', v, 'todos')}
+            onFactionChange={(v) => setFilter('faction', v, 'todas')}
+            onClear={() => setSearchParams(new URLSearchParams())}
           />
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-8">{renderContent()}</div>
+      <div className="flex-1 overflow-y-auto px-8 pb-8">
+        <NpcContent
+          npcs={npcs}
+          grouped={groupedByFaction}
+          onAdd={openAdd}
+          onEdit={openEdit}
+          onDelete={deleteNpc}
+        />
+      </div>
 
       {modalOpen && (
         <NpcModal initialNpc={editingNpc} onSave={handleSave} onClose={() => setModalOpen(false)} />
