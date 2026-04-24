@@ -1,0 +1,58 @@
+import type { UseFormRegister, UseFormSetValue } from 'react-hook-form'
+import type { CharacterFormInput } from '../../../schemas/character'
+import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
+import Input from '../../atoms/Input'
+
+interface CharacterImagePickerProps {
+  imageUrl: string
+  register: UseFormRegister<CharacterFormInput>
+  setValue: UseFormSetValue<CharacterFormInput>
+}
+
+function CharacterImagePicker({ imageUrl, register, setValue }: CharacterImagePickerProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="block text-white-300 text-xs font-medium mb-1.5">
+        Imagem do Personagem
+      </label>
+      <div className="flex gap-2">
+        {LOCAL_ARTS.map((art) => {
+          const artKey = toLocalArtUrl(art.key)
+          return (
+            <button
+              key={art.key}
+              type="button"
+              onClick={() => setValue('imageUrl', artKey, { shouldValidate: true })}
+              className={`w-14 h-18 rounded-lg overflow-hidden border-2 shrink-0 transition-colors ${
+                imageUrl === artKey
+                  ? 'border-red-100'
+                  : 'border-black-100 hover:border-white-300/40'
+              }`}
+            >
+              <img src={art.url} alt={art.name} className="w-full h-full object-cover" />
+            </button>
+          )
+        })}
+        {imageUrl && !LOCAL_ARTS.some((a) => toLocalArtUrl(a.key) === imageUrl) && (
+          <div className="w-14 h-18 rounded-lg overflow-hidden border-2 border-red-100 shrink-0">
+            <img
+              src={resolveImageUrl(imageUrl)}
+              alt="preview"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <Input
+        {...register('imageUrl')}
+        className="w-full bg-black-500 rounded-lg px-3 py-2"
+        placeholder="ou cole uma URL externa..."
+      />
+    </div>
+  )
+}
+
+export default CharacterImagePicker
