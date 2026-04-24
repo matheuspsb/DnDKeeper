@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Character } from '../../types/character'
+import type { Character } from '../../../types/character'
 import {
   characterFormSchema,
   type CharacterFormInput,
   type CharacterFormOutput,
-} from '../../schemas/character'
-import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../constants/arts'
-import Button from '../atoms/Button'
-import XIcon from '../atoms/icons/XIcon'
+} from '../../../schemas/character'
+import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
+import Button from '../../atoms/Button'
+import XIcon from '../../atoms/icons/XIcon'
 
 interface CharacterModalProps {
   initialCharacter: Character | null

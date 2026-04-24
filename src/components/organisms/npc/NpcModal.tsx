@@ -1,13 +1,13 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Npc } from '../../types/npc.types'
+import type { Npc } from '../../../types/npc.types'
 import NpcImagePositionPicker from './NpcImagePositionPicker'
-import { npcFormSchema, type NpcFormInput, type NpcFormOutput } from '../../schemas/npc.schema'
-import { FACTIONS } from '../../constants/npc.constants'
-import Button from '../atoms/Button'
+import { npcFormSchema, type NpcFormInput, type NpcFormOutput } from '../../../schemas/npc.schema'
+import { FACTIONS } from '../../../constants/npc.constants'
+import Button from '../../atoms/Button'
 import NpcModalHeader from './NpcModalHeader'
 import NpcImagePicker from './NpcImagePicker'
-import SelectArrow from '../atoms/SelectArrow'
+import SelectArrow from '../../atoms/SelectArrow'
 
 interface NpcModalProps {
   initialNpc: Npc | null

@@ -1,13 +1,13 @@
 import { useState, type KeyboardEvent } from 'react'
-import type { Character } from '../../types/character'
-import { getXpProgress } from '../../constants/dnd'
-import { HP_DELTA_OPTIONS } from '../../constants/character'
-import { resolveImageUrl } from '../../constants/arts'
-import { clampNumber, formatNumber } from '../../utils/number'
-import { resolveHpBarColor } from '../../utils/character'
-import PencilIcon from '../atoms/icons/PencilIcon'
-import TrashIcon from '../atoms/icons/TrashIcon'
-import UsersIcon from '../atoms/icons/UsersIcon'
+import type { Character } from '../../../types/character'
+import { getXpProgress } from '../../../constants/dnd'
+import { HP_DELTA_OPTIONS } from '../../../constants/character'
+import { resolveImageUrl } from '../../../constants/arts'
+import { clampNumber, formatNumber } from '../../../utils/number'
+import { resolveHpBarColor } from '../../../utils/character'
+import PencilIcon from '../../atoms/icons/PencilIcon'
+import TrashIcon from '../../atoms/icons/TrashIcon'
+import UsersIcon from '../../atoms/icons/UsersIcon'
 
 interface CharacterCardProps {
   character: Character

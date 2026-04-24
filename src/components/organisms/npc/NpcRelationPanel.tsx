@@ -1,5 +1,5 @@
 import type { Edge } from '@xyflow/react'
-import TrashIcon from '../atoms/icons/TrashIcon'
+import TrashIcon from '../../atoms/icons/TrashIcon'
 
 interface NpcRelationPanelProps {
   edges: Edge[]

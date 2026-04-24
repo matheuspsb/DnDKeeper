@@ -1,4 +1,4 @@
-import type { NpcImagePosition } from '../../types/npc.types'
+import type { NpcImagePosition } from '../../../types/npc.types'
 
 const positions: { value: NpcImagePosition; label: string }[] = [
   { value: 'top', label: 'Topo' },

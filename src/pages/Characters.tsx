@@ -6,8 +6,8 @@ import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
 import GroupHpBar from '../components/molecules/characters/GroupHpBar'
 import CharactersEmpty from '../components/molecules/characters/CharactersEmpty'
-import CharacterCard from '../components/organisms/CharacterCard'
-import CharacterModal from '../components/organisms/CharacterModal'
+import CharacterCard from '../components/organisms/character/CharacterCard'
+import CharacterModal from '../components/organisms/character/CharacterModal'
 
 // ─── Página ──────────────────────────────────────────────────────────────────
 

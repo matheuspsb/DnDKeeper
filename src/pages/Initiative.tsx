@@ -4,8 +4,8 @@ import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
 import InitiativeEmpty from '../components/molecules/initiative/InitiativeEmpty'
-import CombatantRow from '../components/organisms/CombatantRow'
-import InitiativeAddForm from '../components/organisms/InitiativeAddForm'
+import CombatantRow from '../components/organisms/initiative/CombatantRow'
+import InitiativeAddForm from '../components/organisms/initiative/InitiativeAddForm'
 
 function Initiative() {
   const {

@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { Point, RulerMode } from '../../hooks/useMapRuler'
+import type { Point, RulerMode } from '../../../hooks/useMapRuler'
 
 const MARKER_PX = 7
 const STROKE_PX = 2

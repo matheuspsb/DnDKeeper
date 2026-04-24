@@ -11,9 +11,9 @@ import {
   BackgroundVariant,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import type { Npc } from '../../types/npc.types'
-import type { NpcRelation } from '../../types/npcRelation.types'
-import { FACTION_COLOR } from '../../constants/npc.constants'
+import type { Npc } from '../../../types/npc.types'
+import type { NpcRelation } from '../../../types/npcRelation.types'
+import { FACTION_COLOR } from '../../../constants/npc.constants'
 import { npcNodeTypes } from './NpcNode'
 import { buildNodes, buildEdges } from './npcGraph.utils'
 import NpcRelationLegend from './NpcRelationLegend'

@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Npc } from '../../types/npc.types'
+import type { Npc } from '../../../types/npc.types'
 import {
   npcRelationFormSchema,
   type NpcRelationFormInput,
   type NpcRelationFormOutput,
-} from '../../schemas/npcRelation.schema'
-import { RELATION_TYPE_LABEL } from '../../constants/npc.constants'
-import Button from '../atoms/Button'
-import XIcon from '../atoms/icons/XIcon'
+} from '../../../schemas/npcRelation.schema'
+import { RELATION_TYPE_LABEL } from '../../../constants/npc.constants'
+import Button from '../../atoms/Button'
+import XIcon from '../../atoms/icons/XIcon'
 
 interface AddRelationModalProps {
   npcs: Npc[]

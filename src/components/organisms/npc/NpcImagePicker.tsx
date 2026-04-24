@@ -1,5 +1,5 @@
 import type { UseFormRegisterReturn } from 'react-hook-form'
-import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../constants/arts'
+import { LOCAL_ARTS, resolveImageUrl, toLocalArtUrl } from '../../../constants/arts'
 
 const inputClass = `
   w-full bg-black-500 border border-black-100 rounded-lg px-3 py-2

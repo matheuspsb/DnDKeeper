@@ -1,4 +1,4 @@
-import XIcon from '../atoms/icons/XIcon'
+import XIcon from '../../atoms/icons/XIcon'
 
 interface NpcModalHeaderProps {
   isEditing: boolean

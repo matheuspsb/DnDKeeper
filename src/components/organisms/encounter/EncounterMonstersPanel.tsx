@@ -1,11 +1,11 @@
-import type { MonsterEntry } from '../../types/encounter'
-import type { CR } from '../../types/encounter'
-import { CR_OPTIONS, CR_XP } from '../../constants/encounter'
-import { formatNumber } from '../../utils/number'
-import Button from '../atoms/Button'
-import PlusIcon from '../atoms/icons/PlusIcon'
-import TrashIcon from '../atoms/icons/TrashIcon'
-import SwordsIcon from '../atoms/icons/SwordsIcon'
+import type { MonsterEntry } from '../../../types/encounter'
+import type { CR } from '../../../types/encounter'
+import { CR_OPTIONS, CR_XP } from '../../../constants/encounter'
+import { formatNumber } from '../../../utils/number'
+import Button from '../../atoms/Button'
+import PlusIcon from '../../atoms/icons/PlusIcon'
+import TrashIcon from '../../atoms/icons/TrashIcon'
+import SwordsIcon from '../../atoms/icons/SwordsIcon'
 
 interface XpMonstersPanelProps {
   monsters: MonsterEntry[]

@@ -1,8 +1,8 @@
-import type { EncounterSnapshot } from '../../types/encounter'
-import { DIFFICULTY_LABEL, DIFFICULTY_COLOR, DIFFICULTY_BG } from '../../constants/encounter'
-import { formatNumber } from '../../utils/number'
-import TrashIcon from '../atoms/icons/TrashIcon'
-import Button from '../atoms/Button'
+import type { EncounterSnapshot } from '../../../types/encounter'
+import { DIFFICULTY_LABEL, DIFFICULTY_COLOR, DIFFICULTY_BG } from '../../../constants/encounter'
+import { formatNumber } from '../../../utils/number'
+import TrashIcon from '../../atoms/icons/TrashIcon'
+import Button from '../../atoms/Button'
 
 interface EncounterHistoryPanelProps {
   history: EncounterSnapshot[]

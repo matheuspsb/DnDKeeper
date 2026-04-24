@@ -1,9 +1,9 @@
-import type { Combatant, CombatantStatus } from '../../types/initiative'
-import { HP_DELTAS } from '../../constants/initiative'
-import { resolveImageUrl } from '../../constants/arts'
-import TrashIcon from '../atoms/icons/TrashIcon'
-import TypeBadge from '../atoms/TypeBadge'
-import InitiativeBadge from '../molecules/initiative/InitiativeBadge'
+import type { Combatant, CombatantStatus } from '../../../types/initiative'
+import { HP_DELTAS } from '../../../constants/initiative'
+import { resolveImageUrl } from '../../../constants/arts'
+import TrashIcon from '../../atoms/icons/TrashIcon'
+import TypeBadge from '../../atoms/TypeBadge'
+import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
 
 interface CombatantRowProps {
   combatant: Combatant

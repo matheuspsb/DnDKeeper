@@ -1,8 +1,8 @@
-import type { PartyMember } from '../../types/encounter'
-import Button from '../atoms/Button'
-import PlusIcon from '../atoms/icons/PlusIcon'
-import TrashIcon from '../atoms/icons/TrashIcon'
-import UsersIcon from '../atoms/icons/UsersIcon'
+import type { PartyMember } from '../../../types/encounter'
+import Button from '../../atoms/Button'
+import PlusIcon from '../../atoms/icons/PlusIcon'
+import TrashIcon from '../../atoms/icons/TrashIcon'
+import UsersIcon from '../../atoms/icons/UsersIcon'
 
 interface XpPartyPanelProps {
   party: PartyMember[]

@@ -1,7 +1,7 @@
 import type { Node, Edge } from '@xyflow/react'
-import type { Npc } from '../../types/npc.types'
-import type { NpcRelation } from '../../types/npcRelation.types'
-import { RELATION_TYPE_COLOR, RELATION_TYPE_LABEL } from '../../constants/npc.constants'
+import type { Npc } from '../../../types/npc.types'
+import type { NpcRelation } from '../../../types/npcRelation.types'
+import { RELATION_TYPE_COLOR, RELATION_TYPE_LABEL } from '../../../constants/npc.constants'
 
 export function buildNodes(npcs: Npc[]): Node[] {
   const cols = 4

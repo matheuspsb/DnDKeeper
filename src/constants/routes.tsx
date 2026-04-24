@@ -16,7 +16,7 @@ import RandomTables from '../pages/RandomTables'
 import Encounter from '../pages/Encounter'
 import Npcs from '../pages/Npcs'
 import ArvoreGenealogica from '../pages/ArvoreGenealogica'
-import type { AppRoute } from '../types/route'
+import type { AppRoute } from '../types/route.types'
 
 export const ROUTES: AppRoute[] = [
   {

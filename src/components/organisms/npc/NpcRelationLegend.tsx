@@ -1,4 +1,4 @@
-import { RELATION_TYPE_COLOR, RELATION_TYPE_LABEL } from '../../constants/npc.constants'
+import { RELATION_TYPE_COLOR, RELATION_TYPE_LABEL } from '../../../constants/npc.constants'
 
 function NpcRelationLegend() {
   return (

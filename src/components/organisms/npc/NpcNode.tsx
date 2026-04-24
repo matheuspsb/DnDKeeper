@@ -1,8 +1,8 @@
 import { Handle, Position, type NodeTypes } from '@xyflow/react'
-import type { Npc } from '../../types/npc.types'
-import { FACTION_COLOR, NPC_STATUS_COLOR } from '../../constants/npc.constants'
-import { resolveImageUrl } from '../../constants/arts'
-import MaskIcon from '../atoms/icons/MaskIcon'
+import type { Npc } from '../../../types/npc.types'
+import { FACTION_COLOR, NPC_STATUS_COLOR } from '../../../constants/npc.constants'
+import { resolveImageUrl } from '../../../constants/arts'
+import MaskIcon from '../../atoms/icons/MaskIcon'
 
 export interface NpcNodeData {
   npc: Npc
