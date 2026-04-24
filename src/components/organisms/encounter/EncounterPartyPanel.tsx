@@ -1,4 +1,5 @@
 import type { PartyMember } from '../../../types/encounter'
+import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import PlusIcon from '../../atoms/icons/PlusIcon'
 import TrashIcon from '../../atoms/icons/TrashIcon'
@@ -12,12 +13,6 @@ interface XpPartyPanelProps {
   onImportCharacters: () => void
   hasCharacters: boolean
 }
-
-const inputClass = `
-  bg-black-500 border border-black-100 rounded-lg px-3 py-2
-  text-white-100 text-sm placeholder:text-white-300/30
-  focus:outline-none focus:border-red-100 transition-colors
-`
 
 const LEVELS = Array.from({ length: 20 }, (_, i) => i + 1)
 
@@ -77,17 +72,17 @@ function XpPartyPanel({
 
         {party.map((member) => (
           <div key={member.id} className="flex items-center gap-2">
-            <input
+            <Input
               value={member.name}
               onChange={(e) => onUpdate(member.id, { name: e.target.value })}
               placeholder="Nome do jogador..."
-              className={`flex-1 min-w-0 ${inputClass}`}
+              className="flex-1 min-w-0 bg-black-500 rounded-lg px-3 py-2"
             />
             <div className="relative shrink-0">
               <select
                 value={member.level}
                 onChange={(e) => onUpdate(member.id, { level: Number(e.target.value) })}
-                className={`w-20 appearance-none pr-6 ${inputClass} cursor-pointer`}
+                className="w-20 bg-black-500 border border-black-100 rounded-lg px-3 py-2 text-white-100 text-sm appearance-none pr-6 focus:outline-none focus:border-red-100 transition-colors cursor-pointer"
               >
                 {LEVELS.map((lvl) => (
                   <option key={lvl} value={lvl} className="bg-black-500">
