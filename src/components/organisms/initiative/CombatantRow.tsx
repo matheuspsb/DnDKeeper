@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
 import { HP_DELTAS } from '../../../constants/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import TypeBadge from '../../atoms/TypeBadge'
 import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
+import ConditionBadge from '../../molecules/initiative/ConditionBadge'
+import ConditionModal from './ConditionModal'
 
 interface CombatantRowProps {
   combatant: Combatant
@@ -11,6 +14,7 @@ interface CombatantRowProps {
   onRemove: () => void
   onAdjustHp: (delta: number) => void
   onUpdateInitiative: (val: number) => void
+  onSetConditions: (conditions: string[]) => void
 }
 
 function CombatantRow({
@@ -19,7 +23,9 @@ function CombatantRow({
   onRemove,
   onAdjustHp,
   onUpdateInitiative,
+  onSetConditions,
 }: CombatantRowProps) {
+  const [conditionModalOpen, setConditionModalOpen] = useState(false)
   const isCurrent = status === 'current'
   const isDone = status === 'done'
 
@@ -38,6 +44,7 @@ function CombatantRow({
           : '#D72334'
 
   return (
+    <>
     <div
       className={`rounded-xl overflow-hidden ${isCurrent ? 'p-0.5 current-turn-border' : ''} ${isDone ? 'opacity-40' : ''}`}
     >
@@ -86,6 +93,17 @@ function CombatantRow({
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <TypeBadge isPlayer={combatant.isPlayer} />
             </div>
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              {(combatant.conditions ?? []).map((c) => (
+                <ConditionBadge key={c} label={c} />
+              ))}
+              <button
+                onClick={() => setConditionModalOpen(true)}
+                className="text-[10px] font-medium px-1.5 py-0.5 rounded border border-dashed border-white-300/30 text-white-300/60 hover:text-white-300 hover:border-white-300/60 transition-colors cursor-pointer leading-tight shrink-0"
+              >
+                {(combatant.conditions?.length ?? 0) > 0 ? 'Editar' : '+ Condição'}
+              </button>
+            </div>
           </div>
 
           {combatant.hp !== null && combatant.maxHp !== null && (
@@ -128,6 +146,16 @@ function CombatantRow({
         </div>
       </div>
     </div>
+
+    {conditionModalOpen && (
+      <ConditionModal
+        combatantName={combatant.name}
+        active={combatant.conditions ?? []}
+        onSave={onSetConditions}
+        onClose={() => setConditionModalOpen(false)}
+      />
+    )}
+    </>
   )
 }
 

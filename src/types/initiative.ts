@@ -7,6 +7,7 @@ export interface Combatant {
   isPlayer: boolean
   imageUrl?: string
   characterId?: string
+  conditions?: string[]
 }
 
 export type CombatantStatus = 'current' | 'pending' | 'done'

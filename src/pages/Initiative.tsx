@@ -16,6 +16,7 @@ function Initiative() {
     removeCombatant,
     adjustHp,
     updateInitiative,
+    setConditions,
     nextTurn,
     reset,
   } = useInitiative()
@@ -81,6 +82,7 @@ function Initiative() {
                 onRemove={() => removeCombatant(combatant.id)}
                 onAdjustHp={(delta) => handleAdjustHp(combatant, delta)}
                 onUpdateInitiative={(val) => updateInitiative(combatant.id, val)}
+                onSetConditions={(conditions) => setConditions(combatant.id, conditions)}
               />
             ))}
           </div>

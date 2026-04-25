@@ -87,6 +87,17 @@ export function useInitiative() {
     })
   }, [])
 
+  const setConditions = useCallback((id: string, conditions: string[]) => {
+    setState((prev) => {
+      const next = prev.combatants.map((combatant) =>
+        combatant.id === id ? { ...combatant, conditions } : combatant,
+      )
+      const nextState = { ...prev, combatants: next }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
+      return nextState
+    })
+  }, [])
+
   const nextTurn = useCallback(() => {
     setState((prev) => {
       if (prev.combatants.length === 0) return prev
@@ -108,6 +119,7 @@ export function useInitiative() {
     removeCombatant,
     adjustHp,
     updateInitiative,
+    setConditions,
     nextTurn,
     reset,
   }
