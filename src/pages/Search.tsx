@@ -1,148 +1,15 @@
-import { memo, useState, useRef } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
 import { useGlobalSearch } from '../hooks/useGlobalSearch'
+import { useSearchInput } from '../hooks/useSearchInput'
 import { useAuth } from '../contexts/AuthContext'
-import { FACTION_COLOR, NPC_STATUS_LABEL, NPC_STATUS_COLOR } from '../constants/npc.constants'
-import { resolveImageUrl } from '../constants/arts'
-import type { Npc } from '../types/npc.types'
-import type { Character } from '../types/character'
+import NpcResult from '../components/molecules/search/NpcResult'
+import CharacterResult from '../components/molecules/search/CharacterResult'
+import ResultSection from '../components/molecules/search/ResultSection'
 import Input from '../components/atoms/Input'
 import SearchIcon from '../components/atoms/icons/SearchIcon'
-import MaskIcon from '../components/atoms/icons/MaskIcon'
-import UsersIcon from '../components/atoms/icons/UsersIcon'
-
-const NpcResult = memo(function NpcResult({ npc }: { npc: Npc }) {
-  return (
-    <Link
-      to="/npcs"
-      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-black-300 transition-colors group"
-    >
-      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black-300">
-        {npc.imageUrl ? (
-          <img
-            src={resolveImageUrl(npc.imageUrl)}
-            alt={npc.name}
-            className="w-full h-full object-cover"
-            style={{ objectPosition: npc.imagePosition ?? 'top' }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white-300/30">
-            <MaskIcon size={20} />
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-white-100 text-sm font-medium truncate">{npc.name}</span>
-          <span
-            className="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0"
-            style={{ color: NPC_STATUS_COLOR[npc.status], backgroundColor: NPC_STATUS_COLOR[npc.status] + '22' }}
-          >
-            {NPC_STATUS_LABEL[npc.status]}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span
-            className="text-[10px] font-semibold"
-            style={{ color: FACTION_COLOR[npc.faction] }}
-          >
-            {npc.faction}
-          </span>
-          {npc.description && (
-            <>
-              <span className="text-white-300/30 text-[10px]">·</span>
-              <span className="text-white-300/50 text-xs truncate">{npc.description}</span>
-            </>
-          )}
-        </div>
-      </div>
-    </Link>
-  )
-})
-
-const CharacterResult = memo(function CharacterResult({ character }: { character: Character }) {
-  return (
-    <Link
-      to="/personagens"
-      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-black-300 transition-colors"
-    >
-      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black-300">
-        {character.imageUrl ? (
-          <img
-            src={resolveImageUrl(character.imageUrl)}
-            alt={character.name}
-            className="w-full h-full object-cover object-top"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white-300/30">
-            <UsersIcon size={20} />
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-white-100 text-sm font-medium truncate">{character.name}</span>
-          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-yellow/20 text-yellow shrink-0">
-            PC
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 mt-0.5 text-white-300/50 text-xs">
-          {character.playerName && <span>{character.playerName}</span>}
-          {character.playerName && (character.characterClass || character.race) && (
-            <span className="text-white-300/30">·</span>
-          )}
-          {character.characterClass && <span>{character.characterClass}</span>}
-          {character.characterClass && character.race && (
-            <span className="text-white-300/30">·</span>
-          )}
-          {character.race && <span>{character.race}</span>}
-        </div>
-      </div>
-    </Link>
-  )
-})
-
-function ResultSection({
-  title,
-  count,
-  children,
-}: {
-  title: string
-  count: number
-  children: React.ReactNode
-}) {
-  return (
-    <section>
-      <div className="flex items-center gap-2 px-4 mb-1">
-        <span className="text-white-300/50 text-xs font-semibold uppercase tracking-wider">
-          {title}
-        </span>
-        <span className="text-white-300/30 text-xs">{count}</span>
-      </div>
-      <div className="flex flex-col">{children}</div>
-    </section>
-  )
-}
 
 function Search() {
-  const [searchParams, setSearchParams] = useSearchParams()
   const { user } = useAuth()
-  const query = searchParams.get('q') ?? ''
-
-  const [inputValue, setInputValue] = useState(query)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = e.target.value
-    setInputValue(val)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      setSearchParams(val ? { q: val } : {}, { replace: true })
-    }, 300)
-  }
-
+  const { query, inputValue, handleChange } = useSearchInput()
   const { results } = useGlobalSearch(query)
 
   const visibleCharacters = user?.role === 'dm' ? results.characters : []
