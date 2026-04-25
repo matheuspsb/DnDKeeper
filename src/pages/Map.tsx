@@ -48,7 +48,6 @@ function Mapa() {
     interaction.clearMousePos()
   }
 
-  // Stable callbacks — props won't change between scrolls, so MapToolbar stays frozen
   const handleCalibrateToggle = useCallback(() => {
     if (ruler.mode === 'calibrating') ruler.exitRuler()
     else ruler.enterCalibrate()
@@ -97,7 +96,6 @@ function Mapa() {
           </div>
         )}
 
-        {/* Outside TransformWrapper — never re-renders from transform changes */}
         <MapHintBar mode={ruler.mode} pointCount={ruler.points.length} />
         <MapToolbar
           rulerMode={ruler.mode}

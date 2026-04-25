@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
 import LogOutIcon from '../atoms/icons/LogOutIcon'
+import SearchIcon from '../atoms/icons/SearchIcon'
 import { ROUTES } from '../../constants/routes'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -34,6 +35,29 @@ function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1 p-2 mt-2">
+        <NavLink
+          to="/search"
+          title={!open ? 'Buscar' : undefined}
+          className={({ isActive }) => `
+            flex items-center gap-3 px-3 py-2.5 rounded-lg w-full
+            transition-colors duration-150 overflow-hidden
+            ${isActive
+              ? 'bg-red-100/20 text-white'
+              : 'text-white-300 hover:bg-black-300 hover:text-white-100'
+            }
+          `}
+        >
+          {({ isActive }) => (
+            <>
+              <span className="shrink-0"><SearchIcon size={18} /></span>
+              {open && <span className="text-sm font-medium whitespace-nowrap">Buscar</span>}
+              {isActive && <span className="ml-auto w-1 h-4 rounded-full bg-red-100 shrink-0" />}
+            </>
+          )}
+        </NavLink>
+
+        <div className="my-1 border-t border-black-200" />
+
         {ROUTES.filter((route) => !route.dmOnly || user?.role === 'dm').map((route) => (
           <NavLink
             key={route.id}
