@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useGlobalSearch } from '../hooks/useGlobalSearch'
 import { useAuth } from '../contexts/AuthContext'
@@ -131,15 +131,22 @@ function Search() {
   const { user } = useAuth()
   const query = searchParams.get('q') ?? ''
 
+  const [inputValue, setInputValue] = useState(query)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value
+    setInputValue(val)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setSearchParams(val ? { q: val } : {}, { replace: true })
+    }, 300)
+  }
+
   const { results } = useGlobalSearch(query)
 
   const visibleCharacters = user?.role === 'dm' ? results.characters : []
   const visibleTotal = results.npcs.length + visibleCharacters.length
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = e.target.value
-    setSearchParams(val ? { q: val } : {}, { replace: true })
-  }
 
   return (
     <div className="flex flex-col h-full">
@@ -152,7 +159,7 @@ function Search() {
               className="absolute left-3 top-1/2 -translate-y-1/2 text-white-300/40 pointer-events-none"
             />
             <Input
-              value={query}
+              value={inputValue}
               onChange={handleChange}
               placeholder="NPCs, personagens, facções..."
               className="w-full bg-black-400 rounded-lg pl-9 pr-4 py-2"
