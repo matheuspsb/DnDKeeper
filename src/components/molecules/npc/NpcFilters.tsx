@@ -1,5 +1,6 @@
 import type { Faction, NpcStatus } from '../../../types/npc.types'
 import { FACTIONS, NPC_STATUS_LABEL } from '../../../constants/npc.constants'
+import SelectArrow from '../../atoms/SelectArrow'
 
 type StatusFilter = NpcStatus | 'todos'
 type FactionFilter = Faction | 'todas'
@@ -13,9 +14,9 @@ interface NpcFiltersProps {
 }
 
 const selectClass = `
-  bg-black-400 border border-black-100 rounded-lg px-3 py-1.5
+  bg-black-400 border border-black-100 rounded-lg px-3 py-1.5 pr-8
   text-white-300 text-sm focus:outline-none focus:border-red-100
-  transition-colors cursor-pointer
+  transition-colors cursor-pointer appearance-none
 `
 
 function NpcFilters({
@@ -29,31 +30,37 @@ function NpcFilters({
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
-      <select
-        value={statusFilter}
-        onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
-        className={selectClass}
-      >
-        <option value="todos">Todos os status</option>
-        {(Object.entries(NPC_STATUS_LABEL) as [NpcStatus, string][]).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
+          className={selectClass}
+        >
+          <option value="todos">Todos os status</option>
+          {(Object.entries(NPC_STATUS_LABEL) as [NpcStatus, string][]).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <SelectArrow />
+      </div>
 
-      <select
-        value={factionFilter}
-        onChange={(e) => onFactionChange(e.target.value as FactionFilter)}
-        className={selectClass}
-      >
-        <option value="todas">Todas as facções</option>
-        {FACTIONS.map((f) => (
-          <option key={f} value={f}>
-            {f}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={factionFilter}
+          onChange={(e) => onFactionChange(e.target.value as FactionFilter)}
+          className={selectClass}
+        >
+          <option value="todas">Todas as facções</option>
+          {FACTIONS.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
+        <SelectArrow />
+      </div>
 
       {hasActiveFilters && (
         <button
