@@ -8,30 +8,33 @@ Ferramenta web para mestres de D&D gerenciarem sessões ao vivo — sons, artes,
 
 ## ✨ Funcionalidades
 
-| Módulo                         | Descrição                                                                  | Status |
-| ------------------------------ | -------------------------------------------------------------------------- | ------ |
-| 🗺️ **Mapa**                    | Visualizador interativo com pan/zoom ilimitado, fit automático e bounds    | ✅     |
-| 🖼️ **Artes**                   | Galeria sincronizada com Google Drive, lightbox, blur toggle               | ✅     |
-| 👥 **Personagens**             | Gestão de HP, XP, notas e imagem dos PCs                                   | ✅     |
-| ⚔️ **Iniciativa**              | Controle de turnos com border beam animado e imagens de fundo atmosféricas | ✅     |
-| 🎲 **Tabelas Aleatórias**      | 17 tabelas em 6 categorias — encontros, NPCs, loot, clima e mais           | ✅     |
-| ⚖️ **Calculadora de Encontro** | Dificuldade e XP por grupo, com histórico e envio automático de XP         | ✅     |
-| 🎵 **Sons**                    | Loops de ambiente e efeitos sonoros                                        | 🚧     |
+| Módulo                         | Descrição                                                                             | Status |
+| ------------------------------ | ------------------------------------------------------------------------------------- | ------ |
+| 🔍 **Busca Global**            | Pesquisa por NPCs e personagens via URL (`/search?q=`), com debounce                 | ✅     |
+| 🗺️ **Mapa**                    | Visualizador interativo com pan/zoom ilimitado, fit automático e régua de distância  | ✅     |
+| 🖼️ **Artes**                   | Galeria sincronizada com Google Drive, lightbox, blur toggle                          | ✅     |
+| 👥 **Personagens**             | Gestão de HP, XP, notas e imagem dos PCs                                              | ✅     |
+| ⚔️ **Iniciativa**              | Turnos com border beam animado, imagens atmosféricas e condições de combate (D&D 5e) | ✅     |
+| 🎭 **NPCs**                    | CRUD com filtros, agrupamento por facção e imagens                                    | ✅     |
+| 🕸️ **Conexões**                | Grafo interativo de relações entre NPCs                                               | ✅     |
+| 🎲 **Tabelas Aleatórias**      | 17 tabelas em 6 categorias — encontros, NPCs, loot, clima e mais                     | ✅     |
+| ⚖️ **Calculadora de Encontro** | Dificuldade e XP por grupo, com histórico e envio automático de XP                   | ✅     |
+| 🎵 **Sons**                    | Loops de ambiente e efeitos sonoros                                                   | 🚧     |
 
 ---
 
 ## 🛠️ Stack
 
-| Tecnologia            | Versão |
-| --------------------- | ------ |
-| React                 | 19     |
-| TypeScript            | 6      |
-| Vite                  | 8      |
-| Tailwind CSS          | v4     |
-| React Router          | v7     |
-| React Hook Form + Zod | 7 / 4  |
-| Axios                 | 1.15.0 |
-| react-zoom-pan-pinch  | 4      |
+| Tecnologia            | Versão | Detalhe                                   |
+| --------------------- | ------ | ----------------------------------------- |
+| React                 | 19     | com StrictMode                            |
+| TypeScript            | 6      | strict mode                               |
+| Vite                  | 8      | bundler + dev server                      |
+| Tailwind CSS          | v4     | via `@tailwindcss/vite`, sem config.js    |
+| React Router          | v7     | BrowserRouter + `useSearchParams`         |
+| React Hook Form + Zod | 7 / 4  | formulários com `zodResolver`             |
+| Axios                 | 1.15.0 | versão segura (1.14.1 foi comprometida)   |
+| @xyflow/react         | latest | grafo de conexões entre NPCs              |
 
 ---
 
@@ -86,17 +89,30 @@ VITE_BACKEND_URL=http://localhost:3002
 
 ```
 src/
-├── components/
-│   ├── atoms/          # Botões, badges, ícones SVG
-│   ├── molecules/      # Cards, barras de HP, badges de iniciativa
-│   └── organisms/      # Modais, sidebar, painéis de encontro
-├── constants/          # Dados estáticos: rotas, tabelas, XP thresholds
-├── hooks/              # Estado com persistência: personagens, iniciativa, histórico
-├── pages/              # Uma página por rota
-├── schemas/            # Schemas Zod para formulários
-├── services/           # Axios + Google Drive API
-├── types/              # Tipos TypeScript por domínio
-└── utils/              # Funções puras: cálculos, cores, random
+├── components/                 # Atomic Design
+│   ├── atoms/                  # Primitivos: Button, Input, badges, ícones SVG
+│   ├── molecules/              # Combinações: cards, barras de HP, filtros, resultados de busca
+│   │   ├── characters/
+│   │   ├── encounter/
+│   │   ├── gallery/
+│   │   ├── initiative/
+│   │   ├── npc/
+│   │   └── search/
+│   └── organisms/              # Blocos complexos: modais, sidebar, painéis
+│       ├── character/
+│       ├── encounter/
+│       ├── initiative/
+│       ├── map/
+│       └── npc/
+├── constants/                  # Dados estáticos: rotas, tabelas, XP thresholds, condições
+├── contexts/                   # AuthContext
+├── hooks/                      # Estado com persistência + lógica de formulários
+├── pages/                      # Uma página por rota
+├── schemas/                    # Schemas Zod para formulários
+├── services/                   # Axios + Google Drive API
+├── styles/                     # Classes CSS compartilhadas (labelClass)
+├── types/                      # Tipos TypeScript por domínio
+└── utils/                      # Funções puras: cálculos, cores, random
 ```
 
 Organizado em **Atomic Design** — átomos → moléculas → organismos → páginas.
@@ -105,14 +121,18 @@ Organizado em **Atomic Design** — átomos → moléculas → organismos → p�
 
 ## 🗺️ Rotas
 
-| Path           | Página                             |
-| -------------- | ---------------------------------- |
-| `/mapa`        | Visualizador de mapa               |
-| `/artes`       | Galeria de artes                   |
-| `/personagens` | Gestão de personagens _(mestre)_   |
-| `/iniciativa`  | Controle de iniciativa _(mestre)_  |
-| `/tabelas`     | Tabelas aleatórias _(mestre)_      |
-| `/encontro`    | Calculadora de encontro _(mestre)_ |
+| Path           | Página                             | Acesso      |
+| -------------- | ---------------------------------- | ----------- |
+| `/search`      | Busca global                       | todos       |
+| `/artes`       | Galeria de artes                   | todos       |
+| `/npcs`        | Gestão de NPCs                     | todos       |
+| `/mapa`        | Visualizador de mapa               | todos       |
+| `/arvore`      | Grafo de conexões entre NPCs       | todos       |
+| `/personagens` | Gestão de personagens              | mestre      |
+| `/iniciativa`  | Controle de iniciativa             | mestre      |
+| `/tabelas`     | Tabelas aleatórias                 | mestre      |
+| `/encontro`    | Calculadora de encontro            | mestre      |
+| `/sons`        | Sons de ambiente                   | mestre 🚧   |
 
 ---
 
