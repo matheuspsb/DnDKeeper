@@ -51,5 +51,10 @@ export function useNpcs() {
     [mutate],
   )
 
-  return { npcs, addNpc, updateNpc, deleteNpc }
+  const resetToSeed = useCallback(() => {
+    persist(NPC_SEED)
+    setNpcs(NPC_SEED)
+  }, [])
+
+  return { npcs, addNpc, updateNpc, deleteNpc, resetToSeed }
 }

@@ -6,6 +6,7 @@ import { useNpcs } from '../hooks/useNpcs'
 import { FACTIONS } from '../constants/npc.constants'
 import NpcContent from '../components/molecules/npc/NpcContent'
 import NpcFilters from '../components/molecules/npc/NpcFilters'
+import NpcSeedReset from '../components/molecules/npc/NpcSeedReset'
 import NpcModal from '../components/organisms/npc/NpcModal'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
@@ -16,7 +17,7 @@ type FactionFilter = Faction | 'todas'
 
 function Npcs() {
   const { user } = useAuth()
-  const { npcs, addNpc, updateNpc, deleteNpc } = useNpcs()
+  const { npcs, addNpc, updateNpc, deleteNpc, resetToSeed } = useNpcs()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -79,12 +80,15 @@ function Npcs() {
                 ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
             </p>
           </div>
-          {user?.role === 'dm' && (
-            <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
-              <PlusIcon size={16} />
-              Novo NPC
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <NpcSeedReset onReset={resetToSeed} />
+            {user?.role === 'dm' && (
+              <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
+                <PlusIcon size={16} />
+                Novo NPC
+              </Button>
+            )}
+          </div>
         </div>
 
         {npcs.length > 0 && (

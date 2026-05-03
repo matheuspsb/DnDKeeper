@@ -8,7 +8,7 @@ export const NPC_SEED: Npc[] = [
     status: 'morto',
     description: '',
     notes: '',
-    imageUrl: 'https://drive.google.com/thumbnail?id=f1xjxIFiyn0Cu96Ol3rXb-DP1elNYHOC8Susp&sz=w800',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1xjxIFiyn0Cu96Ol3rXb-DP1elNYHOC8S&sz=w800',
   },
   {
     id: '041866b7-3544-4523-b3ec-f72c87f5641a',
