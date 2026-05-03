@@ -2,6 +2,15 @@ import type { Npc } from '../types/npc.types'
 
 export const NPC_SEED: Npc[] = [
   {
+    id: '65ceece3-1b18-4ebc-a8a2-fd2c030dbad0',
+    name: 'Zen',
+    faction: 'Zhentarim',
+    status: 'morto',
+    description: '',
+    notes: '',
+    imageUrl: 'https://drive.google.com/thumbnail?id=f1xjxIFiyn0Cu96Ol3rXb-DP1elNYHOC8Susp&sz=w800',
+  },
+  {
     id: '041866b7-3544-4523-b3ec-f72c87f5641a',
     name: 'Galdor',
     faction: 'Independente',
@@ -248,7 +257,7 @@ export const NPC_SEED: Npc[] = [
     status: 'morto',
     description: '',
     notes: '',
-    imageUrl: 'https://drive.google.com/thumbnail?id=1jd3iWwclP_OuRT6cNI2ghUw2xIDAmQE1&sz=w800',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1jd3iWwclP_OuRT6cNI2ghUw2xIDAmQE1',
     imagePosition: 'top',
   },
 ]
