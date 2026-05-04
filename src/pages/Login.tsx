@@ -13,7 +13,6 @@ function Login() {
   const navigate = useNavigate()
 
   const [dmError, setDmError] = useState<string | null>(null)
-  const [guestError, setGuestError] = useState<string | null>(null)
 
   const dmForm = useForm<DmLoginInput>({
     resolver: zodResolver(dmLoginSchema),
@@ -38,14 +37,9 @@ function Login() {
     }
   }
 
-  async function handleGuestLogin(data: GuestInput) {
-    setGuestError(null)
-    try {
-      await guestLogin(data.name)
-      navigate('/sons', { replace: true })
-    } catch {
-      setGuestError('Não foi possível entrar como convidado')
-    }
+  function handleGuestLogin(data: GuestInput) {
+    guestLogin(data.name)
+    navigate('/artes', { replace: true })
   }
 
   return (
@@ -124,8 +118,6 @@ function Login() {
               </span>
             )}
           </div>
-
-          {guestError && <p className="text-red-100 text-xs text-center">{guestError}</p>}
 
           <button
             type="submit"
