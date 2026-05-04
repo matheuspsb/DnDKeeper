@@ -25,13 +25,13 @@ function Login() {
   })
 
   if (isLoading) return null
-  if (user) return <Navigate to="/sons" replace />
+  if (user) return <Navigate to="/npcs" replace />
 
   async function handleDmLogin(data: DmLoginInput) {
     setDmError(null)
     try {
       await dmLogin(data.username, data.password)
-      navigate('/sons', { replace: true })
+      navigate('/npcs', { replace: true })
     } catch {
       setDmError('Usuário ou senha inválidos')
     }
