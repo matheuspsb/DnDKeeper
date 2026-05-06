@@ -17,10 +17,21 @@ interface AuthContextValue {
 }
 
 const GUEST_SESSION_KEY = 'dndkeeper_guest'
+const DM_SESSION_KEY = 'dndkeeper_dm'
+const BACKEND_TIMEOUT_MS = 3000
 
 function loadGuest(): JwtPayload | null {
   try {
     const raw = sessionStorage.getItem(GUEST_SESSION_KEY)
+    return raw ? (JSON.parse(raw) as JwtPayload) : null
+  } catch {
+    return null
+  }
+}
+
+function loadDm(): JwtPayload | null {
+  try {
+    const raw = localStorage.getItem(DM_SESSION_KEY)
     return raw ? (JSON.parse(raw) as JwtPayload) : null
   } catch {
     return null
@@ -41,12 +52,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    const dm = loadDm()
+    if (dm) {
+      setUser(dm)
+      setIsLoading(false)
+      return
+    }
+
     backendApi
-      .get<JwtPayload>('/api/auth/me')
+      .get<JwtPayload>('/api/auth/me', { timeout: BACKEND_TIMEOUT_MS })
       .then((res) => {
         const data = res.data
-        if (data?.role === 'dm' || data?.role === 'guest') setUser(data)
-        else setUser(null)
+        if (data?.role === 'dm') {
+          localStorage.setItem(DM_SESSION_KEY, JSON.stringify(data))
+          setUser(data)
+        } else {
+          setUser(null)
+        }
       })
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false))
@@ -54,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const dmLogin = useCallback(async (username: string, password: string) => {
     const res = await backendApi.post<JwtPayload>('/api/auth/dm/login', { username, password })
+    localStorage.setItem(DM_SESSION_KEY, JSON.stringify(res.data))
     setUser(res.data)
   }, [])
 
@@ -69,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null)
       return
     }
+    localStorage.removeItem(DM_SESSION_KEY)
     await backendApi.post('/api/auth/logout')
     setUser(null)
   }, [user])
