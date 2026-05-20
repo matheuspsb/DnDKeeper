@@ -33,7 +33,7 @@ function Letters() {
     setModalOpen(true)
   }
 
-  function handleSave(data: Omit<Letter, 'id' | 'createdAt'>) {
+  function handleSave(data: Omit<Letter, 'id'>) {
     if (editingLetter) {
       updateLetter(editingLetter.id, data)
     } else {
@@ -104,9 +104,12 @@ function Letters() {
                 className="group bg-black-300 border border-black-100 rounded-xl p-5 flex flex-col gap-3 transition-colors"
                 onMouseLeave={() => setConfirmDelete(null)}
               >
-                <h3 className="text-white-100 font-semibold text-sm leading-tight wrap-break-word">
-                  {letter.title}
-                </h3>
+                <div className="flex justify-between">
+                  <h3 className="text-white-100 font-semibold text-sm leading-tight wrap-break-word">
+                    {letter.title}
+                  </h3>
+                  <p className="text-white-300/40 text-xs">Encontrada em: {letter.foundAt}</p>
+                </div>
 
                 {letter.recipient && (
                   <p className="text-white-300/60 text-xs">Para: {letter.recipient}</p>
@@ -184,6 +187,9 @@ function Letters() {
                 {viewingLetter.recipient && (
                   <p className="text-white-300/60 text-xs mt-1">Para: {viewingLetter.recipient}</p>
                 )}
+                <p className="text-white-300/40 text-xs mt-0.5">
+                  Encontrada em: {viewingLetter.foundAt}
+                </p>
               </div>
               <button
                 onClick={() => setViewingLetter(null)}

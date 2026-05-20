@@ -4,5 +4,5 @@ export interface Letter {
   content: string
   recipient?: string
   shown: boolean
-  createdAt: string
+  foundAt: string
 }

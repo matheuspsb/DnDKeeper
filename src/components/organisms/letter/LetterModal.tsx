@@ -7,7 +7,7 @@ import XIcon from '../../atoms/icons/XIcon'
 
 interface LetterModalProps {
   initialLetter: Letter | null
-  onSave: (data: Omit<Letter, 'id' | 'createdAt'>) => void
+  onSave: (data: Omit<Letter, 'id'>) => void
   onClose: () => void
 }
 
@@ -42,13 +42,25 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
             {errors.title && <p className={errorClass}>{errors.title.message}</p>}
           </div>
 
-          <div>
-            <label className={labelClass}>Destinatário</label>
-            <Input
-              {...register('recipient')}
-              className={fieldClass}
-              placeholder="Aventureiros da Taverna do Grifo"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Destinatário</label>
+              <Input
+                {...register('recipient')}
+                className={fieldClass}
+                placeholder="Aventureiros da Taverna do Grifo"
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Data de encontro *</label>
+              <Input
+                {...register('foundAt')}
+                error={!!errors.foundAt}
+                className={fieldClass}
+                placeholder="26/04/1372"
+              />
+              {errors.foundAt && <p className={errorClass}>{errors.foundAt.message}</p>}
+            </div>
           </div>
 
           <div>

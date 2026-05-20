@@ -5,19 +5,21 @@ import { letterFormSchema, type LetterFormInput, type LetterFormOutput } from '.
 
 export function useLetterForm(
   initialLetter: Letter | null,
-  onSave: (data: Omit<Letter, 'id' | 'createdAt'>) => void,
+  onSave: (data: Omit<Letter, 'id'>) => void,
 ) {
   const defaultValues: LetterFormInput = initialLetter
     ? {
         title: initialLetter.title,
         content: initialLetter.content,
         recipient: initialLetter.recipient ?? '',
+        foundAt: initialLetter.foundAt,
         shown: initialLetter.shown,
       }
     : {
         title: '',
         content: '',
         recipient: '',
+        foundAt: '',
         shown: false,
       }
 
@@ -33,7 +35,7 @@ export function useLetterForm(
   return {
     register,
     handleSubmit: handleSubmit((data: LetterFormOutput) =>
-      onSave({ ...data, recipient: data.recipient || undefined }),
+      onSave({ ...data, recipient: data.recipient || undefined, foundAt: data.foundAt }),
     ),
     errors,
   }

@@ -31,17 +31,14 @@ export function useLetters() {
   }, [])
 
   const addLetter = useCallback(
-    (data: Omit<Letter, 'id' | 'createdAt'>) => {
-      mutate((prev) => [
-        ...prev,
-        { ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
-      ])
+    (data: Omit<Letter, 'id'>) => {
+      mutate((prev) => [...prev, { ...data, id: crypto.randomUUID() }])
     },
     [mutate],
   )
 
   const updateLetter = useCallback(
-    (id: string, data: Partial<Omit<Letter, 'id' | 'createdAt'>>) => {
+    (id: string, data: Partial<Omit<Letter, 'id'>>) => {
       mutate((prev) => prev.map((l) => (l.id === id ? { ...l, ...data } : l)))
     },
     [mutate],

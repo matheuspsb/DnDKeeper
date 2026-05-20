@@ -7,6 +7,6 @@ export const LETTER_SEED: Letter[] = [
     content:
       'que não podemos parar a produção! Você sabe muito bem que o sucesso da operação na região de Iriaebor depende do fortalecimento da tropa. Pare a produção e eu vou aí arrancar suas tripas!!!\nDH',
     shown: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
+    foundAt: '26/04/1372',
   },
 ]
