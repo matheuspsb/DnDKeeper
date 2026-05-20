@@ -13,7 +13,7 @@ function ParchmentFilter() {
           <feTurbulence
             type="fractalNoise"
             baseFrequency="0.022 0.018"
-            numOctaves="4"
+            numOctaves="2"
             seed="7"
             result="noise"
           />

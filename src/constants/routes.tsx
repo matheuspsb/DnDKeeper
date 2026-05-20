@@ -36,6 +36,14 @@ export const ROUTES: AppRoute[] = [
     icon: <MapIcon />,
   },
   {
+    id: 'cartas',
+    path: '/cartas',
+    label: 'Cartas',
+    element: <Letters />,
+    icon: <ScrollIcon />,
+    dmOnly: true,
+  },
+  {
     id: 'artes',
     path: '/artes',
     label: 'Artes',
@@ -80,14 +88,6 @@ export const ROUTES: AppRoute[] = [
     label: 'Conexões',
     element: <Connections />,
     icon: <NetworkIcon />,
-  },
-  {
-    id: 'cartas',
-    path: '/cartas',
-    label: 'Cartas',
-    element: <Letters />,
-    icon: <ScrollIcon />,
-    dmOnly: true,
   },
   {
     id: 'sons',
