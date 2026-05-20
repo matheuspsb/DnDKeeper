@@ -7,6 +7,7 @@ import DiceIcon from '../components/atoms/icons/DiceIcon'
 import StarIcon from '../components/atoms/icons/StarIcon'
 import MaskIcon from '../components/atoms/icons/MaskIcon'
 import NetworkIcon from '../components/atoms/icons/NetworkIcon'
+import ScrollIcon from '../components/atoms/icons/ScrollIcon'
 import Sounds from '../pages/Sounds'
 import Arts from '../pages/Arts'
 import Map from '../pages/Map'
@@ -16,6 +17,7 @@ import RandomTables from '../pages/RandomTables'
 import Encounter from '../pages/Encounter'
 import Npcs from '../pages/Npcs'
 import Connections from '../pages/Connections'
+import Letters from '../pages/Letters'
 import type { AppRoute } from '../types/route.types'
 
 export const ROUTES: AppRoute[] = [
@@ -78,6 +80,14 @@ export const ROUTES: AppRoute[] = [
     label: 'Conexões',
     element: <Connections />,
     icon: <NetworkIcon />,
+  },
+  {
+    id: 'cartas',
+    path: '/cartas',
+    label: 'Cartas',
+    element: <Letters />,
+    icon: <ScrollIcon />,
+    dmOnly: true,
   },
   {
     id: 'sons',
