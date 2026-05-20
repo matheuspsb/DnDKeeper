@@ -11,10 +11,11 @@ import PencilIcon from '../components/atoms/icons/PencilIcon'
 import TrashIcon from '../components/atoms/icons/TrashIcon'
 import XIcon from '../components/atoms/icons/XIcon'
 import LetterModal from '../components/organisms/letter/LetterModal'
+import LetterSeedReset from '../components/molecules/letter/LetterSeedReset'
 
 function Letters() {
   const { user } = useAuth()
-  const { letters, addLetter, updateLetter, deleteLetter, toggleShown } = useLetters()
+  const { letters, addLetter, updateLetter, deleteLetter, toggleShown, resetToSeed } = useLetters()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingLetter, setEditingLetter] = useState<Letter | null>(null)
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null)
@@ -64,10 +65,13 @@ function Letters() {
           </p>
         </div>
         {isDm && (
-          <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
-            <PlusIcon size={16} />
-            Nova Carta
-          </Button>
+          <div className="flex items-center gap-2">
+            <LetterSeedReset onReset={resetToSeed} />
+            <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
+              <PlusIcon size={16} />
+              Nova Carta
+            </Button>
+          </div>
         )}
       </div>
 
@@ -100,20 +104,9 @@ function Letters() {
                 className="group bg-black-300 border border-black-100 rounded-xl p-5 flex flex-col gap-3 transition-colors"
                 onMouseLeave={() => setConfirmDelete(null)}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-white-100 font-semibold text-sm leading-tight flex-1 wrap-break-words">
-                    {letter.title}
-                  </h3>
-                  <span
-                    className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
-                      letter.shown
-                        ? 'bg-emerald-900/40 text-emerald-400'
-                        : 'bg-black-200 text-white-300/50'
-                    }`}
-                  >
-                    {letter.shown ? 'Revelada' : 'Pendente'}
-                  </span>
-                </div>
+                <h3 className="text-white-100 font-semibold text-sm leading-tight wrap-break-word">
+                  {letter.title}
+                </h3>
 
                 {letter.recipient && (
                   <p className="text-white-300/60 text-xs">Para: {letter.recipient}</p>

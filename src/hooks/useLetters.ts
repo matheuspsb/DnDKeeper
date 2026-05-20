@@ -61,5 +61,10 @@ export function useLetters() {
     [mutate],
   )
 
-  return { letters, addLetter, updateLetter, deleteLetter, toggleShown }
+  const resetToSeed = useCallback(() => {
+    persist(LETTER_SEED)
+    setLetters(LETTER_SEED)
+  }, [])
+
+  return { letters, addLetter, updateLetter, deleteLetter, toggleShown, resetToSeed }
 }
