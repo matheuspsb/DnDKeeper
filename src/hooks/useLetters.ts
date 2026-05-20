@@ -51,17 +51,10 @@ export function useLetters() {
     [mutate],
   )
 
-  const toggleShown = useCallback(
-    (id: string) => {
-      mutate((prev) => prev.map((l) => (l.id === id ? { ...l, shown: !l.shown } : l)))
-    },
-    [mutate],
-  )
-
   const resetToSeed = useCallback(() => {
     persist(LETTER_SEED)
     setLetters(LETTER_SEED)
   }, [])
 
-  return { letters, addLetter, updateLetter, deleteLetter, toggleShown, resetToSeed }
+  return { letters, addLetter, updateLetter, deleteLetter, resetToSeed }
 }

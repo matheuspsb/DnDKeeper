@@ -64,6 +64,15 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
           </div>
 
           <div>
+            <label className={labelClass}>Data de escrita (alinhada à direita)</label>
+            <Input
+              {...register('writtenAt')}
+              className={fieldClass}
+              placeholder="Uktar, 16, 1371 DR"
+            />
+          </div>
+
+          <div>
             <label className={labelClass}>Conteúdo *</label>
             <textarea
               {...register('content')}

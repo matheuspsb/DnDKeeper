@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { Letter } from '../../../types/letter'
 import EyeIcon from '../../atoms/icons/EyeIcon'
-import EyeOffIcon from '../../atoms/icons/EyeOffIcon'
 import PencilIcon from '../../atoms/icons/PencilIcon'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 
@@ -11,10 +10,9 @@ interface LetterCardProps {
   onView: (letter: Letter) => void
   onEdit: (letter: Letter) => void
   onDelete: (id: string) => void
-  onToggleShown: (id: string) => void
 }
 
-function LetterCard({ letter, isDm, onView, onEdit, onDelete, onToggleShown }: LetterCardProps) {
+function LetterCard({ letter, isDm, onView, onEdit, onDelete }: LetterCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   function handleDelete() {
@@ -32,8 +30,12 @@ function LetterCard({ letter, isDm, onView, onEdit, onDelete, onToggleShown }: L
           <h3 className="text-[#2c1506] font-bold text-sm leading-tight wrap-break-word tracking-wide">
             {letter.title}
           </h3>
-          <span className="shrink-0 text-[#3d1e06] text-[10px] italic">{letter.foundAt}</span>
+          <span className="shrink-0 text-[#3d1e06] text-xs italic">{letter.foundAt}</span>
         </div>
+
+        {letter.writtenAt && (
+          <p className="text-[#3a1e08]/70 text-xs italic text-right font-serif">{letter.writtenAt}</p>
+        )}
 
         {letter.recipient && (
           <p className="text-[#6b4220]/75 text-xs italic">Para: {letter.recipient}</p>
@@ -54,13 +56,6 @@ function LetterCard({ letter, isDm, onView, onEdit, onDelete, onToggleShown }: L
 
           {isDm && (
             <div className="flex items-center gap-1">
-              <button
-                onClick={() => onToggleShown(letter.id)}
-                title={letter.shown ? 'Marcar como pendente' : 'Marcar como revelada'}
-                className="p-1.5 rounded text-[#3d1e06] hover:text-black hover:bg-[#8b5220]/20 transition-colors"
-              >
-                {letter.shown ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
-              </button>
               <button
                 onClick={() => onEdit(letter)}
                 className="p-1.5 rounded text-[#3d1e06] hover:text-black hover:bg-[#8b5220]/20 transition-colors"

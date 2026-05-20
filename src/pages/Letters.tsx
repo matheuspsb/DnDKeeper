@@ -13,7 +13,7 @@ import LetterViewModal from '../components/organisms/letter/LetterViewModal'
 
 function Letters() {
   const { user } = useAuth()
-  const { letters, addLetter, updateLetter, deleteLetter, toggleShown, resetToSeed } = useLetters()
+  const { letters, addLetter, updateLetter, deleteLetter, resetToSeed } = useLetters()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingLetter, setEditingLetter] = useState<Letter | null>(null)
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null)
@@ -39,8 +39,6 @@ function Letters() {
     setModalOpen(false)
   }
 
-  const shownCount = letters.filter((l) => l.shown).length
-
   return (
     <div className="flex flex-col h-full">
       <ParchmentFilter />
@@ -51,7 +49,7 @@ function Letters() {
           <p className="text-white-300/60 text-sm mt-1">
             {letters.length === 0
               ? 'Nenhuma carta'
-              : `${letters.length} carta${letters.length > 1 ? 's' : ''} · ${shownCount} revelada${shownCount !== 1 ? 's' : ''}`}
+              : `${letters.length} carta${letters.length > 1 ? 's' : ''}`}
           </p>
         </div>
         {isDm && (
@@ -78,7 +76,6 @@ function Letters() {
                 onView={setViewingLetter}
                 onEdit={openEdit}
                 onDelete={deleteLetter}
-                onToggleShown={toggleShown}
               />
             ))}
           </div>

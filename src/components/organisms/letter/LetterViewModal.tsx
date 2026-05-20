@@ -22,7 +22,7 @@ function LetterViewModal({ letter, onClose }: LetterViewModalProps) {
               {letter.recipient && (
                 <p className="text-[#6b4220]/75 text-xs italic mt-1">Para: {letter.recipient}</p>
               )}
-              <p className="text-[#3d1e06] text-[10px] italic mt-0.5">
+              <p className="text-[#3d1e06] text-xs italic mt-0.5">
                 Encontrada em: {letter.foundAt}
               </p>
             </div>
@@ -33,7 +33,12 @@ function LetterViewModal({ letter, onClose }: LetterViewModalProps) {
               <XIcon size={20} />
             </button>
           </div>
-          <div className="px-7 py-6">
+          <div className="px-7 py-6 flex flex-col gap-3">
+            {letter.writtenAt && (
+              <p className="text-[#3a1e08]/70 text-xs italic text-right font-serif">
+                {letter.writtenAt}
+              </p>
+            )}
             <p className="text-[#3a1e08] text-sm leading-7 whitespace-pre-wrap font-serif">
               {letter.content}
             </p>

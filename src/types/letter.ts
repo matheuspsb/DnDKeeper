@@ -3,6 +3,6 @@ export interface Letter {
   title: string
   content: string
   recipient?: string
-  shown: boolean
+  writtenAt?: string
   foundAt: string
 }
