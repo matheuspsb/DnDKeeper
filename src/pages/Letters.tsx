@@ -55,6 +55,34 @@ function Letters() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* SVG filter — bordas irregulares e queimadas via feDisplacementMap */}
+      <svg width="0" height="0" className="absolute overflow-hidden" aria-hidden="true">
+        <defs>
+          <filter
+            id="burnt-paper"
+            x="-8%"
+            y="-8%"
+            width="116%"
+            height="116%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.022 0.018"
+              numOctaves="4"
+              seed="7"
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="10"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
       <div className="shrink-0 px-8 pt-4 pb-4 flex items-center justify-between">
         <div>
           <h2 className="text-white-100 text-3xl font-bold">Cartas</h2>
@@ -97,32 +125,35 @@ function Letters() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {letters.map((letter) => (
               <div
                 key={letter.id}
-                className="group bg-black-300 border border-black-100 rounded-xl p-5 flex flex-col gap-3 transition-colors"
+                className="parchment group"
                 onMouseLeave={() => setConfirmDelete(null)}
               >
-                <div className="flex justify-between">
-                  <h3 className="text-white-100 font-semibold text-sm leading-tight wrap-break-word">
+              <div className="relative z-10 p-5 flex flex-col gap-3">
+                <div className="flex justify-between items-start gap-2">
+                  <h3 className="text-[#2c1506] font-bold text-sm leading-tight wrap-break-word tracking-wide">
                     {letter.title}
                   </h3>
-                  <p className="text-white-300/40 text-xs">Encontrada em: {letter.foundAt}</p>
+                  <span className="shrink-0 text-[#3d1e06] text-[10px] italic">
+                    {letter.foundAt}
+                  </span>
                 </div>
 
                 {letter.recipient && (
-                  <p className="text-white-300/60 text-xs">Para: {letter.recipient}</p>
+                  <p className="text-[#6b4220]/75 text-xs italic">Para: {letter.recipient}</p>
                 )}
 
-                <p className="text-white-200/70 text-sm leading-relaxed line-clamp-4 flex-1 whitespace-pre-wrap">
+                <p className="text-[#3a1e08]/85 text-sm leading-relaxed line-clamp-4 flex-1 whitespace-pre-wrap font-serif">
                   {letter.content}
                 </p>
 
-                <div className="flex items-center justify-between pt-2 border-t border-black-100/50">
+                <div className="flex items-center justify-between pt-2 border-t border-[#9b6b32]/30">
                   <button
                     onClick={() => setViewingLetter(letter)}
-                    className="text-white-300/60 hover:text-white-100 transition-colors text-xs flex items-center gap-1.5"
+                    className="text-[#3d1e06] hover:text-black transition-colors text-xs flex items-center gap-1.5 font-medium"
                   >
                     <EyeIcon size={13} />
                     Ler
@@ -133,13 +164,13 @@ function Letters() {
                       <button
                         onClick={() => toggleShown(letter.id)}
                         title={letter.shown ? 'Marcar como pendente' : 'Marcar como revelada'}
-                        className="p-1.5 rounded text-white-300/50 hover:text-white-100 hover:bg-black-200 transition-colors"
+                        className="p-1.5 rounded text-[#3d1e06] hover:text-black hover:bg-[#8b5220]/20 transition-colors"
                       >
                         {letter.shown ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                       </button>
                       <button
                         onClick={() => openEdit(letter)}
-                        className="p-1.5 rounded text-white-300/50 hover:text-white-100 hover:bg-black-200 transition-colors"
+                        className="p-1.5 rounded text-[#3d1e06] hover:text-black hover:bg-[#8b5220]/20 transition-colors"
                       >
                         <PencilIcon size={14} />
                       </button>
@@ -147,8 +178,8 @@ function Letters() {
                         onClick={() => handleDelete(letter.id)}
                         className={`p-1.5 rounded transition-colors ${
                           confirmDelete === letter.id
-                            ? 'text-red-100 bg-red-400/10'
-                            : 'text-white-300/50 hover:text-red-100 hover:bg-black-200'
+                            ? 'text-red-700 bg-red-400/20'
+                            : 'text-[#3d1e06] hover:text-red-700 hover:bg-red-400/15'
                         }`}
                       >
                         <TrashIcon size={14} />
@@ -156,6 +187,7 @@ function Letters() {
                     </div>
                   )}
                 </div>
+              </div>
               </div>
             ))}
           </div>
@@ -172,36 +204,40 @@ function Letters() {
 
       {viewingLetter && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"
           onClick={() => setViewingLetter(null)}
         >
           <div
-            className="bg-black-400 border border-black-100 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl"
+            className="parchment w-full max-w-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between px-6 py-4 border-b border-black-100 gap-4">
-              <div>
-                <h2 className="text-white-100 font-semibold text-lg leading-tight">
-                  {viewingLetter.title}
-                </h2>
-                {viewingLetter.recipient && (
-                  <p className="text-white-300/60 text-xs mt-1">Para: {viewingLetter.recipient}</p>
-                )}
-                <p className="text-white-300/40 text-xs mt-0.5">
-                  Encontrada em: {viewingLetter.foundAt}
+            <div className="relative z-10 max-h-[85vh] overflow-y-auto">
+              <div className="flex items-start justify-between px-7 pt-6 pb-4 border-b border-[#9b6b32]/35 gap-4">
+                <div>
+                  <h2 className="text-[#2c1506] font-bold text-xl leading-tight tracking-wide">
+                    {viewingLetter.title}
+                  </h2>
+                  {viewingLetter.recipient && (
+                    <p className="text-[#6b4220]/75 text-xs italic mt-1">
+                      Para: {viewingLetter.recipient}
+                    </p>
+                  )}
+                  <p className="text-[#3d1e06] text-[10px] italic mt-0.5">
+                    Encontrada em: {viewingLetter.foundAt}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setViewingLetter(null)}
+                  className="shrink-0 text-[#3d1e06] hover:text-black transition-colors mt-0.5"
+                >
+                  <XIcon size={20} />
+                </button>
+              </div>
+              <div className="px-7 py-6">
+                <p className="text-[#3a1e08] text-sm leading-7 whitespace-pre-wrap font-serif">
+                  {viewingLetter.content}
                 </p>
               </div>
-              <button
-                onClick={() => setViewingLetter(null)}
-                className="shrink-0 text-white-300 hover:text-white-100 transition-colors mt-0.5"
-              >
-                <XIcon size={20} />
-              </button>
-            </div>
-            <div className="px-6 py-5">
-              <p className="text-white-200 text-sm leading-relaxed whitespace-pre-wrap">
-                {viewingLetter.content}
-              </p>
             </div>
           </div>
         </div>
