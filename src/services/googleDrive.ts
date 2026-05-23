@@ -15,8 +15,7 @@ interface DriveFilesResponse {
 }
 
 export function toImageUrl(id: string, size: string): string {
-  const base = import.meta.env.DEV ? '/drive-img' : 'https://drive.google.com/thumbnail'
-  return `${base}?id=${id}&sz=${size}`
+  return `/drive-img?id=${id}&sz=${size}`
 }
 
 async function fetchImages(

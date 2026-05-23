@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/drive-img", "destination": "https://drive.google.com/thumbnail" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
