@@ -13,7 +13,7 @@ export const NPC_SEED: Npc[] = [
   {
     id: '041866b7-3544-4523-b3ec-f72c87f5641a',
     name: 'Galdor',
-    faction: 'Independente',
+    faction: 'Zhentarim',
     status: 'vivo',
     description: 'Membro do Conselho Mercante',
     notes: 'Mestre das Especiarias',
@@ -53,7 +53,7 @@ export const NPC_SEED: Npc[] = [
   {
     id: '826f6728-3d07-4a10-95e3-d6e74d2c3a80',
     name: 'Traitos Rednose',
-    faction: 'Independente',
+    faction: 'Zhentarim',
     status: 'vivo',
     description: 'Membro do Conselho Mercante',
     notes: 'Mestre da Moeda',
@@ -153,7 +153,7 @@ export const NPC_SEED: Npc[] = [
   {
     id: '79bffc3c-51f8-4870-b315-eff89ffae788',
     name: 'Kandaelis',
-    faction: 'Independente',
+    faction: 'Zhentarim',
     status: 'vivo',
     description: 'Braço direito do Galdor',
     notes: '',
