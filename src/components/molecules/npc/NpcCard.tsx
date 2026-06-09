@@ -8,9 +8,10 @@ interface NpcCardProps {
   npc: Npc
   onEdit: () => void
   onDelete: () => void
+  onImageClick?: () => void
 }
 
-function NpcCard({ npc, onEdit, onDelete }: NpcCardProps) {
+function NpcCard({ npc, onEdit, onDelete, onImageClick }: NpcCardProps) {
   const { user } = useAuth()
   const isDead = npc.status === 'morto'
 
@@ -20,7 +21,7 @@ function NpcCard({ npc, onEdit, onDelete }: NpcCardProps) {
         ${isDead ? 'border-red-400/60' : 'border-black-100 hover:border-black-200'}`}
     >
       <div className="relative">
-        <NpcCardImage npc={npc} />
+        <NpcCardImage npc={npc} onImageClick={onImageClick} />
         {user?.role === 'dm' && <NpcCardActions onEdit={onEdit} onDelete={onDelete} />}
       </div>
       <NpcCardBody npc={npc} />

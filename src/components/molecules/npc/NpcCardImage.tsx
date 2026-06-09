@@ -6,14 +6,18 @@ import MaskIcon from '../../atoms/icons/MaskIcon'
 
 interface NpcCardImageProps {
   npc: Npc
+  onImageClick?: () => void
 }
 
-function NpcCardImage({ npc }: NpcCardImageProps) {
+function NpcCardImage({ npc, onImageClick }: NpcCardImageProps) {
   const isDead = npc.status === 'morto'
   const factionImg = FACTION_IMAGE[npc.faction]
 
   return (
-    <div className="h-52 relative bg-black-400 shrink-0">
+    <div
+      className={`h-52 relative bg-black-400 shrink-0 ${npc.imageUrl && onImageClick ? 'cursor-pointer' : ''}`}
+      onClick={npc.imageUrl ? onImageClick : undefined}
+    >
       <div className="absolute inset-0 overflow-hidden">
         {npc.imageUrl ? (
           <img

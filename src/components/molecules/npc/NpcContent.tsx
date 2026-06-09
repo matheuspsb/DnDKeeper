@@ -9,9 +9,10 @@ interface NpcContentProps {
   onAdd: () => void
   onEdit: (npc: Npc) => void
   onDelete: (id: string) => void
+  onImageClick: (npc: Npc) => void
 }
 
-function NpcContent({ npcs, grouped, onAdd, onEdit, onDelete }: NpcContentProps) {
+function NpcContent({ npcs, grouped, onAdd, onEdit, onDelete, onImageClick }: NpcContentProps) {
   if (npcs.length === 0) return <NpcEmpty onAdd={onAdd} />
 
   if (grouped.length === 0)
@@ -47,6 +48,7 @@ function NpcContent({ npcs, grouped, onAdd, onEdit, onDelete }: NpcContentProps)
                 npc={npc}
                 onEdit={() => onEdit(npc)}
                 onDelete={() => onDelete(npc.id)}
+                onImageClick={() => onImageClick(npc)}
               />
             ))}
           </div>
