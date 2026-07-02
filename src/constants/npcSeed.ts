@@ -341,6 +341,16 @@ export const NPC_SEED: Npc[] = [
     imagePosition: 'top',
   },
   {
+    id: 'c0d1e2f3-a4b5-4678-2345-789012345679',
+    name: 'Condessa',
+    faction: 'Culto do Dragão',
+    status: 'vivo',
+    description: '2ª Asa do Culto do Dragão',
+    notes: '',
+    imageUrl: 'https://drive.google.com/thumbnail?id=1t8cUgCcC_MCJwtbIqwhvua7UnokJkISK&sz=w800',
+    imagePosition: 'top',
+  },
+  {
     id: 'b9c0d1e2-f3a4-4567-1234-678901234568',
     name: 'Loyre',
     faction: 'Independente',
