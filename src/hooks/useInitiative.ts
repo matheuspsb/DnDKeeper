@@ -122,6 +122,14 @@ export function useInitiative() {
 
   const reset = useCallback(() => save(INITIAL_STATE), [save])
 
+  const goToTop = useCallback(() => {
+    setState((prev) => {
+      const nextState = { ...prev, currentIndex: 0 }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
+      return nextState
+    })
+  }, [])
+
   return {
     combatants: state.combatants,
     currentIndex: state.currentIndex,
@@ -133,6 +141,7 @@ export function useInitiative() {
     setConditions,
     setImageUrl,
     nextTurn,
+    goToTop,
     reset,
   }
 }

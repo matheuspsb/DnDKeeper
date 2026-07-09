@@ -19,6 +19,7 @@ function Initiative() {
     setConditions,
     setImageUrl,
     nextTurn,
+    goToTop,
     reset,
   } = useInitiative()
 
@@ -63,6 +64,9 @@ function Initiative() {
             <div className="flex items-center gap-2">
               <Button variant="secondary" onClick={reset} className="w-auto! px-4 gap-2">
                 <RefreshIcon size={14} /> Resetar
+              </Button>
+              <Button variant="secondary" onClick={goToTop} className="w-auto! px-4">
+                Ir para o topo
               </Button>
               <Button variant="primary" onClick={nextTurn} className="w-auto! px-5 gap-2">
                 Próximo Turno <ChevronRightIcon size={15} />
