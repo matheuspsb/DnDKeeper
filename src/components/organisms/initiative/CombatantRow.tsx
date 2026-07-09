@@ -11,7 +11,7 @@ import ConditionModal from './ConditionModal'
 
 function parseDriveUrl(input: string): string {
   const match = input.match(/\/d\/([a-zA-Z0-9_-]+)/)
-  if (match) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`
+  if (match) return `/drive-img?id=${match[1]}&sz=w800`
   return input
 }
 
