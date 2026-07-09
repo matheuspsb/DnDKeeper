@@ -98,6 +98,17 @@ export function useInitiative() {
     })
   }, [])
 
+  const setImageUrl = useCallback((id: string, imageUrl: string) => {
+    setState((prev) => {
+      const next = prev.combatants.map((combatant) =>
+        combatant.id === id ? { ...combatant, imageUrl: imageUrl || undefined } : combatant,
+      )
+      const nextState = { ...prev, combatants: next }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
+      return nextState
+    })
+  }, [])
+
   const nextTurn = useCallback(() => {
     setState((prev) => {
       if (prev.combatants.length === 0) return prev
@@ -120,6 +131,7 @@ export function useInitiative() {
     adjustHp,
     updateInitiative,
     setConditions,
+    setImageUrl,
     nextTurn,
     reset,
   }

@@ -17,6 +17,7 @@ function Initiative() {
     adjustHp,
     updateInitiative,
     setConditions,
+    setImageUrl,
     nextTurn,
     reset,
   } = useInitiative()
@@ -83,6 +84,7 @@ function Initiative() {
                 onAdjustHp={(delta) => handleAdjustHp(combatant, delta)}
                 onUpdateInitiative={(val) => updateInitiative(combatant.id, val)}
                 onSetConditions={(conditions) => setConditions(combatant.id, conditions)}
+                onSetImageUrl={(url) => setImageUrl(combatant.id, url)}
               />
             ))}
           </div>
