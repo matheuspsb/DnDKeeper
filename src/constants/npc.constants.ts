@@ -1,5 +1,4 @@
 import type { Faction, NpcStatus } from '../types/npc.types'
-import type { RelationType } from '../types/npcRelation.types'
 import zhentarimImg from '../assets/watermarks/zhentarim.webp'
 import cultoImg from '../assets/watermarks/culto.png'
 import irmandadeImg from '../assets/watermarks/irmandade.png'
@@ -44,20 +43,4 @@ export const FACTION_COLOR: Record<Faction, string> = {
   Harpers: '#3b82f6',
   'Confraria da Lâmina Velada': '#64748b',
   Independente: '#6b7280',
-}
-
-export const RELATION_TYPE_LABEL: Record<RelationType, string> = {
-  familiar: 'Familiar',
-  aliado: 'Aliado',
-  inimigo: 'Inimigo',
-  neutro: 'Neutro',
-  subordinado: 'Subordinado',
-}
-
-export const RELATION_TYPE_COLOR: Record<RelationType, string> = {
-  familiar: '#f97316',
-  aliado: '#22c55e',
-  inimigo: '#ef4444',
-  neutro: '#94a3b8',
-  subordinado: '#a855f7',
 }

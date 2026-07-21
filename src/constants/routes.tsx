@@ -83,8 +83,8 @@ export const ROUTES: AppRoute[] = [
     dmOnly: true,
   },
   {
-    id: 'arvore',
-    path: '/arvore',
+    id: 'conexoes',
+    path: '/conexoes',
     label: 'Conexões',
     element: <Connections />,
     icon: <NetworkIcon />,
