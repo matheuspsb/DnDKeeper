@@ -9,6 +9,7 @@ export interface HierarchyNode {
   imageUrl?: string
   imagePosition?: ImagePosition
   status: NpcStatus
+  children?: HierarchyNode[]
 }
 
 export interface HierarchyTree {
@@ -68,6 +69,64 @@ export const CULT_TREE: HierarchyTree = {
       name: "Ki'Narage",
       imageUrl: '/drive-img?id=1IcyMRxsvafvyBD7loA_MNUemFRrKuNa4&sz=w800',
       status: 'morto',
+      children: [
+        {
+          id: 'asa-12-1',
+          label: 'Kiaransalee',
+          imageUrl: '/drive-img?id=1GZ7yRBeUnWe9qN52_LtRnshlEnRWkJFl&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-2',
+          label: 'Kimatira',
+          imageUrl: '/drive-img?id=1XZOjPA22_9rvdkLS-xQr9ilK7Co8bUxP&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-3',
+          label: 'Caldrous',
+          imageUrl: '/drive-img?id=1RdAFCB5lcCTYaciom8CYMvWn7Dwjy8nV&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-4',
+          label: 'Eilistraee',
+          imageUrl: '/drive-img?id=1ZzFwkR7unFdexcFdc7_Bdbvo_Q1pwHhA&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-7',
+          label: 'Skarnoth',
+          imageUrl: '/drive-img?id=1PwLfNDF3ePjlM07eO1sDcI5-s7pcu4dW&sz=w800',
+          imagePosition: 'top',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-8',
+          label: 'Thalian',
+          imageUrl: '/drive-img?id=1g80xzL0Dn5u17K78MhcRXlbW-oi9dt16&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-9',
+          label: 'Thimtek',
+          imageUrl: '/drive-img?id=1jd3iWwclP_OuRT6cNI2ghUw2xIDAmQE1&sz=w800',
+          imagePosition: 'top',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-6',
+          label: 'Golg',
+          imageUrl: '/drive-img?id=1N9tqciSFM1xBo_ERg7jqYtx9nLpRdMHd&sz=w800',
+          status: 'morto',
+        },
+        {
+          id: 'asa-12-5',
+          label: 'Fumaça',
+          imageUrl: '/drive-img?id=1fwXdVFwThJ23dguqwrf94pH32cBaKjj7&sz=w800',
+          status: 'morto',
+        },
+      ],
     },
   ],
 }

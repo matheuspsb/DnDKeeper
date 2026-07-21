@@ -21,13 +21,18 @@ interface TreeNodeProps {
   node: HierarchyNode
   radius: number
   imageRadius: number
+  hasChildren?: boolean
+  isExpanded?: boolean
 }
 
-export function TreeNode({ node, radius, imageRadius }: TreeNodeProps) {
-  const isRevealed = node.status !== 'desconhecido'
-  const isDead = node.status === 'morto'
+export function TreeNode({ node, radius, imageRadius, hasChildren, isExpanded }: TreeNodeProps) {
+  const isRevealed  = node.status !== 'desconhecido'
+  const isDead      = node.status === 'morto'
   const borderColor = BORDER_COLOR[node.status]
-  const background = BACKGROUND_COLOR[node.status]
+  const background  = BACKGROUND_COLOR[node.status]
+  const labelY      = radius + 17
+  const nameY       = radius + 31
+  const chevronY    = node.name ? nameY + 14 : labelY + 14
 
   return (
     <>
@@ -59,13 +64,11 @@ export function TreeNode({ node, radius, imageRadius }: TreeNodeProps) {
           imagePosition={node.imagePosition}
         />
       ) : (
-        <text y={5} textAnchor="middle" fill="#4b5563" fontSize={20}>
-          ?
-        </text>
+        <text y={5} textAnchor="middle" fill="#4b5563" fontSize={20}>?</text>
       )}
 
       <text
-        y={radius + 17}
+        y={labelY}
         textAnchor="middle"
         fill={isRevealed ? '#e5e7eb' : '#6b7280'}
         fontSize={11}
@@ -75,8 +78,14 @@ export function TreeNode({ node, radius, imageRadius }: TreeNodeProps) {
       </text>
 
       {node.name && (
-        <text y={radius + 31} textAnchor="middle" fill="#a78bfa" fontSize={10}>
+        <text y={nameY} textAnchor="middle" fill="#a78bfa" fontSize={10}>
           {node.name}
+        </text>
+      )}
+
+      {hasChildren && (
+        <text y={chevronY} textAnchor="middle" fill="#6b7280" fontSize={9}>
+          {isExpanded ? '▲' : '▼'}
         </text>
       )}
     </>
