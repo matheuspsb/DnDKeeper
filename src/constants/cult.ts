@@ -1,10 +1,13 @@
 import { NpcStatus } from '@/types/npc.types'
 
+export type ImagePosition = 'top' | 'center' | 'bottom'
+
 export interface HierarchyNode {
   id: string
   label: string
   name?: string
   imageUrl?: string
+  imagePosition?: ImagePosition
   status: NpcStatus
 }
 
@@ -14,7 +17,7 @@ export interface HierarchyTree {
 }
 
 export const CULT_TREE: HierarchyTree = {
-  root: { label: 'Mestre', faction: 'Culto do Dragão' },
+  root: { label: 'Mestre', faction: '' },
   children: [
     { id: 'asa-1', label: '1ª Asa', status: 'desconhecido' },
     {
@@ -22,6 +25,7 @@ export const CULT_TREE: HierarchyTree = {
       label: '2ª Asa',
       name: 'Condessa',
       imageUrl: '/drive-img?id=1t8cUgCcC_MCJwtbIqwhvua7UnokJkISK&sz=w800',
+      imagePosition: 'top',
       status: 'vivo',
     },
     { id: 'asa-3', label: '3ª Asa', status: 'desconhecido' },
@@ -40,6 +44,7 @@ export const CULT_TREE: HierarchyTree = {
       label: '8ª Asa',
       name: 'Odin',
       imageUrl: '/drive-img?id=1cRQNaHtK1GvJ9ujdgYMPRVD5ApUY1mC3&sz=w800',
+      imagePosition: 'top',
       status: 'vivo',
     },
     {

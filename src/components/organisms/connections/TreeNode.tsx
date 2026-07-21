@@ -56,6 +56,7 @@ export function TreeNode({ node, radius, imageRadius }: TreeNodeProps) {
           imageUrl={node.imageUrl}
           radius={imageRadius}
           grayscale={isDead}
+          imagePosition={node.imagePosition}
         />
       ) : (
         <text y={5} textAnchor="middle" fill="#4b5563" fontSize={20}>
