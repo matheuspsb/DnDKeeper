@@ -87,6 +87,41 @@ export const CULT_TREE: HierarchyTree = {
           label: 'Caldrous',
           imageUrl: '/drive-img?id=1RdAFCB5lcCTYaciom8CYMvWn7Dwjy8nV&sz=w800',
           status: 'morto',
+          children: [
+            {
+              id: 'asa-12-3-0',
+              label: 'Derek Duas Facas',
+              imageUrl: '/drive-img?id=11BhJk4Fe_8cBJVFugpx-J4uk06kJ__Wb&sz=w800',
+              imagePosition: 'top',
+              status: 'morto',
+            },
+            {
+              id: 'asa-12-3-4',
+              label: 'Quitara',
+              imageUrl: '/drive-img?id=1kPvIrlOuYD8jGForrghXJ7wI41T3-fCl&sz=w800',
+              status: 'morto',
+            },
+            {
+              id: 'asa-12-3-1',
+              label: 'Desconhecido',
+              imageUrl: '/drive-img?id=1BaRnaVUgWcuH-1i5VN_0hpbWnEYR1t5b&sz=w800',
+              imagePosition: 'top',
+              status: 'morto',
+            },
+            {
+              id: 'asa-12-3-2',
+              label: 'Desconhecido',
+              imageUrl: '/drive-img?id=19WFCZvDNDXTeAkmHxO1TXERGSF6WVv_E&sz=w800',
+              imagePosition: 'top',
+              status: 'morto',
+            },
+            {
+              id: 'asa-12-3-3',
+              label: 'Desconhecido',
+              imageUrl: '/drive-img?id=1cG_i81YGPy_RFQXma0TxPQtynWbUadFq&sz=w800',
+              status: 'morto',
+            },
+          ],
         },
         {
           id: 'asa-12-4',
