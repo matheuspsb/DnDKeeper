@@ -31,10 +31,10 @@ export const CULT_TREE: HierarchyTree = {
     },
     { id: 'asa-3', label: '3ª Asa', status: 'desconhecido' },
     { id: 'asa-4', label: '4ª Asa', status: 'desconhecido' },
-    { id: 'asa-5', label: '5ª Asa', status: 'desconhecido' },
+    { id: 'asa-6', label: '6ª Asa', status: 'desconhecido' },
     {
-      id: 'asa-6',
-      label: '6ª Asa',
+      id: 'asa-5',
+      label: '5ª Asa',
       name: 'Vortak',
       imageUrl: '/drive-img?id=18d47EVYaO2d8VHgw-N95iwfd5cLlpn2q&sz=w800',
       status: 'vivo',
