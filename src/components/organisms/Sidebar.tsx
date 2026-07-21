@@ -8,7 +8,7 @@ import { ROUTES } from '../../constants/routes'
 import { useAuth } from '../../contexts/AuthContext'
 
 function Sidebar() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -41,15 +41,18 @@ function Sidebar() {
           className={({ isActive }) => `
             flex items-center gap-3 px-3 py-2.5 rounded-lg w-full
             transition-colors duration-150 overflow-hidden
-            ${isActive
-              ? 'bg-red-100/20 text-white'
-              : 'text-white-300 hover:bg-black-300 hover:text-white-100'
+            ${
+              isActive
+                ? 'bg-red-100/20 text-white'
+                : 'text-white-300 hover:bg-black-300 hover:text-white-100'
             }
           `}
         >
           {({ isActive }) => (
             <>
-              <span className="shrink-0"><SearchIcon size={18} /></span>
+              <span className="shrink-0">
+                <SearchIcon size={18} />
+              </span>
               {open && <span className="text-sm font-medium whitespace-nowrap">Buscar</span>}
               {isActive && <span className="ml-auto w-1 h-4 rounded-full bg-red-100 shrink-0" />}
             </>
