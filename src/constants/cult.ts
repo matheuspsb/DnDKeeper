@@ -35,8 +35,20 @@ export const CULT_TREE: HierarchyTree = {
       status: 'vivo',
     },
     { id: 'asa-7', label: '7ª Asa', status: 'desconhecido' },
-    { id: 'asa-8', label: '8ª Asa', status: 'desconhecido' },
-    { id: 'asa-9', label: '9ª Asa', status: 'desconhecido' },
+    {
+      id: 'asa-8',
+      label: '8ª Asa',
+      name: 'Odin',
+      imageUrl: '/drive-img?id=1cRQNaHtK1GvJ9ujdgYMPRVD5ApUY1mC3&sz=w800',
+      status: 'vivo',
+    },
+    {
+      id: 'asa-9',
+      label: '9ª Asa',
+      name: 'Nhalzir',
+      imageUrl: '/drive-img?id=1oUUwIJsQH2VzvZr1yomil_1455fMtt3Q&sz=w800',
+      status: 'vivo',
+    },
     { id: 'asa-10', label: '10ª Asa', status: 'desconhecido' },
     {
       id: 'asa-11',
