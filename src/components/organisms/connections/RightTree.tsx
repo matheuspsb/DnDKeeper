@@ -46,9 +46,13 @@ interface RightTreeProps {
 
 export function RightTree({ tree, wasJustClick }: RightTreeProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [mountedIds, setMountedIds] = useState<Set<string>>(new Set())
 
   function toggleExpanded(nodeId: string) {
     if (!wasJustClick()) return
+    if (!expandedIds.has(nodeId)) {
+      setMountedIds((prev) => new Set(prev).add(nodeId))
+    }
     setExpandedIds((prev) => {
       const next = new Set(prev)
       if (next.has(nodeId)) next.delete(nodeId)
@@ -106,71 +110,99 @@ export function RightTree({ tree, wasJustClick }: RightTreeProps) {
           />
         ))}
 
-      {/* L1 → L2 */}
+      {/* L1 → L2 connectors */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const childY = getChildY(index, childCount)
-        return child.children.map((grandchild, gcIndex) => (
-          <TreeConnector
-            key={`l1l2-${grandchild.id}`}
-            direction="right"
-            fromCenterX={childX}
-            fromCenterY={childY}
-            fromRadius={CHILD_RADIUS}
-            toCenterX={grandchildX}
-            toCenterY={getGrandchildY(childY, gcIndex, child.children!.length)}
-            toRadius={GRANDCHILD_RADIUS}
-            status={grandchild.status}
-          />
-        ))
+        const isL1Expanded = expandedIds.has(child.id)
+        return (
+          <g
+            key={`l1l2c-${child.id}`}
+            visibility={isL1Expanded ? undefined : 'hidden'}
+            pointerEvents="none"
+          >
+            {child.children!.map((grandchild, gcIndex) => (
+              <TreeConnector
+                key={`l1l2-${grandchild.id}`}
+                direction="right"
+                fromCenterX={childX}
+                fromCenterY={childY}
+                fromRadius={CHILD_RADIUS}
+                toCenterX={grandchildX}
+                toCenterY={getGrandchildY(childY, gcIndex, child.children!.length)}
+                toRadius={GRANDCHILD_RADIUS}
+                status={grandchild.status}
+              />
+            ))}
+          </g>
+        )
       })}
 
-      {/* L2 → L3 */}
+      {/* L2 → L3 connectors */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const childY = getChildY(index, childCount)
         return child.children.map((grandchild, gcIndex) => {
-          if (!expandedIds.has(grandchild.id) || !grandchild.children?.length) return null
+          if (!mountedIds.has(grandchild.id) || !grandchild.children?.length) return null
           const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
-          return grandchild.children.map((ggc, ggcIndex) => (
-            <TreeConnector
-              key={`l2l3-${ggc.id}`}
-              direction="right"
-              fromCenterX={grandchildX}
-              fromCenterY={gcY}
-              fromRadius={GRANDCHILD_RADIUS}
-              toCenterX={greatGrandchildX}
-              toCenterY={getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)}
-              toRadius={GREAT_GRANDCHILD_RADIUS}
-              status={ggc.status}
-            />
-          ))
+          const isVisible = expandedIds.has(child.id) && expandedIds.has(grandchild.id)
+          return (
+            <g
+              key={`l2l3c-${grandchild.id}`}
+              visibility={isVisible ? undefined : 'hidden'}
+              pointerEvents="none"
+            >
+              {grandchild.children!.map((ggc, ggcIndex) => (
+                <TreeConnector
+                  key={`l2l3-${ggc.id}`}
+                  direction="right"
+                  fromCenterX={grandchildX}
+                  fromCenterY={gcY}
+                  fromRadius={GRANDCHILD_RADIUS}
+                  toCenterX={greatGrandchildX}
+                  toCenterY={getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)}
+                  toRadius={GREAT_GRANDCHILD_RADIUS}
+                  status={ggc.status}
+                />
+              ))}
+            </g>
+          )
         })
       })}
 
-      {/* L3 → L4 */}
+      {/* L3 → L4 connectors */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const childY = getChildY(index, childCount)
         return child.children.map((grandchild, gcIndex) => {
-          if (!expandedIds.has(grandchild.id) || !grandchild.children?.length) return null
+          if (!mountedIds.has(grandchild.id) || !grandchild.children?.length) return null
           const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
           return grandchild.children.map((ggc, ggcIndex) => {
-            if (!expandedIds.has(ggc.id) || !ggc.children?.length) return null
+            if (!mountedIds.has(ggc.id) || !ggc.children?.length) return null
             const ggcY = getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)
-            return ggc.children.map((l4, l4Index) => (
-              <TreeConnector
-                key={`l3l4-${l4.id}`}
-                direction="right"
-                fromCenterX={greatGrandchildX}
-                fromCenterY={ggcY}
-                fromRadius={GREAT_GRANDCHILD_RADIUS}
-                toCenterX={level4X}
-                toCenterY={getLevel4Y(ggcY, l4Index, ggc.children!.length)}
-                toRadius={LEVEL4_RADIUS}
-                status={l4.status}
-              />
-            ))
+            const isVisible =
+              expandedIds.has(child.id) && expandedIds.has(grandchild.id) && expandedIds.has(ggc.id)
+            return (
+              <g
+                key={`l3l4c-${ggc.id}`}
+                visibility={isVisible ? undefined : 'hidden'}
+                pointerEvents="none"
+              >
+                {ggc.children!.map((l4, l4Index) => (
+                  <TreeConnector
+                    key={`l3l4-${l4.id}`}
+                    direction="right"
+                    fromCenterX={greatGrandchildX}
+                    fromCenterY={ggcY}
+                    fromRadius={GREAT_GRANDCHILD_RADIUS}
+                    toCenterX={level4X}
+                    toCenterY={getLevel4Y(ggcY, l4Index, ggc.children!.length)}
+                    toRadius={LEVEL4_RADIUS}
+                    status={l4.status}
+                  />
+                ))}
+              </g>
+            )
           })
         })
       })}
@@ -202,92 +234,120 @@ export function RightTree({ tree, wasJustClick }: RightTreeProps) {
 
       {/* Nós L2 */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
+        const childY = getChildY(index, childCount)
+        const isL1Expanded = expandedIds.has(child.id)
+        return (
+          <g
+            key={`l2n-${child.id}`}
+            visibility={isL1Expanded ? undefined : 'hidden'}
+            pointerEvents={isL1Expanded ? undefined : 'none'}
+          >
+            {child.children!.map((grandchild, gcIndex) => {
+              const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
+              const hasChildren = !!grandchild.children?.length
+              const isExpanded = expandedIds.has(grandchild.id)
+              return (
+                <g
+                  key={grandchild.id}
+                  transform={`translate(${grandchildX}, ${gcY})`}
+                  onClick={hasChildren ? () => toggleExpanded(grandchild.id) : undefined}
+                  cursor={hasChildren ? 'pointer' : undefined}
+                >
+                  <TreeNode
+                    node={grandchild}
+                    radius={GRANDCHILD_RADIUS}
+                    imageRadius={GRANDCHILD_IMG_R}
+                    hasChildren={hasChildren}
+                    isExpanded={isExpanded}
+                    expandDirection="right"
+                    accentColor={accentColor}
+                  />
+                </g>
+              )
+            })}
+          </g>
+        )
+      })}
+
+      {/* Nós L3 */}
+      {tree.children.map((child, index) => {
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const childY = getChildY(index, childCount)
         return child.children.map((grandchild, gcIndex) => {
+          if (!mountedIds.has(grandchild.id) || !grandchild.children?.length) return null
           const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
-          const hasChildren = !!grandchild.children?.length
-          const isExpanded = expandedIds.has(grandchild.id)
+          const isVisible = expandedIds.has(child.id) && expandedIds.has(grandchild.id)
           return (
             <g
-              key={grandchild.id}
-              transform={`translate(${grandchildX}, ${gcY})`}
-              onClick={hasChildren ? () => toggleExpanded(grandchild.id) : undefined}
-              cursor={hasChildren ? 'pointer' : undefined}
+              key={`l3n-${grandchild.id}`}
+              visibility={isVisible ? undefined : 'hidden'}
+              pointerEvents={isVisible ? undefined : 'none'}
             >
-              <TreeNode
-                node={grandchild}
-                radius={GRANDCHILD_RADIUS}
-                imageRadius={GRANDCHILD_IMG_R}
-                hasChildren={hasChildren}
-                isExpanded={isExpanded}
-                expandDirection="right"
-                accentColor={accentColor}
-              />
+              {grandchild.children!.map((ggc, ggcIndex) => {
+                const ggcY = getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)
+                const hasChildren = !!ggc.children?.length
+                const isExpanded = expandedIds.has(ggc.id)
+                return (
+                  <g
+                    key={ggc.id}
+                    transform={`translate(${greatGrandchildX}, ${ggcY})`}
+                    onClick={hasChildren ? () => toggleExpanded(ggc.id) : undefined}
+                    cursor={hasChildren ? 'pointer' : undefined}
+                  >
+                    <TreeNode
+                      node={ggc}
+                      radius={GREAT_GRANDCHILD_RADIUS}
+                      imageRadius={GREAT_GRANDCHILD_IMG_R}
+                      hasChildren={hasChildren}
+                      isExpanded={isExpanded}
+                      expandDirection="right"
+                      fontSize={9}
+                      accentColor={accentColor}
+                    />
+                  </g>
+                )
+              })}
             </g>
           )
         })
       })}
 
-      {/* Nós L3 */}
-      {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
-        const childY = getChildY(index, childCount)
-        return child.children.map((grandchild, gcIndex) => {
-          if (!expandedIds.has(grandchild.id) || !grandchild.children?.length) return null
-          const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
-          return grandchild.children.map((ggc, ggcIndex) => {
-            const ggcY = getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)
-            const hasChildren = !!ggc.children?.length
-            const isExpanded = expandedIds.has(ggc.id)
-            return (
-              <g
-                key={ggc.id}
-                transform={`translate(${greatGrandchildX}, ${ggcY})`}
-                onClick={hasChildren ? () => toggleExpanded(ggc.id) : undefined}
-                cursor={hasChildren ? 'pointer' : undefined}
-              >
-                <TreeNode
-                  node={ggc}
-                  radius={GREAT_GRANDCHILD_RADIUS}
-                  imageRadius={GREAT_GRANDCHILD_IMG_R}
-                  hasChildren={hasChildren}
-                  isExpanded={isExpanded}
-                  expandDirection="right"
-                  fontSize={9}
-                  accentColor={accentColor}
-                />
-              </g>
-            )
-          })
-        })
-      })}
-
       {/* Nós L4 */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const childY = getChildY(index, childCount)
         return child.children.map((grandchild, gcIndex) => {
-          if (!expandedIds.has(grandchild.id) || !grandchild.children?.length) return null
+          if (!mountedIds.has(grandchild.id) || !grandchild.children?.length) return null
           const gcY = getGrandchildY(childY, gcIndex, child.children!.length)
           return grandchild.children.map((ggc, ggcIndex) => {
-            if (!expandedIds.has(ggc.id) || !ggc.children?.length) return null
+            if (!mountedIds.has(ggc.id) || !ggc.children?.length) return null
             const ggcY = getGreatGrandchildY(gcY, ggcIndex, grandchild.children!.length)
-            return ggc.children.map((l4, l4Index) => (
+            const isVisible =
+              expandedIds.has(child.id) && expandedIds.has(grandchild.id) && expandedIds.has(ggc.id)
+            return (
               <g
-                key={l4.id}
-                transform={`translate(${level4X}, ${getLevel4Y(ggcY, l4Index, ggc.children!.length)})`}
+                key={`l4n-${ggc.id}`}
+                visibility={isVisible ? undefined : 'hidden'}
+                pointerEvents={isVisible ? undefined : 'none'}
               >
-                <TreeNode
-                  node={l4}
-                  radius={LEVEL4_RADIUS}
-                  imageRadius={LEVEL4_IMG_R}
-                  expandDirection="right"
-                  fontSize={8}
-                  accentColor={accentColor}
-                />
+                {ggc.children!.map((l4, l4Index) => (
+                  <g
+                    key={l4.id}
+                    transform={`translate(${level4X}, ${getLevel4Y(ggcY, l4Index, ggc.children!.length)})`}
+                  >
+                    <TreeNode
+                      node={l4}
+                      radius={LEVEL4_RADIUS}
+                      imageRadius={LEVEL4_IMG_R}
+                      expandDirection="right"
+                      fontSize={8}
+                      accentColor={accentColor}
+                    />
+                  </g>
+                ))}
               </g>
-            ))
+            )
           })
         })
       })}

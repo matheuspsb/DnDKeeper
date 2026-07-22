@@ -35,6 +35,7 @@ interface DownTreeProps {
 
 export function DownTree({ tree, wasJustClick }: DownTreeProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [mountedIds, setMountedIds] = useState<Set<string>>(new Set())
 
   const nodeCount = tree.children.length
   const treeWidth = getDownTreeWidth(tree)
@@ -42,6 +43,9 @@ export function DownTree({ tree, wasJustClick }: DownTreeProps) {
   const rootCenterX = treeWidth / 2
 
   function toggleExpanded(nodeId: string) {
+    if (!expandedIds.has(nodeId)) {
+      setMountedIds((prev) => new Set(prev).add(nodeId))
+    }
     setExpandedIds((previous) => {
       const next = new Set(previous)
       if (next.has(nodeId)) next.delete(nodeId)
@@ -86,44 +90,62 @@ export function DownTree({ tree, wasJustClick }: DownTreeProps) {
         />
       ))}
 
-      {/* Nível 2 → 3 (expandidos) */}
+      {/* Nível 2 → 3 */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const parentX = getChildCenterX(index)
-        return child.children.map((grandchild, gcIndex) => (
-          <TreeConnector
-            key={`l23-${grandchild.id}`}
-            fromCenterX={parentX}
-            fromCenterY={CHILD_CENTER_Y}
-            fromRadius={CHILD_RADIUS}
-            toCenterX={getGrandchildCenterX(parentX, gcIndex, child.children!.length)}
-            toCenterY={GRANDCHILD_CENTER_Y}
-            toRadius={GRANDCHILD_RADIUS}
-            status={grandchild.status}
-          />
-        ))
+        const isExpanded = expandedIds.has(child.id)
+        return (
+          <g
+            key={`l23c-${child.id}`}
+            visibility={isExpanded ? undefined : 'hidden'}
+            pointerEvents="none"
+          >
+            {child.children!.map((grandchild, gcIndex) => (
+              <TreeConnector
+                key={`l23-${grandchild.id}`}
+                fromCenterX={parentX}
+                fromCenterY={CHILD_CENTER_Y}
+                fromRadius={CHILD_RADIUS}
+                toCenterX={getGrandchildCenterX(parentX, gcIndex, child.children!.length)}
+                toCenterY={GRANDCHILD_CENTER_Y}
+                toRadius={GRANDCHILD_RADIUS}
+                status={grandchild.status}
+              />
+            ))}
+          </g>
+        )
       })}
 
       {/* Nível 3 → 4 */}
       {tree.children.map((child, childIndex) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const parentX = getChildCenterX(childIndex)
-        return child.children.map((grandchild, gcIndex) => {
-          if (!grandchild.children?.length) return null
-          const gcX = getGrandchildCenterX(parentX, gcIndex, child.children!.length)
-          return grandchild.children.map((ggc, ggcIndex) => (
-            <TreeConnector
-              key={`l34-${ggc.id}`}
-              fromCenterX={gcX}
-              fromCenterY={GRANDCHILD_CENTER_Y}
-              fromRadius={GRANDCHILD_RADIUS}
-              toCenterX={getGreatGrandchildCenterX(gcX, ggcIndex, grandchild.children!.length)}
-              toCenterY={GREAT_GRANDCHILD_CENTER_Y}
-              toRadius={GREAT_GRANDCHILD_RADIUS}
-              status={ggc.status}
-            />
-          ))
-        })
+        const isExpanded = expandedIds.has(child.id)
+        return (
+          <g
+            key={`l34c-${child.id}`}
+            visibility={isExpanded ? undefined : 'hidden'}
+            pointerEvents="none"
+          >
+            {child.children!.map((grandchild, gcIndex) => {
+              if (!grandchild.children?.length) return null
+              const gcX = getGrandchildCenterX(parentX, gcIndex, child.children!.length)
+              return grandchild.children.map((ggc, ggcIndex) => (
+                <TreeConnector
+                  key={`l34-${ggc.id}`}
+                  fromCenterX={gcX}
+                  fromCenterY={GRANDCHILD_CENTER_Y}
+                  fromRadius={GRANDCHILD_RADIUS}
+                  toCenterX={getGreatGrandchildCenterX(gcX, ggcIndex, grandchild.children!.length)}
+                  toCenterY={GREAT_GRANDCHILD_CENTER_Y}
+                  toRadius={GREAT_GRANDCHILD_RADIUS}
+                  status={ggc.status}
+                />
+              ))
+            })}
+          </g>
+        )
       })}
 
       {/* Nó raiz */}
@@ -176,39 +198,61 @@ export function DownTree({ tree, wasJustClick }: DownTreeProps) {
 
       {/* Nível 3 */}
       {tree.children.map((child, index) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const parentX = getChildCenterX(index)
-        return child.children.map((grandchild, gcIndex) => (
+        const isExpanded = expandedIds.has(child.id)
+        return (
           <g
-            key={grandchild.id}
-            transform={`translate(${getGrandchildCenterX(parentX, gcIndex, child.children!.length)}, ${GRANDCHILD_CENTER_Y})`}
+            key={`l3n-${child.id}`}
+            visibility={isExpanded ? undefined : 'hidden'}
+            pointerEvents={isExpanded ? undefined : 'none'}
           >
-            <TreeNode node={grandchild} radius={GRANDCHILD_RADIUS} imageRadius={GRANDCHILD_IMG_R} />
+            {child.children!.map((grandchild, gcIndex) => (
+              <g
+                key={grandchild.id}
+                transform={`translate(${getGrandchildCenterX(parentX, gcIndex, child.children!.length)}, ${GRANDCHILD_CENTER_Y})`}
+              >
+                <TreeNode
+                  node={grandchild}
+                  radius={GRANDCHILD_RADIUS}
+                  imageRadius={GRANDCHILD_IMG_R}
+                />
+              </g>
+            ))}
           </g>
-        ))
+        )
       })}
 
       {/* Nível 4 */}
       {tree.children.map((child, childIndex) => {
-        if (!expandedIds.has(child.id) || !child.children?.length) return null
+        if (!mountedIds.has(child.id) || !child.children?.length) return null
         const parentX = getChildCenterX(childIndex)
-        return child.children.map((grandchild, gcIndex) => {
-          if (!grandchild.children?.length) return null
-          const gcX = getGrandchildCenterX(parentX, gcIndex, child.children!.length)
-          return grandchild.children.map((ggc, ggcIndex) => (
-            <g
-              key={ggc.id}
-              transform={`translate(${getGreatGrandchildCenterX(gcX, ggcIndex, grandchild.children!.length)}, ${GREAT_GRANDCHILD_CENTER_Y})`}
-            >
-              <TreeNode
-                node={ggc}
-                radius={GREAT_GRANDCHILD_RADIUS}
-                imageRadius={GREAT_GRANDCHILD_IMG_R}
-                fontSize={8}
-              />
-            </g>
-          ))
-        })
+        const isExpanded = expandedIds.has(child.id)
+        return (
+          <g
+            key={`l4n-${child.id}`}
+            visibility={isExpanded ? undefined : 'hidden'}
+            pointerEvents={isExpanded ? undefined : 'none'}
+          >
+            {child.children!.map((grandchild, gcIndex) => {
+              if (!grandchild.children?.length) return null
+              const gcX = getGrandchildCenterX(parentX, gcIndex, child.children!.length)
+              return grandchild.children.map((ggc, ggcIndex) => (
+                <g
+                  key={ggc.id}
+                  transform={`translate(${getGreatGrandchildCenterX(gcX, ggcIndex, grandchild.children!.length)}, ${GREAT_GRANDCHILD_CENTER_Y})`}
+                >
+                  <TreeNode
+                    node={ggc}
+                    radius={GREAT_GRANDCHILD_RADIUS}
+                    imageRadius={GREAT_GRANDCHILD_IMG_R}
+                    fontSize={8}
+                  />
+                </g>
+              ))
+            })}
+          </g>
+        )
       })}
     </>
   )
