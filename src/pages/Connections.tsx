@@ -1,4 +1,4 @@
-import { CULT_TREE } from '../constants/cult'
+import { FACTION_TREES } from '../constants/connections.constants'
 import { TreeView } from '../components/organisms/connections/TreeView'
 
 function Connections() {
@@ -10,7 +10,7 @@ function Connections() {
       </div>
 
       <div className="flex-1 min-h-0">
-        <TreeView tree={CULT_TREE} />
+        <TreeView trees={FACTION_TREES} />
       </div>
     </div>
   )

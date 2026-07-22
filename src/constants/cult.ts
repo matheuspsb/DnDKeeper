@@ -13,7 +13,16 @@ export interface HierarchyNode {
 }
 
 export interface HierarchyTree {
-  root: { label: string; faction: string }
+  root: {
+    label: string
+    faction: string
+    name?: string
+    status?: NpcStatus
+    imageUrl?: string
+    imagePosition?: ImagePosition
+  }
+  direction?: 'down' | 'right'
+  hideRoot?: boolean
   children: HierarchyNode[]
 }
 
@@ -80,6 +89,7 @@ export const CULT_TREE: HierarchyTree = {
           id: 'asa-12-2',
           label: 'Kimatira',
           imageUrl: '/drive-img?id=1XZOjPA22_9rvdkLS-xQr9ilK7Co8bUxP&sz=w800',
+          imagePosition: 'top',
           status: 'morto',
         },
         {
@@ -99,6 +109,7 @@ export const CULT_TREE: HierarchyTree = {
               id: 'asa-12-3-4',
               label: 'Quitara',
               imageUrl: '/drive-img?id=1kPvIrlOuYD8jGForrghXJ7wI41T3-fCl&sz=w800',
+              imagePosition: 'top',
               status: 'morto',
             },
             {
