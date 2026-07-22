@@ -1,8 +1,8 @@
 import type { NpcStatus } from '../../../types/npc.types'
 
 const CONNECTOR_COLOR: Record<NpcStatus, string> = {
-  vivo:         '#2d2f3a',
-  morto:        '#7f1d1d',
+  vivo: '#2d2f3a',
+  morto: '#7f1d1d',
   desconhecido: '#2d2f3a',
   desaparecido: '#2d2f3a',
 }
@@ -17,6 +17,7 @@ interface TreeConnectorProps {
   toCenterY: number
   toRadius: number
   status: NpcStatus
+  direction?: 'down' | 'right'
 }
 
 export function TreeConnector({
@@ -27,15 +28,24 @@ export function TreeConnector({
   toCenterY,
   toRadius,
   status,
+  direction = 'down',
 }: TreeConnectorProps) {
   const isDead = status === 'morto'
 
-  const startY     = fromCenterY + fromRadius
-  const endY       = toCenterY - toRadius
-  const controlY1  = startY + CONTROL_POINT_OFFSET
-  const controlY2  = endY - CONTROL_POINT_OFFSET
+  let path: string
 
-  const path = `M ${fromCenterX} ${startY} C ${fromCenterX} ${controlY1}, ${toCenterX} ${controlY2}, ${toCenterX} ${endY}`
+  if (direction === 'right') {
+    const startX = fromCenterX + fromRadius
+    const endX = toCenterX - toRadius
+    const ctrlOffset = Math.min((endX - startX) / 2, Math.max(30, (endX - startX) * 0.4))
+    path = `M ${startX} ${fromCenterY} C ${startX + ctrlOffset} ${fromCenterY}, ${endX - ctrlOffset} ${toCenterY}, ${endX} ${toCenterY}`
+  } else {
+    const startY = fromCenterY + fromRadius
+    const endY = toCenterY - toRadius
+    const controlY1 = startY + CONTROL_POINT_OFFSET
+    const controlY2 = endY - CONTROL_POINT_OFFSET
+    path = `M ${fromCenterX} ${startY} C ${fromCenterX} ${controlY1}, ${toCenterX} ${controlY2}, ${toCenterX} ${endY}`
+  }
 
   return (
     <path

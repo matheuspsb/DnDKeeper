@@ -2,6 +2,7 @@ import type { NpcStatus } from '../../../types/npc.types'
 import type { HierarchyNode } from '../../../constants/cult'
 import { FILTER_ID } from './TreeFilters'
 import { NodeImage } from './NodeImage'
+import SkullBadge from '../../atoms/icons/SkullBadge'
 
 const BORDER_COLOR: Record<NpcStatus, string> = {
   vivo: '#7c3aed',
@@ -24,17 +25,30 @@ interface TreeNodeProps {
   hasChildren?: boolean
   isExpanded?: boolean
   fontSize?: number
+  expandDirection?: 'down' | 'right'
+  accentColor?: string
 }
 
-export function TreeNode({ node, radius, imageRadius, hasChildren, isExpanded, fontSize = 11 }: TreeNodeProps) {
-  const isRevealed  = node.status !== 'desconhecido'
-  const isDead      = node.status === 'morto'
-  const borderColor = BORDER_COLOR[node.status]
-  const background  = BACKGROUND_COLOR[node.status]
-  const lineHeight  = fontSize + 3
-  const labelY      = radius + lineHeight + 3
-  const nameY       = labelY + lineHeight
-  const chevronY    = node.name ? nameY + lineHeight : labelY + lineHeight
+export function TreeNode({
+  node,
+  radius,
+  imageRadius,
+  hasChildren,
+  isExpanded,
+  fontSize = 11,
+  expandDirection = 'down',
+  accentColor,
+}: TreeNodeProps) {
+  const isRevealed = node.status !== 'desconhecido'
+  const isDead = node.status === 'morto'
+  const isVivo = node.status === 'vivo'
+  const borderColor = isVivo && accentColor ? accentColor : BORDER_COLOR[node.status]
+  const nameColor = isVivo && accentColor ? accentColor : '#a78bfa'
+  const background = isVivo && accentColor ? '#17181c' : BACKGROUND_COLOR[node.status]
+  const lineHeight = fontSize + 3
+  const labelY = radius + lineHeight + 3
+  const nameY = labelY + lineHeight
+  const chevronY = node.name ? nameY + lineHeight : labelY + lineHeight
 
   return (
     <>
@@ -66,8 +80,12 @@ export function TreeNode({ node, radius, imageRadius, hasChildren, isExpanded, f
           imagePosition={node.imagePosition}
         />
       ) : (
-        <text y={5} textAnchor="middle" fill="#4b5563" fontSize={20}>?</text>
+        <text y={5} textAnchor="middle" fill="#4b5563" fontSize={20}>
+          ?
+        </text>
       )}
+
+      {isDead && <SkullBadge radius={radius} />}
 
       <text
         y={labelY}
@@ -80,14 +98,14 @@ export function TreeNode({ node, radius, imageRadius, hasChildren, isExpanded, f
       </text>
 
       {node.name && (
-        <text y={nameY} textAnchor="middle" fill="#a78bfa" fontSize={fontSize - 1}>
+        <text y={nameY} textAnchor="middle" fill={nameColor} fontSize={fontSize - 1}>
           {node.name}
         </text>
       )}
 
       {hasChildren && (
         <text y={chevronY} textAnchor="middle" fill="#6b7280" fontSize={fontSize - 2}>
-          {isExpanded ? '▲' : '▼'}
+          {expandDirection === 'right' ? (isExpanded ? '◀' : '▶') : isExpanded ? '▲' : '▼'}
         </text>
       )}
     </>
