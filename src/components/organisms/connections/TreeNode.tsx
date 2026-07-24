@@ -104,9 +104,23 @@ export function TreeNode({
       )}
 
       {hasChildren && (
-        <text y={chevronY} textAnchor="middle" fill="#6b7280" fontSize={fontSize - 2}>
-          {expandDirection === 'right' ? (isExpanded ? '◀' : '▶') : isExpanded ? '▲' : '▼'}
-        </text>
+        <path
+          transform={`translate(0, ${chevronY})`}
+          d={
+            expandDirection === 'right'
+              ? isExpanded
+                ? 'M 4 -6 L -4 0 L 4 6'
+                : 'M -4 -6 L 4 0 L -4 6'
+              : isExpanded
+                ? 'M -6 4 L 0 -4 L 6 4'
+                : 'M -6 -4 L 0 4 L 6 -4'
+          }
+          fill="none"
+          stroke="#6b7280"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       )}
     </>
   )
