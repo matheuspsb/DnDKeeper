@@ -3,6 +3,7 @@ import type { HierarchyNode } from '../../../constants/cult'
 import { FILTER_ID } from './TreeFilters'
 import { NodeImage } from './NodeImage'
 import SkullBadge from '../../atoms/icons/SkullBadge'
+import { TreeChevron } from './TreeChevron'
 
 const BORDER_COLOR: Record<NpcStatus, string> = {
   vivo: '#7c3aed',
@@ -104,22 +105,13 @@ export function TreeNode({
       )}
 
       {hasChildren && (
-        <path
-          transform={`translate(0, ${chevronY})`}
-          d={
+        <TreeChevron
+          y={chevronY}
+          direction={
             expandDirection === 'right'
-              ? isExpanded
-                ? 'M 4 -6 L -4 0 L 4 6'
-                : 'M -4 -6 L 4 0 L -4 6'
-              : isExpanded
-                ? 'M -6 4 L 0 -4 L 6 4'
-                : 'M -6 -4 L 0 4 L 6 -4'
+              ? isExpanded ? 'left' : 'right'
+              : isExpanded ? 'up' : 'down'
           }
-          fill="none"
-          stroke="#6b7280"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
         />
       )}
     </>
