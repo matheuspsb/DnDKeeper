@@ -1,5 +1,7 @@
 import { memo } from 'react'
 import type { Point, RulerMode } from '../../../hooks/useMapRuler'
+import type { DrawnPath } from '../../../types/drawing'
+import { toSvgPath } from '../../../utils/drawing'
 
 const MARKER_PX = 7
 const STROKE_PX = 2
@@ -17,7 +19,12 @@ type MapSvgOverlayProps = {
   previewLabel: string | null
   showPreviewLine: boolean
   currentScale: number
+  drawnPaths?: DrawnPath[]
+  currentDrawPath?: { x: number; y: number }[] | null
+  currentDrawColor?: string
+  currentDrawWidth?: number
 }
+
 
 const MapSvgOverlay = memo(function MapSvgOverlay({
   imgSize,
@@ -29,6 +36,10 @@ const MapSvgOverlay = memo(function MapSvgOverlay({
   previewLabel,
   showPreviewLine,
   currentScale,
+  drawnPaths = [],
+  currentDrawPath,
+  currentDrawColor = '#D72334',
+  currentDrawWidth = 4,
 }: MapSvgOverlayProps) {
   const markerRadius = MARKER_PX / currentScale
   const strokeWidth = STROKE_PX / currentScale
@@ -45,6 +56,28 @@ const MapSvgOverlay = memo(function MapSvgOverlay({
       viewBox={`0 0 ${imgSize.width} ${imgSize.height}`}
       style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', userSelect: 'none' }}
     >
+      {drawnPaths.map((path) => (
+        <path
+          key={path.id}
+          d={toSvgPath(path.points)}
+          stroke={path.color}
+          strokeWidth={path.width / currentScale}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
+      {currentDrawPath && currentDrawPath.length >= 2 && (
+        <path
+          d={toSvgPath(currentDrawPath)}
+          stroke={currentDrawColor}
+          strokeWidth={currentDrawWidth / currentScale}
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity={0.85}
+        />
+      )}
       {showPreviewLine && mousePos && (
         <>
           <line

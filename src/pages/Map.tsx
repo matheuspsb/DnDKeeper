@@ -8,6 +8,7 @@ import MapSvgOverlay from '../components/organisms/map/MapSvgOverlay'
 import MapCalibrationModal from '../components/organisms/map/MapCalibrationModal'
 import { useMapRuler } from '../hooks/useMapRuler'
 import { useMapInteraction } from '../hooks/useMapInteraction'
+import { useMapDrawing } from '../hooks/useMapDrawing'
 import { toImageUrl } from '../services/googleDrive'
 
 const MAP_FILE_ID = import.meta.env.VITE_GOOGLE_DRIVE_MAP_FILE_ID as string
@@ -24,6 +25,7 @@ function Mapa() {
 
   const ruler = useMapRuler()
   const interaction = useMapInteraction(transformRef, currentScale)
+  const drawing = useMapDrawing()
 
   function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.currentTarget
@@ -44,9 +46,26 @@ function Mapa() {
   }
 
   function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (drawing.isDrawingMode) return
     if (ruler.mode === 'idle') return
     ruler.addPoint(interaction.getImageCoords(e))
     interaction.clearMousePos()
+  }
+
+  function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
+    if (!drawing.isDrawingMode) return
+    drawing.startStroke(interaction.getImageCoords(e))
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    interaction.handleMouseMove(e)
+    if (!drawing.isDrawingMode || e.buttons !== 1) return
+    drawing.addToStroke(interaction.getImageCoords(e))
+  }
+
+  function handleMouseUp() {
+    if (!drawing.isDrawingMode) return
+    drawing.endStroke()
   }
 
   const handleCalibrateToggle = useCallback(() => {
@@ -71,6 +90,12 @@ function Mapa() {
 
   const showPreviewLine = ruler.points.length === 1 && interaction.mousePos !== null
   const inRulerMode = ruler.mode !== 'idle'
+
+  function getCursor() {
+    if (drawing.isDrawingMode) return 'crosshair'
+    if (inRulerMode) return 'crosshair'
+    return 'grab'
+  }
 
   if (!MAP_FILE_ID) {
     return (
@@ -114,6 +139,14 @@ function Mapa() {
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
           onReset={handleReset}
+          isDrawingMode={drawing.isDrawingMode}
+          onDrawingToggle={drawing.toggleDrawingMode}
+          brushColor={drawing.brushColor}
+          onBrushColorChange={drawing.setBrushColor}
+          brushSize={drawing.brushSize}
+          onBrushSizeChange={drawing.setBrushSize}
+          onUndo={drawing.undoLast}
+          onClearDrawings={drawing.clearDrawings}
         />
 
         <TransformWrapper
@@ -124,16 +157,19 @@ function Mapa() {
           limitToBounds={true}
           wheel={{ step: 0.001 }}
           doubleClick={{ disabled: true }}
+          panning={{ disabled: drawing.isDrawingMode }}
           onTransform={(ref) => setCurrentScale(ref.state.scale)}
         >
           <TransformComponent
             wrapperStyle={{ width: '100%', height: '100%' }}
-            contentStyle={{ cursor: inRulerMode ? 'crosshair' : 'grab' }}
+            contentStyle={{ cursor: getCursor() }}
           >
             <div
               style={{ position: 'relative', display: 'inline-block' }}
               onClick={handleMapClick}
-              onMouseMove={interaction.handleMouseMove}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
               onMouseLeave={interaction.handleMouseLeave}
             >
               <img
@@ -157,6 +193,10 @@ function Mapa() {
                   previewLabel={previewLabel}
                   showPreviewLine={showPreviewLine}
                   currentScale={currentScale}
+                  drawnPaths={drawing.paths}
+                  currentDrawPath={drawing.currentPath}
+                  currentDrawColor={drawing.brushColor}
+                  currentDrawWidth={drawing.brushSize}
                 />
               )}
             </div>
