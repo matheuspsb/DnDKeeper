@@ -19,6 +19,7 @@ function Mapa() {
   const [minScale, setMinScale] = useState(0.01)
   const [currentScale, setCurrentScale] = useState(0.01)
   const [imageReady, setImageReady] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
 
   const ruler = useMapRuler()
@@ -84,15 +85,23 @@ function Mapa() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-8 pb-4 shrink-0">
+      <div className="p-4 shrink-0 md:p-8 md:pb-4">
         <h2 className="text-white-100 text-3xl font-bold">Mapa</h2>
       </div>
 
       <div ref={containerRef} className="flex-1 overflow-hidden relative bg-black-500">
-        {!imageReady && (
+        {!imageReady && !imageError && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
             <div className="w-10 h-10 rounded-full border-2 border-black-100 border-t-red-100 animate-spin" />
             <span className="text-white-300 text-sm">Carregando mapa...</span>
+          </div>
+        )}
+        {imageError && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
+            <span className="text-white-300 text-sm">
+              Erro ao carregar o mapa. Verifique o VITE_GOOGLE_DRIVE_MAP_FILE_ID e reinicie o
+              servidor.
+            </span>
           </div>
         )}
 
@@ -132,6 +141,7 @@ function Mapa() {
                 alt="Mapa"
                 draggable={false}
                 onLoad={handleImageLoad}
+                onError={() => setImageError(true)}
                 style={{ display: 'block' }}
                 className={`select-none max-w-none transition-opacity duration-500 ${imageReady ? 'opacity-100' : 'opacity-0'}`}
               />
