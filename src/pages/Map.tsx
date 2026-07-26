@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import GalleryEmpty from '../components/molecules/gallery/GalleryEmpty'
@@ -18,7 +18,7 @@ function Mapa() {
   const containerRef = useRef<HTMLDivElement>(null)
   const transformRef = useRef<ReactZoomPanPinchRef>(null)
   const [minScale, setMinScale] = useState(0.01)
-  const [currentScale, setCurrentScale] = useState(0.01)
+  const [currentScale, setCurrentScale] = useState(1)
   const [imageReady, setImageReady] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
@@ -29,21 +29,20 @@ function Mapa() {
 
   function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.currentTarget
-    const container = containerRef.current
-    const transform = transformRef.current
-    if (!container || !transform) return
-
     setImgSize({ width: img.naturalWidth, height: img.naturalHeight })
+  }
 
-    const scale = Math.min(
-      container.clientWidth / img.naturalWidth,
-      container.clientHeight / img.naturalHeight,
+  useEffect(() => {
+    if (!imgSize || !containerRef.current || !transformRef.current) return
+    const scale = Math.max(
+      containerRef.current.clientWidth / imgSize.width,
+      containerRef.current.clientHeight / imgSize.height,
     )
     setMinScale(scale)
     setCurrentScale(scale)
-    transform.centerView(scale, 0)
+    transformRef.current.centerView(scale, 0)
     setImageReady(true)
-  }
+  }, [imgSize])
 
   function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
     if (drawing.isDrawingMode) return
@@ -110,10 +109,6 @@ function Mapa() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 shrink-0 md:p-8 md:pb-4">
-        <h2 className="text-white-100 text-3xl font-bold">Mapa</h2>
-      </div>
-
       <div ref={containerRef} className="flex-1 overflow-hidden relative bg-black-500">
         {!imageReady && !imageError && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
