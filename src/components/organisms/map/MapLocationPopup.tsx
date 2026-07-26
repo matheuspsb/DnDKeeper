@@ -18,7 +18,7 @@ export default function MapLocationPopup({ location, screenX, screenY, onClose }
         transform: 'translate(-50%, calc(-100% - 14px))',
         zIndex: 30,
       }}
-      className="w-64 bg-black-300 border border-black-100 rounded-lg shadow-2xl overflow-visible"
+      className="w-70 bg-black-300 border border-black-100 rounded-lg shadow-2xl overflow-visible"
     >
       <div className="rounded-lg overflow-hidden">
         {location.imageUrl && (
