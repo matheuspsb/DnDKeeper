@@ -10,6 +10,9 @@ import { useMapRuler } from '../hooks/useMapRuler'
 import { useMapInteraction } from '../hooks/useMapInteraction'
 import { useMapDrawing } from '../hooks/useMapDrawing'
 import { toImageUrl } from '../services/googleDrive'
+import { MAP_LOCATIONS } from '../constants/mapLocations'
+import type { MapLocation } from '../types/mapLocation'
+import MapLocationPopup from '../components/organisms/map/MapLocationPopup'
 
 const MAP_FILE_ID = import.meta.env.VITE_GOOGLE_DRIVE_MAP_FILE_ID as string
 const MAP_SIZE = 'w6000'
@@ -22,6 +25,12 @@ function Mapa() {
   const [imageReady, setImageReady] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
+
+  const [selectedLocation, setSelectedLocation] = useState<{
+    location: MapLocation
+    screenX: number
+    screenY: number
+  } | null>(null)
 
   const ruler = useMapRuler()
   const interaction = useMapInteraction(transformRef, currentScale)
@@ -46,9 +55,22 @@ function Mapa() {
 
   function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
     if (drawing.isDrawingMode) return
-    if (ruler.mode === 'idle') return
-    ruler.addPoint(interaction.getImageCoords(e))
-    interaction.clearMousePos()
+    if (ruler.mode !== 'idle') {
+      ruler.addPoint(interaction.getImageCoords(e))
+      interaction.clearMousePos()
+      return
+    }
+    const coords = interaction.getImageCoords(e)
+    const hit = MAP_LOCATIONS.find(
+      (loc) => coords.x >= loc.x1 && coords.x <= loc.x2 && coords.y >= loc.y1 && coords.y <= loc.y2,
+    )
+    if (hit) {
+      if (selectedLocation?.location.id === hit.id) return
+      const rect = containerRef.current!.getBoundingClientRect()
+      setSelectedLocation({ location: hit, screenX: e.clientX - rect.left, screenY: e.clientY - rect.top })
+    } else {
+      setSelectedLocation(null)
+    }
   }
 
   function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
@@ -125,6 +147,12 @@ function Mapa() {
           </div>
         )}
 
+        {import.meta.env.DEV && interaction.mousePos && (
+          <div className="absolute bottom-4 left-4 z-10 px-2 py-1 bg-black-400/90 border border-black-100 rounded text-xs text-white-300 font-mono pointer-events-none">
+            x: {Math.round(interaction.mousePos.x)} y: {Math.round(interaction.mousePos.y)}
+          </div>
+        )}
+
         <MapHintBar mode={ruler.mode} pointCount={ruler.points.length} />
         <MapToolbar
           rulerMode={ruler.mode}
@@ -150,9 +178,9 @@ function Mapa() {
           minScale={minScale}
           maxScale={10}
           limitToBounds={true}
-          wheel={{ step: 0.001 }}
+          wheel={{ step: 0.001, disabled: !!selectedLocation }}
           doubleClick={{ disabled: true }}
-          panning={{ disabled: drawing.isDrawingMode }}
+          panning={{ disabled: drawing.isDrawingMode || !!selectedLocation }}
           onTransform={(ref) => setCurrentScale(ref.state.scale)}
         >
           <TransformComponent
@@ -204,6 +232,15 @@ function Mapa() {
             onCalibMilesChange={ruler.setCalibMiles}
             onConfirm={ruler.confirmCalibration}
             onCancel={ruler.cancelCalibration}
+          />
+        )}
+
+        {selectedLocation && (
+          <MapLocationPopup
+            location={selectedLocation.location}
+            screenX={selectedLocation.screenX}
+            screenY={selectedLocation.screenY}
+            onClose={() => setSelectedLocation(null)}
           />
         )}
       </div>
