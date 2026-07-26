@@ -9,7 +9,6 @@ type Props = {
 }
 
 export default function MapLocationPopup({ location, screenX, screenY, onClose }: Props) {
-
   return (
     <div
       style={{
