@@ -28,7 +28,7 @@ export function resolveImageUrl(imageUrl: string): string {
     return LOCAL_ARTS.find((a) => a.key === filename)?.url ?? ''
   }
 
-  return imageUrl
+  return resolveDriveUrl(imageUrl)
 }
 
 export function toLocalArtUrl(key: string): string {
