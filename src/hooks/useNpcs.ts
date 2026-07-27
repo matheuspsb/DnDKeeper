@@ -1,60 +1,62 @@
-import { useState, useCallback } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Npc } from '../types/npc.types'
-import { NPC_SEED } from '../constants/npcSeed'
+import backendApi from '../services/backendApi'
 
-const STORAGE_KEY = 'dndkeeper_npcs'
+export type NpcInput = Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>
 
-function load(): Npc[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as Npc[]
-    persist(NPC_SEED)
-    return NPC_SEED
-  } catch {
-    return NPC_SEED
-  }
+export const npcKeys = {
+  all: ['npcs'] as const,
 }
 
-function persist(npcs: Npc[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(npcs))
+async function fetchNpcs(): Promise<Npc[]> {
+  const res = await backendApi.get<Npc[]>('/api/npcs')
+  return res.data
 }
 
 export function useNpcs() {
-  const [npcs, setNpcs] = useState<Npc[]>(load)
+  return useQuery({ queryKey: npcKeys.all, queryFn: fetchNpcs })
+}
 
-  const mutate = useCallback((updater: (prev: Npc[]) => Npc[]) => {
-    setNpcs((prev) => {
-      const next = updater(prev)
-      persist(next)
-      return next
-    })
-  }, [])
+export function useAddNpc() {
+  const queryClient = useQueryClient()
 
-  const addNpc = useCallback(
-    (data: Omit<Npc, 'id'>) => {
-      mutate((prev) => [...prev, { ...data, id: crypto.randomUUID() }])
+  return useMutation({
+    mutationFn: async (data: NpcInput) => {
+      const res = await backendApi.post<Npc>('/api/npcs', data)
+      return res.data
     },
-    [mutate],
-  )
-
-  const updateNpc = useCallback(
-    (id: string, data: Partial<Omit<Npc, 'id'>>) => {
-      mutate((prev) => prev.map((npc) => (npc.id === id ? { ...npc, ...data } : npc)))
+    onSuccess: (npc) => {
+      queryClient.setQueryData<Npc[]>(npcKeys.all, (prev) => (prev ? [...prev, npc] : [npc]))
     },
-    [mutate],
-  )
+  })
+}
 
-  const deleteNpc = useCallback(
-    (id: string) => {
-      mutate((prev) => prev.filter((npc) => npc.id !== id))
+export function useUpdateNpc() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<NpcInput> }) => {
+      const res = await backendApi.patch<Npc>(`/api/npcs/${id}`, data)
+      return res.data
     },
-    [mutate],
-  )
+    onSuccess: (npc) => {
+      queryClient.setQueryData<Npc[]>(npcKeys.all, (prev) =>
+        prev?.map((existing) => (existing.id === npc.id ? npc : existing)),
+      )
+    },
+  })
+}
 
-  const resetToSeed = useCallback(() => {
-    persist(NPC_SEED)
-    setNpcs(NPC_SEED)
-  }, [])
+export function useDeleteNpc() {
+  const queryClient = useQueryClient()
 
-  return { npcs, addNpc, updateNpc, deleteNpc, resetToSeed }
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await backendApi.delete(`/api/npcs/${id}`)
+      return id
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData<Npc[]>(npcKeys.all, (prev) => prev?.filter((npc) => npc.id !== id))
+    },
+  })
 }

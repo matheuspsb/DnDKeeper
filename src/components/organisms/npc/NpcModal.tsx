@@ -1,6 +1,7 @@
 import type { Npc } from '../../../types/npc.types'
 import { FACTIONS } from '../../../constants/npc.constants'
 import { useNpcForm } from '../../../hooks/useNpcForm'
+import type { NpcInput } from '../../../hooks/useNpcs'
 import { labelClass } from '../../../styles/form'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
@@ -11,7 +12,7 @@ import NpcImagePositionPicker from './NpcImagePositionPicker'
 
 interface NpcModalProps {
   initialNpc: Npc | null
-  onSave: (data: Omit<Npc, 'id'>) => void
+  onSave: (data: NpcInput) => Promise<void>
   onClose: () => void
 }
 
@@ -21,10 +22,8 @@ const textareaClass = `${fieldClass} border border-black-100 text-white-100 text
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
-  const { register, handleSubmit, setValue, errors, imageUrl, imagePosition } = useNpcForm(
-    initialNpc,
-    onSave,
-  )
+  const { register, handleSubmit, setValue, errors, imageUrl, imagePosition, isSubmitting, saveError } =
+    useNpcForm(initialNpc, onSave)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -102,12 +101,19 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
             />
           </div>
 
+          {saveError && <p className={errorClass}>{saveError}</p>}
+
           <div className="flex gap-3 pt-1">
             <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
               Cancelar
             </Button>
-            <Button type="submit" variant="primary" className="w-auto! flex-1">
-              {initialNpc ? 'Salvar Alterações' : 'Adicionar NPC'}
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+              className="w-auto! flex-1 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Salvando…' : initialNpc ? 'Salvar Alterações' : 'Adicionar NPC'}
             </Button>
           </div>
         </form>

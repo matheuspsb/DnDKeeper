@@ -19,4 +19,6 @@ export type Npc = {
   notes: string
   imageUrl?: string
   imagePosition?: NpcImagePosition
+  createdAt: string
+  updatedAt: string
 }

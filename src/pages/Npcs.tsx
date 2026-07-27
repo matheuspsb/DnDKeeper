@@ -2,12 +2,11 @@ import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { Faction, NpcStatus } from '../types/npc.types'
-import { useNpcs } from '../hooks/useNpcs'
+import { useAddNpc, useDeleteNpc, useNpcs, useUpdateNpc } from '../hooks/useNpcs'
 import { FACTIONS } from '../constants/npc.constants'
 import { resolveImageUrl } from '../constants/arts'
 import NpcContent from '../components/molecules/npc/NpcContent'
 import NpcFilters from '../components/molecules/npc/NpcFilters'
-import NpcSeedReset from '../components/molecules/npc/NpcSeedReset'
 import NpcModal from '../components/organisms/npc/NpcModal'
 import Lightbox from '../components/organisms/Lightbox'
 import Button from '../components/atoms/Button'
@@ -19,12 +18,16 @@ type FactionFilter = Faction | 'todas'
 
 function Npcs() {
   const { user } = useAuth()
-  const { npcs, addNpc, updateNpc, deleteNpc, resetToSeed } = useNpcs()
+  const { data: npcs = [], isLoading, isError } = useNpcs()
+  const addNpc = useAddNpc()
+  const updateNpc = useUpdateNpc()
+  const deleteNpc = useDeleteNpc()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingNpc, setEditingNpc] = useState<Npc | null>(null)
   const [lightboxNpc, setLightboxNpc] = useState<Npc | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
   const factionFilter = (searchParams.get('faction') ?? 'todas') as FactionFilter
@@ -64,13 +67,22 @@ function Npcs() {
 
   const npcsWithImage = useMemo(() => filtered.filter((n) => n.imageUrl), [filtered])
 
-  function handleSave(data: Omit<Npc, 'id'>) {
+  async function handleSave(data: Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>) {
     if (editingNpc) {
-      updateNpc(editingNpc.id, data)
+      await updateNpc.mutateAsync({ id: editingNpc.id, data })
     } else {
-      addNpc(data)
+      await addNpc.mutateAsync(data)
     }
     setModalOpen(false)
+  }
+
+  async function handleDelete(id: string) {
+    setDeleteError(null)
+    try {
+      await deleteNpc.mutateAsync(id)
+    } catch {
+      setDeleteError('Não foi possível remover o NPC.')
+    }
   }
 
   return (
@@ -80,13 +92,17 @@ function Npcs() {
           <div>
             <h2 className="text-white-100 text-3xl font-bold">NPCs</h2>
             <p className="text-white-300/60 text-sm mt-1">
-              {npcs.length === 0 ? 'Nenhum NPC' : `${npcs.length} NPC${npcs.length > 1 ? 's' : ''}`}
-              {filtered.length !== npcs.length &&
+              {isLoading
+                ? 'Carregando…'
+                : npcs.length === 0
+                  ? 'Nenhum NPC'
+                  : `${npcs.length} NPC${npcs.length > 1 ? 's' : ''}`}
+              {!isLoading &&
+                filtered.length !== npcs.length &&
                 ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <NpcSeedReset onReset={resetToSeed} />
             {user?.role === 'dm' && (
               <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
                 <PlusIcon size={16} />
@@ -108,14 +124,27 @@ function Npcs() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-8 pb-8">
-        <NpcContent
-          npcs={npcs}
-          grouped={groupedByFaction}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={deleteNpc}
-          onImageClick={setLightboxNpc}
-        />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24">
+            <p className="text-white-300/50 text-sm">Carregando NPCs…</p>
+          </div>
+        ) : isError ? (
+          <div className="flex items-center justify-center py-24">
+            <p className="text-red-100 text-sm">Não foi possível carregar os NPCs.</p>
+          </div>
+        ) : (
+          <>
+            {deleteError && <p className="text-red-100 text-xs mb-4">{deleteError}</p>}
+            <NpcContent
+              npcs={npcs}
+              grouped={groupedByFaction}
+              onAdd={openAdd}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+              onImageClick={setLightboxNpc}
+            />
+          </>
+        )}
       </div>
 
       {modalOpen && (

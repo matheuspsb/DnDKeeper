@@ -16,6 +16,7 @@ Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite or
 | Zod | 4 | schemas de validação em `src/schemas/` |
 | @hookform/resolvers | 5 | ponte entre RHF e Zod |
 | @xyflow/react | latest | grafo de relações entre NPCs (Conexões) |
+| @tanstack/react-query | 5 | cache de estado de servidor — usado para dados que vêm do backend (hoje: NPCs) |
 
 ## Linguagem
 
@@ -136,7 +137,6 @@ src/
 │   ├── encounter.ts                        # CR_XP, THRESHOLDS_PER_LEVEL, DIFFICULTY_LABEL/COLOR/BG/ORDER, getEncounterMultiplier
 │   ├── initiative.ts                       # HP_DELTAS + CONDITIONS (15 condições D&D 5e em PT) + type Condition
 │   ├── npc.constants.ts                    # FACTIONS, NPC_STATUS_LABEL/COLOR, FACTION_COLOR, FACTION_IMAGE, RELATION_TYPE_LABEL/COLOR
-│   ├── npcSeed.ts                          # Dados iniciais de NPCs para popular o localStorage
 │   ├── randomTables.ts                     # RANDOM_TABLES + TABLE_CATEGORIES, TABLES_BY_CATEGORY, TABLES_BY_ID
 │   └── routes.tsx                          # Fonte única das rotas: id, path, label, icon, element, dmOnly
 │
@@ -157,7 +157,7 @@ src/
 │   ├── useMapRuler.ts                      # Hook de régua do mapa — calibração e medição em milhas
 │   ├── useNpcForm.ts                       # Lógica de formulário do NpcModal — RHF + Zod
 │   ├── useNpcRelations.ts                  # CRUD de relações entre NPCs + localStorage `dndkeeper_npc_relations`
-│   ├── useNpcs.ts                          # CRUD de NPCs + localStorage `dndkeeper_npcs`
+│   ├── useNpcs.ts                          # CRUD de NPCs via `backendApi` (`/api/npcs`) — async, sem localStorage
 │   └── useSearchInput.ts                   # Estado do input de busca com debounce (300ms) via useRef — sem useEffect
 │
 ├── pages/
@@ -261,9 +261,9 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 - `useCharacters` — persiste em `localStorage` com chave `dndkeeper_characters`
 - `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
 - `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
-- `useNpcs` — persiste em `localStorage` com chave `dndkeeper_npcs`
 - `useNpcRelations` — persiste em `localStorage` com chave `dndkeeper_npc_relations`
 - Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
+- **Exceção**: `useNpcs` não usa `localStorage` — dado vem do backend via **React Query** (`@tanstack/react-query`); ver seção "NPCs e Conexões"
 
 ## Paleta de cores
 
@@ -384,6 +384,14 @@ A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) 
 ## NPCs e Conexões
 
 - `/npcs` — CRUD de NPCs com filtros por status e facção; cards **agrupados por facção** em seções com header
+- NPCs são persistidos no **backend** (`rpg-system_backend`, Express + Prisma/Postgres) via **React Query**, não em `localStorage`
+  - `GET /api/npcs` é público; `POST`/`PATCH`/`DELETE` exigem sessão de DM (cookie `rpg_session`, `withCredentials: true` no `backendApi`)
+  - `QueryClientProvider` fica no `main.tsx`, por fora do `BrowserRouter`/`AuthProvider`; `QueryClient` configurado com `retry: 1` nas queries
+  - `src/hooks/useNpcs.ts` — `npcKeys.all` (query key factory) + `useNpcs()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddNpc`/`useUpdateNpc`/`useDeleteNpc` (`useMutation`, um hook por operação — não um hook monolítico)
+  - Cada mutation atualiza o cache direto via `queryClient.setQueryData(npcKeys.all, ...)` no `onSuccess` (append/map/filter) em vez de invalidar e refazer o fetch
+  - Componentes chamam `mutation.mutateAsync(...)` e tratam erro com `try/catch` — RHF/`useNpcForm` usa o `catch` para mapear erros `400` do backend (`{ error, details: { campo: [mensagem] } }`) em `setError` por campo; erro genérico (rede, 401/403/404) vira `saveError` exibido no modal
+  - Não existe endpoint de "resetar pro seed" — a feature de reset foi removida (`NpcSeedReset`/`npcSeed.ts` não existem mais)
+  - `Npc` ganhou `createdAt`/`updatedAt` (ISO date), preenchidos pelo backend — nunca enviar no payload de criação/edição
 - `/arvore` — grafo de relações entre NPCs usando `@xyflow/react` (`NpcGraph`)
 - **Facções** (6): Zhentarim, Culto do Dragão, Irmandade Carmesim, Harpers, Confraria da Lâmina Velada, Independente — definidas em `FACTIONS` (`constants/npc.constants.ts`)
 - **Relações bidirecionais**: `addRelation` cria dois registros (A→B e B→A); `deleteRelation` remove os dois — o grafo deduplica via `seen` set antes de criar as edges
