@@ -29,7 +29,7 @@ function LetterSeedReset({ onReset }: LetterSeedResetProps) {
 
   return (
     <Button variant="secondary" onClick={() => setConfirm(true)} className="w-auto! px-3">
-      Restaurar Seed
+      Atualizar
     </Button>
   )
 }

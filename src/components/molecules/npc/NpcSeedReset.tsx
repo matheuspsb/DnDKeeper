@@ -29,7 +29,7 @@ function NpcSeedReset({ onReset }: NpcSeedResetProps) {
 
   return (
     <Button variant="secondary" onClick={() => setConfirm(true)} className="w-auto! px-3">
-      Restaurar Seed
+      Atualizar
     </Button>
   )
 }
