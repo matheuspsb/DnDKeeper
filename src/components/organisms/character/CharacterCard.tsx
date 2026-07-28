@@ -53,7 +53,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
         ${isCharacterDead ? 'border-red-400/60' : 'border-black-100 hover:border-black-200'}`}
     >
       <div className="h-64 relative bg-black-400 shrink-0">
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden cursor-pointer" onClick={onEdit}>
           {character.imageUrl ? (
             <img
               src={resolveImageUrl(character.imageUrl)}
