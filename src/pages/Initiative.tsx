@@ -3,6 +3,7 @@ import { useCharacters } from '../hooks/useCharacters'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
+import GroupHpBar from '../components/molecules/characters/GroupHpBar'
 import InitiativeEmpty from '../components/molecules/initiative/InitiativeEmpty'
 import CombatantRow from '../components/organisms/initiative/CombatantRow'
 import InitiativeAddForm from '../components/organisms/initiative/InitiativeAddForm'
@@ -47,6 +48,11 @@ function Initiative() {
     }
   }
 
+  const partyCombatants = combatants.filter((c) => c.isPlayer && c.hp !== null && c.maxHp !== null)
+  const totalGroupHP = partyCombatants.reduce((sum, c) => sum + (c.hp ?? 0), 0)
+  const totalGroupMaxHP = partyCombatants.reduce((sum, c) => sum + (c.maxHp ?? 0), 0)
+  const groupHpPercentage = totalGroupMaxHP > 0 ? (totalGroupHP / totalGroupMaxHP) * 100 : 0
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
@@ -74,6 +80,14 @@ function Initiative() {
             </div>
           )}
         </div>
+
+        {partyCombatants.length > 1 && (
+          <GroupHpBar
+            totalHP={totalGroupHP}
+            totalMaxHP={totalGroupMaxHP}
+            percentage={groupHpPercentage}
+          />
+        )}
 
         {combatants.length === 0 ? (
           <InitiativeEmpty />

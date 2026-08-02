@@ -346,7 +346,7 @@ A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) 
 - **Border beam no turno atual**: combatante ativo tem wrapper com `p-0.5 current-turn-border`; os 2px de padding expõem o gradiente animado como "borda"; inner div usa `bg-black-300 rounded-[10px]` para cobrir o gradiente em tudo exceto a borda
   - Implementado em `index.css` via `@property --border-angle` + `@keyframes border-beam` + `.current-turn-border` com `conic-gradient`
   - `@property` permite animar custom properties CSS com `transition`/`animation`
-- **Imagem de fundo atmosférica**: `Combatant` tem campo `imageUrl?: string` (opcional); quando presente, renderiza a imagem como camada absoluta com overlay `bg-black-300/82`
+- **Imagem de fundo atmosférica**: `Combatant` tem campo `imageUrl?: string` (opcional); quando presente, renderiza a imagem como camada absoluta com overlay `bg-black-300/45`
   - Personagens importados herdam `imageUrl` automaticamente; monstros adicionados manualmente ficam sem imagem
   - Estrutura de duas camadas: `absolute inset-0` para imagem + overlay; `relative z-10` para o conteúdo
 - **Condições de combate**: `Combatant` tem campo `conditions?: string[]` persistido no localStorage

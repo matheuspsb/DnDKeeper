@@ -1,4 +1,4 @@
-export const HP_DELTAS = [-5, -1, 1, 5] as const
+export const HP_DELTAS = [-10, -5, -1, 1, 5, 10] as const
 
 export const CONDITIONS = [
   'Amedrontado',
