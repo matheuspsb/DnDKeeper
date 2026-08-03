@@ -1,4 +1,5 @@
 import type { Character } from '../../../types/character'
+import type { CharacterInput } from '../../../hooks/useCharacters'
 import { useCharacterForm } from '../../../hooks/useCharacterForm'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
@@ -8,7 +9,7 @@ import { labelClass } from '../../../styles/form'
 
 interface CharacterModalProps {
   initialCharacter: Character | null
-  onSave: (data: Omit<Character, 'id'>) => void
+  onSave: (data: CharacterInput) => Promise<void>
   onClose: () => void
 }
 
@@ -16,10 +17,8 @@ const fieldClass = 'w-full bg-black-500 rounded-lg px-3 py-2'
 const errorClass = 'text-red-100 text-xs mt-1'
 
 function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalProps) {
-  const { register, handleSubmit, setValue, errors, imageUrl } = useCharacterForm(
-    initialCharacter,
-    onSave,
-  )
+  const { register, handleSubmit, setValue, errors, imageUrl, isSubmitting, saveError } =
+    useCharacterForm(initialCharacter, onSave)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -106,12 +105,23 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
             />
           </div>
 
+          {saveError && <p className={errorClass}>{saveError}</p>}
+
           <div className="flex gap-3 pt-1">
             <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
               Cancelar
             </Button>
-            <Button type="submit" variant="primary" className="w-auto! flex-1">
-              {initialCharacter ? 'Salvar Alterações' : 'Adicionar Personagem'}
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+              className="w-auto! flex-1 disabled:opacity-50"
+            >
+              {isSubmitting
+                ? 'Salvando…'
+                : initialCharacter
+                  ? 'Salvar Alterações'
+                  : 'Adicionar Personagem'}
             </Button>
           </div>
         </form>

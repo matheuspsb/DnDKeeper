@@ -1,5 +1,5 @@
 import { useInitiative } from '../hooks/useInitiative'
-import { useCharacters } from '../hooks/useCharacters'
+import { useCharacters, useUpdateCharacter } from '../hooks/useCharacters'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
@@ -24,7 +24,8 @@ function Initiative() {
     reset,
   } = useInitiative()
 
-  const { characters, updateCharacter } = useCharacters()
+  const { data: characters = [] } = useCharacters()
+  const updateCharacter = useUpdateCharacter()
 
   function handleImportCharacters() {
     characters.forEach((char) => {
@@ -44,7 +45,7 @@ function Initiative() {
     adjustHp(combatant.id, delta)
     if (combatant.characterId && combatant.hp !== null && combatant.maxHp !== null) {
       const newHp = Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta))
-      updateCharacter(combatant.characterId, { currentHP: newHp })
+      updateCharacter.mutate({ id: combatant.characterId, data: { currentHP: newHp } })
     }
   }
 

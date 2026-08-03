@@ -7,6 +7,6 @@ export interface Character {
   currentHP: number
   maxHP: number
   xp: number
-  imageUrl: string
+  imageUrl?: string
   notes: string
 }

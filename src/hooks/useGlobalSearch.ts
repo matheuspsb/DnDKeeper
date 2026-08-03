@@ -9,7 +9,7 @@ function matchesQuery(fields: (string | undefined)[], query: string): boolean {
 
 export function useGlobalSearch(query: string) {
   const { data: npcs = [] } = useNpcs()
-  const { characters } = useCharacters()
+  const { data: characters = [] } = useCharacters()
 
   const { results, total } = useMemo(() => {
     const trimmed = query.trim()

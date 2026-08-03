@@ -1,6 +1,6 @@
-import { useState, useRef, type ChangeEvent } from 'react'
+import { useState } from 'react'
 import type { Character } from '../types/character'
-import { useCharacters } from '../hooks/useCharacters'
+import { useAddCharacter, useCharacters, useDeleteCharacter, useUpdateCharacter } from '../hooks/useCharacters'
 import { clampNumber } from '../utils/number'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
@@ -12,12 +12,14 @@ import CharacterModal from '../components/organisms/character/CharacterModal'
 // ─── Página ──────────────────────────────────────────────────────────────────
 
 function Characters() {
-  const { characters, addCharacter, updateCharacter, deleteCharacter, exportJSON, importJSON } =
-    useCharacters()
+  const { data: characters = [], isLoading, isError } = useCharacters()
+  const addCharacter = useAddCharacter()
+  const updateCharacter = useUpdateCharacter()
+  const deleteCharacter = useDeleteCharacter()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null)
-  const importInputRef = useRef<HTMLInputElement>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   function openNewCharacterModal() {
     setEditingCharacter(null)
@@ -34,27 +36,31 @@ function Characters() {
     setEditingCharacter(null)
   }
 
-  function handleCharacterSave(data: Omit<Character, 'id'>) {
+  async function handleCharacterSave(data: Omit<Character, 'id'>) {
     if (editingCharacter) {
-      updateCharacter(editingCharacter.id, data)
+      await updateCharacter.mutateAsync({ id: editingCharacter.id, data })
     } else {
-      addCharacter(data)
+      await addCharacter.mutateAsync(data)
     }
     closeModal()
+  }
+
+  async function handleDelete(id: string) {
+    setDeleteError(null)
+    try {
+      await deleteCharacter.mutateAsync(id)
+    } catch {
+      setDeleteError('Não foi possível remover o personagem.')
+    }
   }
 
   function handleHpAdjust(characterId: string, delta: number) {
     const character = characters.find((c) => c.id === characterId)
     if (!character) return
-    updateCharacter(characterId, {
-      currentHP: clampNumber(character.currentHP + delta, 0, character.maxHP),
+    updateCharacter.mutate({
+      id: characterId,
+      data: { currentHP: clampNumber(character.currentHP + delta, 0, character.maxHP) },
     })
-  }
-
-  function handleImportFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) importJSON(file)
-    e.target.value = ''
   }
 
   const totalGroupHP = characters.reduce((sum, character) => sum + character.currentHP, 0)
@@ -67,66 +73,56 @@ function Characters() {
         <div>
           <h2 className="text-white-100 text-3xl font-bold">Personagens</h2>
           <p className="text-white-300 text-sm mt-1">
-            {characters.length === 0
-              ? 'Nenhum personagem cadastrado'
-              : `${characters.length} personagem${characters.length !== 1 ? 's' : ''}`}
+            {isLoading
+              ? 'Carregando…'
+              : characters.length === 0
+                ? 'Nenhum personagem cadastrado'
+                : `${characters.length} personagem${characters.length !== 1 ? 's' : ''}`}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <input
-            ref={importInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImportFileChange}
-            className="hidden"
-          />
-          {characters.length > 0 && (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => importInputRef.current?.click()}
-                className="w-auto! px-4 text-xs"
-              >
-                Importar JSON
-              </Button>
-              <Button variant="secondary" onClick={exportJSON} className="w-auto! px-4 text-xs">
-                Exportar JSON
-              </Button>
-            </>
-          )}
           <Button variant="primary" onClick={openNewCharacterModal} className="w-auto! px-4 gap-2">
             <PlusIcon size={15} /> Adicionar
           </Button>
         </div>
       </div>
 
-      {characters.length > 1 && (
-        <GroupHpBar
-          totalHP={totalGroupHP}
-          totalMaxHP={totalGroupMaxHP}
-          percentage={groupHpPercentage}
-        />
-      )}
-
-      {characters.length === 0 && (
-        <CharactersEmpty
-          onAddCharacter={openNewCharacterModal}
-          onImportJSON={() => importInputRef.current?.click()}
-        />
-      )}
-
-      {characters.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {characters.map((character) => (
-            <CharacterCard
-              key={character.id}
-              character={character}
-              onEdit={() => openEditCharacterModal(character)}
-              onDelete={() => deleteCharacter(character.id)}
-              onHpAdjust={(delta) => handleHpAdjust(character.id, delta)}
-            />
-          ))}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-24">
+          <p className="text-white-300/50 text-sm">Carregando personagens…</p>
         </div>
+      ) : isError ? (
+        <div className="flex items-center justify-center py-24">
+          <p className="text-red-100 text-sm">Não foi possível carregar os personagens.</p>
+        </div>
+      ) : (
+        <>
+          {deleteError && <p className="text-red-100 text-xs">{deleteError}</p>}
+
+          {characters.length > 1 && (
+            <GroupHpBar
+              totalHP={totalGroupHP}
+              totalMaxHP={totalGroupMaxHP}
+              percentage={groupHpPercentage}
+            />
+          )}
+
+          {characters.length === 0 && <CharactersEmpty onAddCharacter={openNewCharacterModal} />}
+
+          {characters.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {characters.map((character) => (
+                <CharacterCard
+                  key={character.id}
+                  character={character}
+                  onEdit={() => openEditCharacterModal(character)}
+                  onDelete={() => handleDelete(character.id)}
+                  onHpAdjust={(delta) => handleHpAdjust(character.id, delta)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {isModalOpen && (

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useEncounter } from '../hooks/useEncounter'
-import { useCharacters } from '../hooks/useCharacters'
+import { useAddCharacterXp, useCharacters } from '../hooks/useCharacters'
 import { useEncounterHistory } from '../hooks/useEncounterHistory'
 import type { EncounterSnapshot } from '../types/encounter'
 import EncounterPartyPanel from '../components/organisms/encounter/EncounterPartyPanel'
@@ -10,7 +10,8 @@ import EncounterHistoryPanel from '../components/organisms/encounter/EncounterHi
 import Button from '../components/atoms/Button'
 
 function Encounter() {
-  const { characters, addXp } = useCharacters()
+  const { data: characters = [] } = useCharacters()
+  const addCharacterXp = useAddCharacterXp()
   const {
     party,
     monsters,
@@ -38,11 +39,11 @@ function Encounter() {
     (snapshots: EncounterSnapshot[]) => {
       snapshots.forEach((snapshot) => {
         snapshot.party.forEach((member) => {
-          addXp(member.id, snapshot.xpPerPlayer)
+          addCharacterXp.mutate({ id: member.id, amount: snapshot.xpPerPlayer })
         })
       })
     },
-    [addXp],
+    [addCharacterXp],
   )
 
   const handleSendXp = useCallback(

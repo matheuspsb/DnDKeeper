@@ -4,10 +4,9 @@ import UsersIcon from '../../atoms/icons/UsersIcon'
 
 interface CharactersEmptyProps {
   onAddCharacter: () => void
-  onImportJSON: () => void
 }
 
-function CharactersEmpty({ onAddCharacter, onImportJSON }: CharactersEmptyProps) {
+function CharactersEmpty({ onAddCharacter }: CharactersEmptyProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-5 py-24">
       <div className="w-24 h-24 rounded-full bg-black-300 border border-black-100 flex items-center justify-center text-white-300/20">
@@ -22,9 +21,6 @@ function CharactersEmpty({ onAddCharacter, onImportJSON }: CharactersEmptyProps)
       <div className="flex gap-3">
         <Button onClick={onAddCharacter} className="gap-2">
           <PlusIcon size={15} /> Adicionar personagem
-        </Button>
-        <Button variant="secondary" onClick={onImportJSON} className="w-auto! px-5">
-          Importar JSON
         </Button>
       </div>
     </div>

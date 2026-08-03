@@ -146,7 +146,7 @@ src/
 ├── hooks/
 │   ├── useAddRelationForm.ts               # Lógica de formulário do AddRelationModal — RHF + Zod
 │   ├── useCharacterForm.ts                 # Lógica de formulário do CharacterModal — RHF + Zod
-│   ├── useCharacters.ts                    # CRUD de personagens com persistência em localStorage
+│   ├── useCharacters.ts                    # CRUD de personagens via `backendApi` (`/api/characters`) — async, sem localStorage
 │   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
 │   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
 │   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
@@ -258,12 +258,11 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 
 ## Persistência local
 
-- `useCharacters` — persiste em `localStorage` com chave `dndkeeper_characters`
 - `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
 - `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
 - `useNpcRelations` — persiste em `localStorage` com chave `dndkeeper_npc_relations`
 - Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
-- **Exceção**: `useNpcs` não usa `localStorage` — dado vem do backend via **React Query** (`@tanstack/react-query`); ver seção "NPCs e Conexões"
+- **Exceção**: `useNpcs` e `useCharacters` não usam `localStorage` — dado vem do backend via **React Query** (`@tanstack/react-query`); ver seções "NPCs e Conexões" e "Personagens"
 
 ## Paleta de cores
 
@@ -376,10 +375,23 @@ A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) 
 - Os thresholds por nível ficam em `THRESHOLDS_PER_LEVEL` (`constants/encounter.ts`); são somados por membro do grupo
 - **Histórico**: cada encontro pode ser salvo como `EncounterSnapshot` via `useEncounterHistory`
   - `EncounterSnapshot` tem flag `xpSent: boolean` para controlar se o XP já foi enviado aos personagens
-  - Envio distribui `xpPerPlayer` para cada membro da party via `useCharacters.addXp`
+  - Envio distribui `xpPerPlayer` para cada membro da party via `useAddCharacterXp` (lê o `xp` atual do cache do React Query, soma o delta e faz `PATCH`)
   - É possível enviar snapshots individuais ou todos os pendentes de uma vez ("Enviar Tudo")
 - **`DifficultyMeter`**: detecta mudança de dificuldade durante o render, chama `spawnParticles` de `utils/encounter.ts` e anima partículas via CSS custom properties `--dx`/`--dy` + classe `.encounter-particle` em `index.css`
 - A página de encontro **não usa RHF** — os painéis de party e monstros usam inputs controlados diretamente
+
+## Personagens
+
+- `/personagens` — CRUD de personagens do grupo; grid de cards com HP, XP e anotações
+- Personagens são persistidos no **backend** (`rpg-system_backend`, Express + Prisma/Postgres) via **React Query**, mesmo padrão dos NPCs — não em `localStorage`
+  - `GET /api/characters` é público; `POST`/`PATCH`/`DELETE` exigem sessão de DM (cookie `rpg_session`, `withCredentials: true` no `backendApi`)
+  - `src/hooks/useCharacters.ts` — `characterKeys.all` + `useCharacters()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddCharacter`/`useUpdateCharacter`/`useDeleteCharacter` (`useMutation`, um hook por operação)
+  - `useAddCharacterXp` — mutation dedicada para somar XP: lê o personagem atual do cache (`queryClient.getQueryData`), soma o delta e envia só `{ xp }` via `PATCH`; usada pelo envio de XP da Calculadora de Encontro
+  - Cada mutation atualiza o cache direto via `queryClient.setQueryData(characterKeys.all, ...)` no `onSuccess`, sem invalidar/refetch
+  - `useCharacterForm` segue o mesmo padrão de `useNpcForm`: `onSave` assíncrono, `catch` mapeia erros `400` (`{ error, details }`) em `setError` por campo, erro genérico vira `saveError` exibido no modal; botão de salvar mostra `isSubmitting`
+  - Não existe endpoint de bulk import/replace — a feature de exportar/importar JSON (que existia na versão com `localStorage`) foi removida junto com a migração, mesmo racional da remoção do reset de seed dos NPCs
+  - `imageUrl` é opcional (`Character.imageUrl?: string`), igual ao `Npc`
+- Importação de personagens em `/iniciativa` (`handleImportCharacters`) e `/encontro` (`importFromCharacters`) lê os dados de `useCharacters().data`, sem mudanças de padrão
 
 ## NPCs e Conexões
 

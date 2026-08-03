@@ -1,103 +1,86 @@
-import { useState, useCallback } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Character } from '../types/character'
+import backendApi from '../services/backendApi'
 
-const STORAGE_KEY = 'dndkeeper_characters'
+export type CharacterInput = Omit<Character, 'id'>
 
-function load(): Character[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Character[]) : []
-  } catch {
-    return []
-  }
+export const characterKeys = {
+  all: ['characters'] as const,
 }
 
-function persist(characters: Character[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(characters))
+async function fetchCharacters(): Promise<Character[]> {
+  const res = await backendApi.get<Character[]>('/api/characters')
+  return res.data
 }
 
 export function useCharacters() {
-  const [characters, setCharacters] = useState<Character[]>(load)
+  return useQuery({ queryKey: characterKeys.all, queryFn: fetchCharacters })
+}
 
-  const mutate = useCallback((updater: (prev: Character[]) => Character[]) => {
-    setCharacters((prev) => {
-      const next = updater(prev)
-      persist(next)
-      return next
-    })
-  }, [])
+export function useAddCharacter() {
+  const queryClient = useQueryClient()
 
-  const addCharacter = useCallback(
-    (data: Omit<Character, 'id'>) => {
-      mutate((prev) => [...prev, { ...data, id: crypto.randomUUID() }])
+  return useMutation({
+    mutationFn: async (data: CharacterInput) => {
+      const res = await backendApi.post<Character>('/api/characters', data)
+      return res.data
     },
-    [mutate],
-  )
-
-  const updateCharacter = useCallback(
-    (id: string, data: Partial<Omit<Character, 'id'>>) => {
-      mutate((prev) =>
-        prev.map((character) => (character.id === id ? { ...character, ...data } : character)),
+    onSuccess: (character) => {
+      queryClient.setQueryData<Character[]>(characterKeys.all, (prev) =>
+        prev ? [...prev, character] : [character],
       )
     },
-    [mutate],
-  )
+  })
+}
 
-  const deleteCharacter = useCallback(
-    (id: string) => {
-      mutate((prev) => prev.filter((character) => character.id !== id))
+export function useUpdateCharacter() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<CharacterInput> }) => {
+      const res = await backendApi.patch<Character>(`/api/characters/${id}`, data)
+      return res.data
     },
-    [mutate],
-  )
-
-  const exportJSON = useCallback(() => {
-    const blob = new Blob([JSON.stringify(characters, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'personagens-dnd.json'
-    link.click()
-    URL.revokeObjectURL(url)
-  }, [characters])
-
-  const importJSON = useCallback(
-    (file: File) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        try {
-          const parsed = JSON.parse(event.target?.result as string)
-          if (Array.isArray(parsed)) {
-            mutate(() => parsed as Character[])
-          }
-        } catch {
-          // JSON inválido — ignora silenciosamente
-        }
-      }
-      reader.readAsText(file)
-    },
-    [mutate],
-  )
-
-  const addXp = useCallback(
-    (id: string, amount: number) => {
-      mutate((prev) =>
-        prev.map((character) =>
-          character.id === id ? { ...character, xp: character.xp + amount } : character,
-        ),
+    onSuccess: (character) => {
+      queryClient.setQueryData<Character[]>(characterKeys.all, (prev) =>
+        prev?.map((existing) => (existing.id === character.id ? character : existing)),
       )
     },
-    [mutate],
-  )
+  })
+}
 
-  return {
-    characters,
-    addCharacter,
-    updateCharacter,
-    deleteCharacter,
-    exportJSON,
-    importJSON,
-    addXp,
-  }
+export function useDeleteCharacter() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await backendApi.delete(`/api/characters/${id}`)
+      return id
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData<Character[]>(characterKeys.all, (prev) =>
+        prev?.filter((character) => character.id !== id),
+      )
+    },
+  })
+}
+
+export function useAddCharacterXp() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
+      const characters = queryClient.getQueryData<Character[]>(characterKeys.all)
+      const currentXp = characters?.find((character) => character.id === id)?.xp ?? 0
+      const res = await backendApi.patch<Character>(`/api/characters/${id}`, {
+        xp: currentXp + amount,
+      })
+      return res.data
+    },
+    onSuccess: (character) => {
+      queryClient.setQueryData<Character[]>(characterKeys.all, (prev) =>
+        prev?.map((existing) => (existing.id === character.id ? character : existing)),
+      )
+    },
+  })
 }
