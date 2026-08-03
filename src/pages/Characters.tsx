@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import type { Character } from '../types/character'
-import { useAddCharacter, useCharacters, useDeleteCharacter, useUpdateCharacter } from '../hooks/useCharacters'
+import {
+  useAddCharacter,
+  useAdjustCharacterHp,
+  useCharacters,
+  useDeleteCharacter,
+  useUpdateCharacter,
+} from '../hooks/useCharacters'
 import { clampNumber } from '../utils/number'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
@@ -16,6 +22,7 @@ function Characters() {
   const addCharacter = useAddCharacter()
   const updateCharacter = useUpdateCharacter()
   const deleteCharacter = useDeleteCharacter()
+  const adjustHp = useAdjustCharacterHp()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null)
@@ -57,10 +64,7 @@ function Characters() {
   function handleHpAdjust(characterId: string, delta: number) {
     const character = characters.find((c) => c.id === characterId)
     if (!character) return
-    updateCharacter.mutate({
-      id: characterId,
-      data: { currentHP: clampNumber(character.currentHP + delta, 0, character.maxHP) },
-    })
+    adjustHp(characterId, clampNumber(character.currentHP + delta, 0, character.maxHP))
   }
 
   const totalGroupHP = characters.reduce((sum, character) => sum + character.currentHP, 0)

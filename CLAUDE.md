@@ -390,6 +390,7 @@ A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) 
   - Cada mutation atualiza o cache direto via `queryClient.setQueryData(characterKeys.all, ...)` no `onSuccess`, sem invalidar/refetch
   - `useCharacterForm` segue o mesmo padrão de `useNpcForm`: `onSave` assíncrono, `catch` mapeia erros `400` (`{ error, details }`) em `setError` por campo, erro genérico vira `saveError` exibido no modal; botão de salvar mostra `isSubmitting`
   - Não existe endpoint de bulk import/replace — a feature de exportar/importar JSON (que existia na versão com `localStorage`) foi removida junto com a migração, mesmo racional da remoção do reset de seed dos NPCs
+  - **Ajuste de HP com debounce**: `useAdjustCharacterHp` evita bater no backend a cada clique nos botões de ±HP (`Characters.tsx` e `Initiative.tsx`). Atualiza o cache do React Query na hora (feedback visual instantâneo) e agenda o `PATCH` real num `setTimeout` de 8s guardado por `characterId` num `useRef(new Map())`; cada novo clique no mesmo personagem cancela o timer anterior e reagenda — só sai 1 request quando passam 8s sem novo ajuste naquele personagem. Não usa `useEffect`; o timer sobrevive ao unmount do componente porque vive no event loop, não no ciclo de vida do React
   - `imageUrl` é opcional (`Character.imageUrl?: string`), igual ao `Npc`
 - Importação de personagens em `/iniciativa` (`handleImportCharacters`) e `/encontro` (`importFromCharacters`) lê os dados de `useCharacters().data`, sem mudanças de padrão
 
