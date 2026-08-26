@@ -12,10 +12,31 @@ interface DriveFile {
 
 interface DriveFilesResponse {
   files: DriveFile[]
+  nextPageToken?: string
 }
 
 export function toImageUrl(id: string, size: string): string {
   return `/drive-img?id=${id}&sz=${size}`
+}
+
+async function fetchAllFiles(folderId: string): Promise<DriveFile[]> {
+  const files: DriveFile[] = []
+  let pageToken: string | undefined
+
+  do {
+    const { data } = await api.get<DriveFilesResponse>('/files', {
+      params: {
+        q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
+        fields: 'nextPageToken, files(id,name)',
+        pageSize: 100,
+        pageToken,
+      },
+    })
+    files.push(...data.files)
+    pageToken = data.nextPageToken
+  } while (pageToken)
+
+  return files
 }
 
 async function fetchImages(
@@ -23,14 +44,8 @@ async function fetchImages(
   thumbSize: string,
   fullSize: string,
 ): Promise<DriveImage[]> {
-  const { data } = await api.get<DriveFilesResponse>('/files', {
-    params: {
-      q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
-      fields: 'files(id,name)',
-      pageSize: 100,
-    },
-  })
-  return data.files.map((file) => ({
+  const files = await fetchAllFiles(folderId)
+  return files.map((file) => ({
     id: file.id,
     name: file.name.replace(/\.[^.]+$/, ''),
     url: toImageUrl(file.id, thumbSize),

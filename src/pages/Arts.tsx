@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { DriveImage } from '../types/image'
 import Button from '../components/atoms/Button'
+import ChevronLeftIcon from '../components/atoms/icons/ChevronLeftIcon'
+import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import EyeIcon from '../components/atoms/icons/EyeIcon'
 import EyeOffIcon from '../components/atoms/icons/EyeOffIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
@@ -10,13 +12,23 @@ import ImageCard from '../components/molecules/gallery/ImageCard'
 import Lightbox from '../components/organisms/Lightbox'
 import { useDriveImages } from '../hooks/useDriveImages'
 
+const PAGE_SIZE = 50
+
 function Artes() {
   const { images, loading, error, sync } = useDriveImages()
   const [selected, setSelected] = useState<DriveImage | null>(null)
   const [blurred, setBlurred] = useState(false)
+  const [page, setPage] = useState(0)
 
   const selectedIndex = images.findIndex((img) => img.id === selected?.id)
   const hasImages = images.length > 0
+  const pageCount = Math.ceil(images.length / PAGE_SIZE)
+  const pagedImages = images.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
+
+  const handleSync = async () => {
+    setPage(0)
+    await sync()
+  }
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -35,11 +47,11 @@ function Artes() {
           )}
 
           {hasImages ? (
-            <IconButton title="Sincronizar com Drive" onClick={sync} disabled={loading}>
+            <IconButton title="Sincronizar com Drive" onClick={handleSync} disabled={loading}>
               <RefreshIcon className={loading ? 'animate-spin' : ''} />
             </IconButton>
           ) : (
-            <Button onClick={sync} disabled={loading}>
+            <Button onClick={handleSync} disabled={loading}>
               {loading ? 'Sincronizando...' : 'Sincronizar com Drive'}
             </Button>
           )}
@@ -63,17 +75,43 @@ function Artes() {
       )}
 
       {hasImages && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {images.map((img) => (
-            <ImageCard
-              key={img.id}
-              image={img}
-              blurred={blurred}
-              dead={img.name.includes('_dead')}
-              onClick={setSelected}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {pagedImages.map((img) => (
+              <ImageCard
+                key={img.id}
+                image={img}
+                blurred={blurred}
+                dead={img.name.includes('_dead')}
+                onClick={setSelected}
+              />
+            ))}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="flex items-center justify-center gap-4">
+              <IconButton
+                title="Página anterior"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+              >
+                <ChevronLeftIcon />
+              </IconButton>
+
+              <span className="text-white-300 text-sm">
+                Página {page + 1} de {pageCount}
+              </span>
+
+              <IconButton
+                title="Próxima página"
+                onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                disabled={page >= pageCount - 1}
+              >
+                <ChevronRightIcon />
+              </IconButton>
+            </div>
+          )}
+        </>
       )}
 
       {selected && (
