@@ -3,4 +3,5 @@ export interface DriveImage {
   name: string
   url: string
   fullUrl: string
+  category: string
 }
