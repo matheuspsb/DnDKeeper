@@ -17,6 +17,8 @@ export type Npc = {
   status: NpcStatus
   description: string
   notes: string
+  location?: string
+  currentActivity?: string
   imageUrl?: string
   imagePosition?: NpcImagePosition
   createdAt: string

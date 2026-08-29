@@ -1,11 +1,17 @@
-import type { Npc, Faction } from '../../../types/npc.types'
-import { FACTION_COLOR } from '../../../constants/npc.constants'
+import type { Npc } from '../../../types/npc.types'
 import NpcCard from './NpcCard'
 import NpcEmpty from './NpcEmpty'
 
+export interface NpcGroup {
+  key: string
+  label: string
+  color: string
+  npcs: Npc[]
+}
+
 interface NpcContentProps {
   npcs: Npc[]
-  grouped: { faction: Faction; npcs: Npc[] }[]
+  grouped: NpcGroup[]
   onAdd: () => void
   onEdit: (npc: Npc) => void
   onDelete: (id: string) => void
@@ -26,23 +32,17 @@ function NpcContent({ npcs, grouped, onAdd, onEdit, onDelete, onImageClick }: Np
 
   return (
     <div className="flex flex-col gap-10">
-      {grouped.map(({ faction, npcs: factionNpcs }) => (
-        <div key={faction}>
+      {grouped.map(({ key, label, color, npcs: groupNpcs }) => (
+        <div key={key}>
           <div className="flex items-center gap-3 mb-4">
-            <span
-              className="text-lg font-semibold tracking-wide"
-              style={{ color: FACTION_COLOR[faction] }}
-            >
-              {faction}
+            <span className="text-lg font-semibold tracking-wide" style={{ color }}>
+              {label}
             </span>
-            <div
-              className="flex-1 h-px"
-              style={{ backgroundColor: FACTION_COLOR[faction] + '33' }}
-            />
-            <span className="text-white-300/40 text-xs">{factionNpcs.length}</span>
+            <div className="flex-1 h-px" style={{ backgroundColor: color + '33' }} />
+            <span className="text-white-300/40 text-xs">{groupNpcs.length}</span>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {factionNpcs.map((npc) => (
+            {groupNpcs.map((npc) => (
               <NpcCard
                 key={npc.id}
                 npc={npc}

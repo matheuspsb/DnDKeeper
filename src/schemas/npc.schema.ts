@@ -12,6 +12,8 @@ export const npcFormSchema = z.object({
   status: statusEnum,
   description: z.string().trim(),
   notes: z.string().trim(),
+  location: z.string().trim(),
+  currentActivity: z.string().trim(),
   imageUrl: z.string().trim().transform(resolveDriveUrl),
   imagePosition: z.enum(['top', 'center', 'bottom']).optional(),
 })

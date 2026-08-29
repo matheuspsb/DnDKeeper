@@ -16,7 +16,10 @@ export function useGlobalSearch(query: string) {
     if (!trimmed) return { results: { npcs: [], characters: [] }, total: 0 }
 
     const filteredNpcs = npcs.filter((npc) =>
-      matchesQuery([npc.name, npc.faction, npc.description, npc.notes], trimmed),
+      matchesQuery(
+        [npc.name, npc.faction, npc.description, npc.notes, npc.location, npc.currentActivity],
+        trimmed,
+      ),
     )
     const filteredChars = characters.filter((char) =>
       matchesQuery([char.name, char.playerName, char.characterClass, char.race, char.notes], trimmed),

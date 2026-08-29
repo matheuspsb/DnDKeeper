@@ -3,10 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { Faction, NpcStatus } from '../types/npc.types'
 import { useAddNpc, useDeleteNpc, useNpcs, useUpdateNpc } from '../hooks/useNpcs'
-import { FACTIONS } from '../constants/npc.constants'
+import { FACTIONS, FACTION_COLOR } from '../constants/npc.constants'
 import { resolveImageUrl } from '../constants/arts'
 import NpcContent from '../components/molecules/npc/NpcContent'
+import type { NpcGroup } from '../components/molecules/npc/NpcContent'
 import NpcFilters from '../components/molecules/npc/NpcFilters'
+import type { GroupBy } from '../components/molecules/npc/NpcFilters'
 import NpcModal from '../components/organisms/npc/NpcModal'
 import Lightbox from '../components/organisms/Lightbox'
 import Button from '../components/atoms/Button'
@@ -15,6 +17,10 @@ import { useAuth } from '../contexts/AuthContext'
 
 type StatusFilter = NpcStatus | 'todos'
 type FactionFilter = Faction | 'todas'
+
+const NO_LOCATION_LABEL = 'Sem localização'
+const LOCATION_COLOR = '#C0C0C0'
+const NO_LOCATION_COLOR = '#6b7280'
 
 function Npcs() {
   const { user } = useAuth()
@@ -31,8 +37,10 @@ function Npcs() {
 
   const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
   const factionFilter = (searchParams.get('faction') ?? 'todas') as FactionFilter
+  const locationFilter = searchParams.get('location') ?? 'todas'
+  const groupBy = (searchParams.get('view') ?? 'location') as GroupBy
 
-  function setFilter(key: 'status' | 'faction', value: string, emptyValue: string) {
+  function setFilter(key: 'status' | 'faction' | 'location', value: string, emptyValue: string) {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
       value === emptyValue ? next.delete(key) : next.set(key, value)
@@ -40,20 +48,58 @@ function Npcs() {
     })
   }
 
+  function setGroupBy(value: GroupBy) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      value === 'location' ? next.delete('view') : next.set('view', value)
+      return next
+    })
+  }
+
+  const locations = useMemo(() => {
+    const unique = new Set(npcs.map((npc) => npc.location?.trim()).filter((l): l is string => !!l))
+    return [...unique].sort((a, b) => a.localeCompare(b))
+  }, [npcs])
+
   const filtered = useMemo(() => {
     return npcs.filter((npc) => {
       if (statusFilter !== 'todos' && npc.status !== statusFilter) return false
       if (factionFilter !== 'todas' && npc.faction !== factionFilter) return false
+      if (locationFilter !== 'todas' && npc.location?.trim() !== locationFilter) return false
       return true
     })
-  }, [npcs, statusFilter, factionFilter])
+  }, [npcs, statusFilter, factionFilter, locationFilter])
 
-  const groupedByFaction = useMemo(() => {
+  const groupedByFaction = useMemo((): NpcGroup[] => {
     return FACTIONS.map((faction) => ({
-      faction,
+      key: faction,
+      label: faction,
+      color: FACTION_COLOR[faction],
       npcs: filtered.filter((npc) => npc.faction === faction),
     })).filter(({ npcs }) => npcs.length > 0)
   }, [filtered])
+
+  const groupedByLocation = useMemo((): NpcGroup[] => {
+    const withLocation = locations
+      .map((location) => ({
+        key: location,
+        label: location,
+        color: LOCATION_COLOR,
+        npcs: filtered.filter((npc) => npc.location?.trim() === location),
+      }))
+      .filter(({ npcs }) => npcs.length > 0)
+
+    const withoutLocation = filtered.filter((npc) => !npc.location?.trim())
+
+    return withoutLocation.length > 0
+      ? [
+          ...withLocation,
+          { key: '__none__', label: NO_LOCATION_LABEL, color: NO_LOCATION_COLOR, npcs: withoutLocation },
+        ]
+      : withLocation
+  }, [filtered, locations])
+
+  const grouped = groupBy === 'location' ? groupedByLocation : groupedByFaction
 
   function openAdd() {
     setEditingNpc(null)
@@ -116,8 +162,13 @@ function Npcs() {
           <NpcFilters
             statusFilter={statusFilter}
             factionFilter={factionFilter}
+            locationFilter={locationFilter}
+            locations={locations}
+            groupBy={groupBy}
             onStatusChange={(v) => setFilter('status', v, 'todos')}
             onFactionChange={(v) => setFilter('faction', v, 'todas')}
+            onLocationChange={(v) => setFilter('location', v, 'todas')}
+            onGroupByChange={setGroupBy}
             onClear={() => setSearchParams(new URLSearchParams())}
           />
         )}
@@ -137,7 +188,7 @@ function Npcs() {
             {deleteError && <p className="text-red-100 text-xs mb-4">{deleteError}</p>}
             <NpcContent
               npcs={npcs}
-              grouped={groupedByFaction}
+              grouped={grouped}
               onAdd={openAdd}
               onEdit={openEdit}
               onDelete={handleDelete}

@@ -21,6 +21,8 @@ export function useNpcForm(initialNpc: Npc | null, onSave: (data: NpcInput) => P
         status: initialNpc.status,
         description: initialNpc.description,
         notes: initialNpc.notes,
+        location: initialNpc.location ?? '',
+        currentActivity: initialNpc.currentActivity ?? '',
         imageUrl: initialNpc.imageUrl ?? '',
         imagePosition: initialNpc.imagePosition ?? 'top',
       }
@@ -30,6 +32,8 @@ export function useNpcForm(initialNpc: Npc | null, onSave: (data: NpcInput) => P
         status: 'vivo',
         description: '',
         notes: '',
+        location: '',
+        currentActivity: '',
         imageUrl: '',
         imagePosition: 'top',
       }

@@ -57,6 +57,25 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
+              <label className={labelClass}>Localização</label>
+              <Input
+                {...register('location')}
+                className={fieldClass}
+                placeholder="Taverna do Corvo Negro"
+              />
+            </div>
+            <div>
+              <label className={labelClass}>O que está fazendo agora</label>
+              <Input
+                {...register('currentActivity')}
+                className={fieldClass}
+                placeholder="Bebendo no balcão, observando a porta"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label className={labelClass}>Facção</label>
               <div className="relative">
                 <select {...register('faction')} className={selectClass}>
