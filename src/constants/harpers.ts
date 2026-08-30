@@ -61,8 +61,18 @@ export const HARPERS_TREE: HierarchyTree = {
     },
     {
       id: 'harper-luas-4',
-      label: 'Luas',
+      label: 'Lua Arcana',
+      name: 'Elminster',
       status: 'vivo',
+      children: [
+        {
+          id: 'harper-arcana-triple-1',
+          label: 'Triple String',
+          name: 'Manarek',
+          status: 'vivo',
+          imageUrl: '/drive-img?id=13kP1CW3jiTCBCicUvW593UV3NLG5JTbc&sz=w800',
+        },
+      ],
     },
     {
       id: 'harper-luas-5',
