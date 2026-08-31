@@ -282,7 +282,7 @@ function Table() {
   }, [round, combatants.length])
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-black-500 px-6 py-6 text-white-100 md:px-10 md:py-8">
+    <div className="relative flex min-h-screen w-full flex-col bg-black-500 px-6 text-white-100 md:px-10">
       {showOffline && (
         <div className="mb-4 rounded-lg border border-yellow/40 bg-yellow/10 px-4 py-2 text-center text-sm font-medium text-yellow">
           Sem conexão com o mestre — tentando reconectar…
