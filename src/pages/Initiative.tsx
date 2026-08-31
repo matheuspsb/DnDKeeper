@@ -4,6 +4,8 @@ import { useAdjustCharacterHp, useCharacters } from '../hooks/useCharacters'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
+import EyeIcon from '../components/atoms/icons/EyeIcon'
+import EyeOffIcon from '../components/atoms/icons/EyeOffIcon'
 import GroupHpBar from '../components/molecules/characters/GroupHpBar'
 import InitiativeEmpty from '../components/molecules/initiative/InitiativeEmpty'
 import CombatantRow from '../components/organisms/initiative/CombatantRow'
@@ -17,6 +19,8 @@ function Initiative() {
     currentIndex,
     round,
     saveFailed,
+    hideMonsterHp,
+    setHideMonsterHp,
     addCombatant,
     addCombatants,
     removeCombatant,
@@ -83,6 +87,15 @@ function Initiative() {
 
           {combatants.length > 0 && (
             <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setHideMonsterHp(!hideMonsterHp)}
+                className="w-auto! px-4 gap-2"
+                title="Mostra/esconde o HP de monstros no painel da mesa (/mesa)"
+              >
+                {hideMonsterHp ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
+                {hideMonsterHp ? 'HP monstro oculto' : 'HP monstro visível'}
+              </Button>
               <Button variant="secondary" onClick={reset} className="w-auto! px-4 gap-2">
                 <RefreshIcon size={14} /> Resetar
               </Button>

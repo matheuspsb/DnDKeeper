@@ -7,6 +7,7 @@ interface InitiativeState {
   combatants: Combatant[]
   currentIndex: number
   round: number
+  hideMonsterHp?: boolean
 }
 
 const STORAGE_KEY = 'dndkeeper_initiative_v2'
@@ -20,7 +21,7 @@ export const initiativeKeys = {
 
 function loadLocal(): InitiativeState {
   try {
-    localStorage.removeItem(LEGACY_STORAGE_KEY) // dado pré-backend não vale mais
+    localStorage.removeItem(LEGACY_STORAGE_KEY)
     const raw = localStorage.getItem(STORAGE_KEY)
     return raw ? (JSON.parse(raw) as InitiativeState) : EMPTY_STATE
   } catch {
@@ -152,8 +153,10 @@ export function useInitiative() {
     combatants: state.combatants,
     currentIndex: state.currentIndex,
     round: state.round,
+    hideMonsterHp: state.hideMonsterHp ?? false,
     isSaving: push.isPending,
     saveFailed: push.isError,
+    setHideMonsterHp: (value: boolean) => mutate((s) => ({ ...s, hideMonsterHp: value })),
     addCombatant: (data: Omit<Combatant, 'id'>) => mutate((s) => withCombatant(s, data)),
     addCombatants: (list: Omit<Combatant, 'id'>[]) => {
       if (list.length === 0) return

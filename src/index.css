@@ -328,3 +328,50 @@ body {
     animation: none;
   }
 }
+
+@keyframes round-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+.round-flash {
+  animation: round-flash 1.6s ease-out forwards;
+  text-shadow: 0 0 30px rgba(215, 35, 52, 0.6);
+}
+
+@keyframes round-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+    color: #ecc83b;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.round-pop {
+  animation: round-pop 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-pop {
+    animation: none;
+  }
+}
