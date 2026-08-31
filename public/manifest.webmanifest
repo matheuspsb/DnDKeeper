@@ -1,0 +1,19 @@
+{
+  "name": "DnDKeeper",
+  "short_name": "DnDKeeper",
+  "description": "Painel de mesa e gestão de campanha de D&D",
+  "start_url": "/mesa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#17181c",
+  "theme_color": "#17181c",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

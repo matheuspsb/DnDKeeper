@@ -4,9 +4,14 @@ import { useInitiativeStream } from '../hooks/useInitiativeStream'
 import { resolveImageUrl } from '../constants/arts'
 import { resolveHpBarColor } from '../utils/character'
 import { getHealthBand } from '../constants/initiative'
+import ExpandIcon from '../components/atoms/icons/ExpandIcon'
 import type { Combatant } from '../types/initiative'
 
 const OFFLINE_GRACE_MS = 4000
+
+function fullscreenAvailable(): boolean {
+  return typeof document !== 'undefined' && !!document.documentElement.requestFullscreen
+}
 
 function reducedMotion(): boolean {
   return (
@@ -281,8 +286,23 @@ function Table() {
     return () => clearTimeout(id)
   }, [round, combatants.length])
 
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {})
+    } else {
+      document.documentElement.requestFullscreen?.().catch(() => {})
+    }
+  }
+
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-black-500 px-6 text-white-100 md:px-10">
+    <div className="relative flex min-h-dvh w-full flex-col bg-black-500 px-6 py-6 text-white-100 md:px-10 md:py-8">
       {showOffline && (
         <div className="mb-4 rounded-lg border border-yellow/40 bg-yellow/10 px-4 py-2 text-center text-sm font-medium text-yellow">
           Sem conexão com o mestre — tentando reconectar…
@@ -301,7 +321,19 @@ function Table() {
             {round}
           </span>
         </div>
-        <LiveStatus connected={connected} lastEventAt={lastEventAt} now={now} />
+        <div className="flex items-center gap-4">
+          {fullscreenAvailable() && (
+            <button
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+              aria-label={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+              className="text-white-300/40 transition-colors hover:text-white-300"
+            >
+              <ExpandIcon size={18} />
+            </button>
+          )}
+          <LiveStatus connected={connected} lastEventAt={lastEventAt} now={now} />
+        </div>
       </header>
 
       {combatants.length === 0 ? (
@@ -312,10 +344,7 @@ function Table() {
       ) : (
         <>
           {current && (
-            <CurrentHero
-              combatant={current}
-              hideHp={!current.isPlayer && !current.hpRevealed}
-            />
+            <CurrentHero combatant={current} hideHp={!current.isPlayer && !current.hpRevealed} />
           )}
 
           <h2 className="mt-8 mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white-300/40">

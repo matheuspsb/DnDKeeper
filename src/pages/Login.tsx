@@ -127,6 +127,18 @@ function Login() {
             {guestForm.formState.isSubmitting ? 'Entrando…' : 'Entrar como Convidado'}
           </button>
         </form>
+
+        {/* Painel da mesa */}
+        <button
+          type="button"
+          onClick={() => navigate('/mesa')}
+          className="w-full h-10 rounded-lg border border-black-100 bg-black-400 text-white-300 text-sm font-semibold transition-colors hover:bg-black-300 hover:text-white-100"
+        >
+          Abrir painel da mesa
+        </button>
+        <p className="-mt-2 text-center text-xs text-white-300/40">
+          Tela só de acompanhamento para o tablet/TV da mesa — não precisa de login
+        </p>
       </div>
     </div>
   )
