@@ -1,8 +1,9 @@
 import type { Combatant } from '../types/initiative'
+import { hpPercent } from './character'
 
 export function combatantHpPercent(combatant: Combatant): number | null {
   if (combatant.hp === null || combatant.maxHp === null || combatant.maxHp <= 0) return null
-  return Math.max(0, Math.min(100, Math.round((combatant.hp / combatant.maxHp) * 100)))
+  return hpPercent(combatant.hp, combatant.maxHp)
 }
 
 export function isCombatantHpHidden(combatant: Combatant): boolean {

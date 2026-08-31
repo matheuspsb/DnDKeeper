@@ -18,7 +18,7 @@ function LettersEmpty({ isDm, onAdd }: LettersEmptyProps) {
         </p>
       </div>
       {isDm && (
-        <Button variant="primary" onClick={onAdd} className="flex items-center gap-2 w-auto!">
+        <Button variant="primary" onClick={onAdd} className="flex items-center gap-2">
           <PlusIcon size={16} />
           Nova Carta
         </Button>

@@ -2,6 +2,9 @@ import { useState, useRef } from 'react'
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
 import { HP_DELTAS } from '../../../constants/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
+import { resolveDriveUrl } from '../../../utils/driveUrl'
+import { resolveHpBarColor } from '../../../utils/character'
+import { combatantHpPercent } from '../../../utils/initiative'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import ImageIcon from '../../atoms/icons/ImageIcon'
 import EyeIcon from '../../atoms/icons/EyeIcon'
@@ -10,12 +13,6 @@ import TypeBadge from '../../atoms/TypeBadge'
 import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
 import ConditionBadge from '../../molecules/initiative/ConditionBadge'
 import ConditionModal from './ConditionModal'
-
-function parseDriveUrl(input: string): string {
-  const match = input.match(/\/d\/([a-zA-Z0-9_-]+)/)
-  if (match) return `/drive-img?id=${match[1]}&sz=w800`
-  return input
-}
 
 interface CombatantRowProps {
   combatant: Combatant
@@ -50,24 +47,13 @@ function CombatantRow({
   }
 
   function handleConfirmImage() {
-    if (imageInputValue.trim()) onSetImageUrl(parseDriveUrl(imageInputValue.trim()))
+    if (imageInputValue.trim()) onSetImageUrl(resolveDriveUrl(imageInputValue.trim()))
     setImageInputOpen(false)
   }
   const isCurrent = status === 'current'
 
-  const hpPercent =
-    combatant.hp !== null && combatant.maxHp !== null && combatant.maxHp > 0
-      ? Math.round((combatant.hp / combatant.maxHp) * 100)
-      : null
-
-  const hpColor =
-    hpPercent === null
-      ? '#C0C0C0'
-      : hpPercent > 50
-        ? '#4ade80'
-        : hpPercent > 25
-          ? '#facc15'
-          : '#D72334'
+  const hpPercent = combatantHpPercent(combatant)
+  const hpColor = hpPercent === null ? '#C0C0C0' : resolveHpBarColor(hpPercent)
 
   return (
     <>

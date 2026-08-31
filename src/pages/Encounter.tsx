@@ -73,7 +73,7 @@ function Encounter() {
           </p>
         </div>
         {result.rawXp > 0 && party.length > 0 && (
-          <Button variant="secondary" onClick={handleSave} className="w-auto! px-4 gap-2 shrink-0">
+          <Button variant="secondary" onClick={handleSave} className="px-4 gap-2 shrink-0">
             Salvar Combate
           </Button>
         )}

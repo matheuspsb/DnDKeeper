@@ -9,7 +9,7 @@ import MapCalibrationModal from '../components/organisms/map/MapCalibrationModal
 import { useMapRuler } from '../hooks/useMapRuler'
 import { useMapInteraction } from '../hooks/useMapInteraction'
 import { useMapDrawing } from '../hooks/useMapDrawing'
-import { toImageUrl } from '../services/googleDrive'
+import { driveImageUrl } from '../utils/driveUrl'
 import { MAP_LOCATIONS } from '../constants/mapLocations'
 import type { MapLocation } from '../types/mapLocation'
 import MapLocationPopup from '../components/organisms/map/MapLocationPopup'
@@ -196,7 +196,7 @@ function Mapa() {
               onMouseLeave={interaction.handleMouseLeave}
             >
               <img
-                src={toImageUrl(MAP_FILE_ID, MAP_SIZE)}
+                src={driveImageUrl(MAP_FILE_ID, MAP_SIZE)}
                 alt="Mapa"
                 draggable={false}
                 onLoad={handleImageLoad}

@@ -56,7 +56,7 @@ function XpMonstersPanel({ monsters, onAdd, onUpdate, onRemove, onClear }: XpMon
             <p className="text-white-300/40 text-xs max-w-35">
               Adicione os monstros do encontro com seu CR
             </p>
-            <Button variant="primary" onClick={onAdd} className="w-auto! px-4 gap-2 h-9 text-xs">
+            <Button variant="primary" onClick={onAdd} className="px-4 gap-2 h-9 text-xs">
               <PlusIcon size={12} /> Adicionar monstro
             </Button>
           </div>

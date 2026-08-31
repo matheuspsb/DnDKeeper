@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Npc } from '../../../types/npc.types'
 import { resolveImageUrl } from '../../../constants/arts'
+import { formatDate } from '../../../utils/time'
 import NpcStatusStamp from '../../atoms/NpcStatusStamp'
 import MaskIcon from '../../atoms/icons/MaskIcon'
 import ChevronRightIcon from '../../atoms/icons/ChevronRightIcon'
@@ -13,15 +14,6 @@ interface NpcDossierRowProps {
   onEdit: () => void
   onDelete: () => void
   onImageClick: () => void
-}
-
-function fmtDate(iso: string) {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  return d
-    .toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-    .replace('.', '')
-    .toLowerCase()
 }
 
 function NpcDossierRow({
@@ -124,8 +116,8 @@ function NpcDossierRow({
             )}
 
             <p className="font-mono text-[10px] text-bone-400/55">
-              ficha aberta {fmtDate(npc.createdAt)}
-              {revised && ` · rev. ${fmtDate(npc.updatedAt)}`}
+              ficha aberta {formatDate(npc.createdAt)}
+              {revised && ` · rev. ${formatDate(npc.updatedAt)}`}
             </p>
 
             {canEdit && (

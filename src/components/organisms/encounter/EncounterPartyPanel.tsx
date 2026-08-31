@@ -64,7 +64,7 @@ function XpPartyPanel({
             <p className="text-white-300/40 text-xs max-w-45">
               Adicione os jogadores ou importe da página de personagens
             </p>
-            <Button variant="primary" onClick={onAdd} className="w-auto! px-4 gap-2 h-9 text-xs">
+            <Button variant="primary" onClick={onAdd} className="px-4 gap-2 h-9 text-xs">
               <PlusIcon size={12} /> Adicionar jogador
             </Button>
           </div>

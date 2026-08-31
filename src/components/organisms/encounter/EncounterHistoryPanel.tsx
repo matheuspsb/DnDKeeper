@@ -1,6 +1,7 @@
 import type { EncounterSnapshot } from '../../../types/encounter'
 import { DIFFICULTY_LABEL, DIFFICULTY_COLOR, DIFFICULTY_BG } from '../../../constants/encounter'
 import { formatNumber } from '../../../utils/number'
+import { formatTimestamp } from '../../../utils/time'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import Button from '../../atoms/Button'
 
@@ -10,18 +11,6 @@ interface EncounterHistoryPanelProps {
   onSendAll: () => void
   onDelete: (id: string) => void
   onClear: () => void
-}
-
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  const isToday = date.toDateString() === new Date().toDateString()
-  if (isToday) return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 function EncounterHistoryPanel({
@@ -55,7 +44,7 @@ function EncounterHistoryPanel({
               <Button
                 variant="primary"
                 onClick={onSendAll}
-                className="w-auto! px-4 h-8 text-xs gap-1.5"
+                className="px-4 h-8 text-xs gap-1.5"
               >
                 Enviar Tudo
               </Button>
@@ -91,7 +80,7 @@ function EncounterHistoryPanel({
                 {DIFFICULTY_LABEL[snapshot.difficulty]}
               </span>
               <span className="text-white-300/40 text-[10px] tabular-nums">
-                {formatTime(snapshot.savedAt)}
+                {formatTimestamp(snapshot.savedAt)}
               </span>
             </div>
 

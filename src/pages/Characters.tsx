@@ -85,7 +85,7 @@ function Characters() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button variant="primary" onClick={openNewCharacterModal} className="w-auto! px-4 gap-2">
+          <Button variant="primary" onClick={openNewCharacterModal} className="px-4 gap-2">
             <PlusIcon size={15} /> Adicionar
           </Button>
         </div>

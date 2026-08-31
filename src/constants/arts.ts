@@ -1,3 +1,5 @@
+import { resolveDriveUrl } from '../utils/driveUrl'
+
 const modules = import.meta.glob<{ default: string }>('../assets/arts/*', { eager: true })
 
 export interface LocalArt {
@@ -35,15 +37,4 @@ export function toLocalArtUrl(key: string): string {
   return `${LOCAL_ART_PREFIX}${key}`
 }
 
-/**
- * Converts a Google Drive share URL to the thumbnail format used in <img>.
- * https://drive.google.com/file/d/{ID}/view?... → https://drive.google.com/thumbnail?id={ID}&sz=w800
- * Returns the input unchanged if it's not a Drive share URL.
- */
-export function resolveDriveUrl(url: string): string {
-  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
-  if (match) {
-    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`
-  }
-  return url
-}
+export { resolveDriveUrl }

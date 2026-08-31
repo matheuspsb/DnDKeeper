@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { FACTIONS } from '../constants/npc.constants'
-import { resolveDriveUrl } from '../constants/arts'
+import { resolveDriveUrl } from '../utils/driveUrl'
 import type { Faction } from '../types/npc.types'
 
 const factionEnum = z.enum(FACTIONS as [Faction, ...Faction[]])

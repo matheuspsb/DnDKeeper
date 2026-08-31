@@ -1,4 +1,5 @@
 import type { DriveImage } from '../types/image'
+import { driveImageUrl } from '../utils/driveUrl'
 import api from './api'
 
 const FOLDER_ID = import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID as string
@@ -17,9 +18,6 @@ interface DriveFilesResponse {
   nextPageToken?: string
 }
 
-export function toImageUrl(id: string, size: string): string {
-  return `/drive-img?id=${id}&sz=${size}`
-}
 
 async function fetchAllFiles(query: string): Promise<DriveFile[]> {
   const files: DriveFile[] = []
@@ -60,8 +58,8 @@ function toDriveImage(
   return {
     id: file.id,
     name: file.name.replace(/\.[^.]+$/, ''),
-    url: toImageUrl(file.id, thumbSize),
-    fullUrl: toImageUrl(file.id, fullSize),
+    url: driveImageUrl(file.id, thumbSize),
+    fullUrl: driveImageUrl(file.id, fullSize),
     category,
   }
 }

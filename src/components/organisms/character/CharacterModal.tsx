@@ -108,14 +108,14 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
           {saveError && <p className={errorClass}>{saveError}</p>}
 
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
+            <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
             <Button
               type="submit"
               variant="primary"
               disabled={isSubmitting}
-              className="w-auto! flex-1 disabled:opacity-50"
+              className="flex-1 disabled:opacity-50"
             >
               {isSubmitting
                 ? 'Salvando…'

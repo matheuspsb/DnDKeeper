@@ -4,7 +4,7 @@ import { getXpProgress } from '../../../constants/dnd'
 import { HP_DELTA_OPTIONS } from '../../../constants/character'
 import { resolveImageUrl } from '../../../constants/arts'
 import { clampNumber, formatNumber } from '../../../utils/number'
-import { resolveHpBarColor } from '../../../utils/character'
+import { hpPercent, resolveHpBarColor } from '../../../utils/character'
 import PencilIcon from '../../atoms/icons/PencilIcon'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import UsersIcon from '../../atoms/icons/UsersIcon'
@@ -21,8 +21,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
   const [isEditingHp, setIsEditingHp] = useState(false)
   const [hpInputValue, setHpInputValue] = useState('')
 
-  const hpPercentage =
-    character.maxHP > 0 ? Math.round((character.currentHP / character.maxHP) * 100) : 0
+  const hpPercentage = hpPercent(character.currentHP, character.maxHP)
 
   const xpProgress = getXpProgress(character.xp)
   const isCharacterDead = character.currentHP === 0

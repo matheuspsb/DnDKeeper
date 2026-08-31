@@ -63,10 +63,10 @@ function ConditionModal({ combatantName, active, onSave, onClose }: ConditionMod
         </div>
 
         <div className="flex gap-3 px-5 pb-5">
-          <Button variant="secondary" onClick={onClose} className="flex-1 w-auto!">
+          <Button variant="secondary" onClick={onClose} className="flex-1">
             Cancelar
           </Button>
-          <Button variant="primary" onClick={handleSave} className="flex-1 w-auto!">
+          <Button variant="primary" onClick={handleSave} className="flex-1">
             Salvar
           </Button>
         </div>

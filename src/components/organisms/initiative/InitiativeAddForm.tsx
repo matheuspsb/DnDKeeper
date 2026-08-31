@@ -78,7 +78,7 @@ function InitiativeAddForm({ onAdd, hasCharacters, onImportCharacters }: Initiat
             />
           </div>
 
-          <Button type="submit" variant="primary" className="w-auto! px-4 gap-2 shrink-0">
+          <Button type="submit" variant="primary" className="px-4 gap-2 shrink-0">
             <PlusIcon size={14} /> Adicionar
           </Button>
         </div>

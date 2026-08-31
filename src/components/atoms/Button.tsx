@@ -4,6 +4,7 @@ type ButtonVariant = 'primary' | 'secondary'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
+  fullWidth?: boolean
 }
 
 const variants: Record<ButtonVariant, string> = {
@@ -23,14 +24,23 @@ const variants: Record<ButtonVariant, string> = {
 
 const base = `
   inline-flex items-center justify-center
-  h-[42px] w-[280px] px-6 py-2
+  h-[42px] px-6 py-2
   rounded-full font-medium text-sm
   transition-all cursor-pointer
 `
 
-function Button({ children, variant = 'primary', className = '', ...props }: ButtonProps) {
+function Button({
+  children,
+  variant = 'primary',
+  fullWidth = false,
+  className = '',
+  ...props
+}: ButtonProps) {
   return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <button
+      className={`${base} ${fullWidth ? 'w-full' : ''} ${variants[variant]} ${className}`}
+      {...props}
+    >
       {children}
     </button>
   )

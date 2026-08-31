@@ -82,16 +82,11 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
             {errors.content && <p className={errorClass}>{errors.content.message}</p>}
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer select-none">
-            <input type="checkbox" {...register('shown')} className="w-4 h-4 accent-red-100" />
-            <span className="text-white-200 text-sm">Já revelada aos jogadores</span>
-          </label>
-
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="secondary" onClick={onClose} className="w-auto! flex-1">
+            <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
-            <Button type="submit" variant="primary" className="w-auto! flex-1">
+            <Button type="submit" variant="primary" className="flex-1">
               {initialLetter ? 'Salvar Alterações' : 'Adicionar Carta'}
             </Button>
           </div>

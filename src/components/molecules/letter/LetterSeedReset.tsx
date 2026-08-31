@@ -17,10 +17,10 @@ function LetterSeedReset({ onReset }: LetterSeedResetProps) {
     return (
       <>
         <span className="text-white-300/50 text-xs">Substituir todas as cartas pelo seed?</span>
-        <Button variant="secondary" onClick={() => setConfirm(false)} className="w-auto! px-3">
+        <Button variant="secondary" onClick={() => setConfirm(false)} className="px-3">
           Cancelar
         </Button>
-        <Button variant="primary" onClick={handleConfirm} className="w-auto! px-3">
+        <Button variant="primary" onClick={handleConfirm} className="px-3">
           Confirmar
         </Button>
       </>
@@ -28,7 +28,7 @@ function LetterSeedReset({ onReset }: LetterSeedResetProps) {
   }
 
   return (
-    <Button variant="secondary" onClick={() => setConfirm(true)} className="w-auto! px-3">
+    <Button variant="secondary" onClick={() => setConfirm(true)} className="px-3">
       Atualizar
     </Button>
   )

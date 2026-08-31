@@ -41,7 +41,7 @@ function RandomTables() {
             Clique em qualquer card para rolar ou role tudo de uma vez
           </p>
         </div>
-        <Button variant="primary" onClick={rollAll} className="w-auto! px-5 gap-2 shrink-0">
+        <Button variant="primary" onClick={rollAll} className="px-5 gap-2 shrink-0">
           <DiceIcon size={15} /> Rolar Tudo
         </Button>
       </div>
