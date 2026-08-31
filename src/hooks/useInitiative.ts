@@ -7,7 +7,6 @@ interface InitiativeState {
   combatants: Combatant[]
   currentIndex: number
   round: number
-  hideMonsterHp?: boolean
 }
 
 const STORAGE_KEY = 'dndkeeper_initiative_v2'
@@ -93,6 +92,13 @@ function withImageUrl(state: InitiativeState, id: string, imageUrl: string): Ini
   }
 }
 
+function withHpRevealed(state: InitiativeState, id: string, revealed: boolean): InitiativeState {
+  return {
+    ...state,
+    combatants: state.combatants.map((c) => (c.id === id ? { ...c, hpRevealed: revealed } : c)),
+  }
+}
+
 function advanceTurn(state: InitiativeState): InitiativeState {
   if (state.combatants.length === 0) return state
   const currentIndex = (state.currentIndex + 1) % state.combatants.length
@@ -153,10 +159,10 @@ export function useInitiative() {
     combatants: state.combatants,
     currentIndex: state.currentIndex,
     round: state.round,
-    hideMonsterHp: state.hideMonsterHp ?? false,
     isSaving: push.isPending,
     saveFailed: push.isError,
-    setHideMonsterHp: (value: boolean) => mutate((s) => ({ ...s, hideMonsterHp: value })),
+    setHpRevealed: (id: string, revealed: boolean) =>
+      mutate((s) => withHpRevealed(s, id, revealed)),
     addCombatant: (data: Omit<Combatant, 'id'>) => mutate((s) => withCombatant(s, data)),
     addCombatants: (list: Omit<Combatant, 'id'>[]) => {
       if (list.length === 0) return

@@ -201,7 +201,7 @@ function CurrentHero({ combatant, hideHp }: CombatantViewProps) {
           {band ? (
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium uppercase tracking-wide text-white-300/50">
-                Condição
+                Estado
               </span>
               <span
                 className="text-3xl font-bold uppercase tracking-wide md:text-4xl"
@@ -242,7 +242,7 @@ function CurrentHero({ combatant, hideHp }: CombatantViewProps) {
 
 function Table() {
   const { connected, lastEventAt } = useInitiativeStream()
-  const { combatants, currentIndex, round, hideMonsterHp } = useInitiative()
+  const { combatants, currentIndex, round } = useInitiative()
 
   const current = combatants[currentIndex] ?? null
 
@@ -312,7 +312,10 @@ function Table() {
       ) : (
         <>
           {current && (
-            <CurrentHero combatant={current} hideHp={hideMonsterHp && !current.isPlayer} />
+            <CurrentHero
+              combatant={current}
+              hideHp={!current.isPlayer && !current.hpRevealed}
+            />
           )}
 
           <h2 className="mt-8 mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white-300/40">
@@ -324,7 +327,7 @@ function Table() {
                 <OrderCard
                   combatant={combatant}
                   status={i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'pending'}
-                  hideHp={hideMonsterHp && !combatant.isPlayer}
+                  hideHp={!combatant.isPlayer && !combatant.hpRevealed}
                 />
               </div>
             ))}

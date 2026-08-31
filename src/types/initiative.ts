@@ -8,6 +8,7 @@ export interface Combatant {
   imageUrl?: string
   characterId?: string
   conditions?: string[]
+  hpRevealed?: boolean
 }
 
 export type CombatantStatus = 'current' | 'pending' | 'done'

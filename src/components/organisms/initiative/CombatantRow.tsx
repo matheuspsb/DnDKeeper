@@ -4,6 +4,8 @@ import { HP_DELTAS } from '../../../constants/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import ImageIcon from '../../atoms/icons/ImageIcon'
+import EyeIcon from '../../atoms/icons/EyeIcon'
+import EyeOffIcon from '../../atoms/icons/EyeOffIcon'
 import TypeBadge from '../../atoms/TypeBadge'
 import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
 import ConditionBadge from '../../molecules/initiative/ConditionBadge'
@@ -23,6 +25,7 @@ interface CombatantRowProps {
   onUpdateInitiative: (val: number) => void
   onSetConditions: (conditions: string[]) => void
   onSetImageUrl: (url: string) => void
+  onToggleHpReveal: () => void
 }
 
 function CombatantRow({
@@ -33,6 +36,7 @@ function CombatantRow({
   onUpdateInitiative,
   onSetConditions,
   onSetImageUrl,
+  onToggleHpReveal,
 }: CombatantRowProps) {
   const [conditionModalOpen, setConditionModalOpen] = useState(false)
   const [imageInputOpen, setImageInputOpen] = useState(false)
@@ -96,6 +100,20 @@ function CombatantRow({
                 onUpdate={onUpdateInitiative}
               />
               <div className="flex items-center gap-1 shrink-0">
+                {!combatant.isPlayer && combatant.hp !== null && (
+                  <button
+                    onClick={onToggleHpReveal}
+                    title={
+                      combatant.hpRevealed
+                        ? 'HP numérico visível na mesa — clique para esconder'
+                        : 'HP escondido na mesa (jogadores veem só a faixa) — clique para revelar'
+                    }
+                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors cursor-pointer
+                    ${combatant.hpRevealed ? 'text-yellow hover:text-yellow/80' : 'text-white-300/30 hover:text-white-300/70'}`}
+                  >
+                    {combatant.hpRevealed ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
+                  </button>
+                )}
                 <button
                   onClick={handleOpenImageInput}
                   title="Definir imagem"
