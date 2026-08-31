@@ -23,7 +23,6 @@ export function useInitiativeStream(): { connected: boolean } {
 
     source.addEventListener('error', () => {
       setConnected(false)
-      queryClient.invalidateQueries({ queryKey: initiativeKeys.all })
     })
 
     return () => source.close()

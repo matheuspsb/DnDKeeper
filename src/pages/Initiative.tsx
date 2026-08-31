@@ -16,7 +16,9 @@ function Initiative() {
     combatants,
     currentIndex,
     round,
+    saveFailed,
     addCombatant,
+    addCombatants,
     removeCombatant,
     adjustHp,
     updateInitiative,
@@ -31,8 +33,8 @@ function Initiative() {
   const adjustCharacterHp = useAdjustCharacterHp()
 
   function handleImportCharacters() {
-    characters.forEach((char) => {
-      addCombatant({
+    addCombatants(
+      characters.map((char) => ({
         name: char.name,
         initiative: 0,
         hp: char.currentHP,
@@ -40,8 +42,8 @@ function Initiative() {
         isPlayer: true,
         imageUrl: char.imageUrl || undefined,
         characterId: char.id,
-      })
-    })
+      })),
+    )
   }
 
   function handleAdjustHp(combatant: (typeof combatants)[number], delta: number) {
@@ -66,6 +68,15 @@ function Initiative() {
             {combatants.length > 0 && (
               <span className="bg-black-400 border border-black-100 text-white-300 text-sm font-semibold px-3 py-1 rounded-full tabular-nums">
                 Rodada {round}
+              </span>
+            )}
+            {saveFailed && (
+              <span
+                className="flex items-center gap-1.5 rounded-full border border-red-400/60 bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-100"
+                title="A última alteração não chegou ao servidor. As mudanças continuam salvas neste navegador."
+              >
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-100" />
+                Sem sincronizar
               </span>
             )}
           </div>
