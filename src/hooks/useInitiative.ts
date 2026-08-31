@@ -9,8 +9,9 @@ interface InitiativeState {
   round: number
 }
 
-const STORAGE_KEY = 'dndkeeper_initiative'
-const HP_FLUSH_DELAY_MS = 600
+const STORAGE_KEY = 'dndkeeper_initiative_v2'
+const LEGACY_STORAGE_KEY = 'dndkeeper_initiative'
+const FLUSH_DELAY_MS = 500
 const EMPTY_STATE: InitiativeState = { combatants: [], currentIndex: 0, round: 1 }
 
 export const initiativeKeys = {
@@ -19,6 +20,7 @@ export const initiativeKeys = {
 
 function loadLocal(): InitiativeState {
   try {
+    localStorage.removeItem(LEGACY_STORAGE_KEY) // dado pré-backend não vale mais
     const raw = localStorage.getItem(STORAGE_KEY)
     return raw ? (JSON.parse(raw) as InitiativeState) : EMPTY_STATE
   } catch {
@@ -110,27 +112,15 @@ export function useInitiative() {
     queryKey: initiativeKeys.all,
     queryFn: fetchInitiative,
     initialData: loadLocal,
-    refetchInterval: 20_000,
+    refetchInterval: 30_000,
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   })
 
-  const commit = useMutation({
+  const push = useMutation({
     mutationFn: async (next: InitiativeState) => {
       const res = await backendApi.put<{ state: InitiativeState }>('/api/initiative', next)
       return res.data.state
-    },
-    onMutate: async (next) => {
-      await queryClient.cancelQueries({ queryKey: initiativeKeys.all })
-      const prev = queryClient.getQueryData<InitiativeState>(initiativeKeys.all)
-      queryClient.setQueryData(initiativeKeys.all, next)
-      saveLocal(next)
-      return { prev }
-    },
-    onError: (_err, _next, ctx) => {
-      if (ctx?.prev) {
-        queryClient.setQueryData(initiativeKeys.all, ctx.prev)
-        saveLocal(ctx.prev)
-      }
     },
     onSuccess: (serverState) => {
       queryClient.setQueryData(initiativeKeys.all, serverState)
@@ -142,39 +132,42 @@ export function useInitiative() {
     return queryClient.getQueryData<InitiativeState>(initiativeKeys.all) ?? EMPTY_STATE
   }
 
-  function apply(transform: (s: InitiativeState) => InitiativeState) {
-    if (flushTimer.current) {
-      clearTimeout(flushTimer.current)
-      flushTimer.current = null
-    }
-    commit.mutate(transform(currentState()))
-  }
-
-  function adjustHp(id: string, delta: number) {
-    const next = withHpDelta(currentState(), id, delta)
-    queryClient.setQueryData(initiativeKeys.all, next)
-    saveLocal(next)
+  function scheduleFlush() {
     if (flushTimer.current) clearTimeout(flushTimer.current)
     flushTimer.current = setTimeout(() => {
       flushTimer.current = null
-      commit.mutate(currentState())
-    }, HP_FLUSH_DELAY_MS)
+      push.mutate(currentState())
+    }, FLUSH_DELAY_MS)
+  }
+
+  function mutate(transform: (s: InitiativeState) => InitiativeState) {
+    queryClient.cancelQueries({ queryKey: initiativeKeys.all })
+    const next = transform(currentState())
+    queryClient.setQueryData(initiativeKeys.all, next)
+    saveLocal(next)
+    scheduleFlush()
   }
 
   return {
     combatants: state.combatants,
     currentIndex: state.currentIndex,
     round: state.round,
-    addCombatant: (data: Omit<Combatant, 'id'>) => apply((s) => withCombatant(s, data)),
-    removeCombatant: (id: string) => apply((s) => withoutCombatant(s, id)),
-    adjustHp,
+    isSaving: push.isPending,
+    saveFailed: push.isError,
+    addCombatant: (data: Omit<Combatant, 'id'>) => mutate((s) => withCombatant(s, data)),
+    addCombatants: (list: Omit<Combatant, 'id'>[]) => {
+      if (list.length === 0) return
+      mutate((s) => list.reduce((acc, data) => withCombatant(acc, data), s))
+    },
+    removeCombatant: (id: string) => mutate((s) => withoutCombatant(s, id)),
+    adjustHp: (id: string, delta: number) => mutate((s) => withHpDelta(s, id, delta)),
     updateInitiative: (id: string, initiative: number) =>
-      apply((s) => withInitiative(s, id, initiative)),
+      mutate((s) => withInitiative(s, id, initiative)),
     setConditions: (id: string, conditions: string[]) =>
-      apply((s) => withConditions(s, id, conditions)),
-    setImageUrl: (id: string, imageUrl: string) => apply((s) => withImageUrl(s, id, imageUrl)),
-    nextTurn: () => apply(advanceTurn),
-    goToTop: () => apply((s) => ({ ...s, currentIndex: 0 })),
-    reset: () => apply(() => ({ ...EMPTY_STATE })),
+      mutate((s) => withConditions(s, id, conditions)),
+    setImageUrl: (id: string, imageUrl: string) => mutate((s) => withImageUrl(s, id, imageUrl)),
+    nextTurn: () => mutate(advanceTurn),
+    goToTop: () => mutate((s) => ({ ...s, currentIndex: 0 })),
+    reset: () => mutate(() => ({ ...EMPTY_STATE })),
   }
 }
