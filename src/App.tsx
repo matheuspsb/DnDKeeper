@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import type { ReactElement } from 'react'
 import AuthGuard from './components/organisms/AuthGuard'
 import Login from './pages/Login'
+import Table from './pages/Table'
 import Search from './pages/Search'
 import { ROUTES } from './constants/routes'
 import { useAuth } from './contexts/AuthContext'
@@ -16,6 +17,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/mesa" element={<Table />} />
       <Route element={<AuthGuard />}>
         <Route index element={<Navigate to="/artes" replace />} />
         <Route path="/search" element={<Search />} />

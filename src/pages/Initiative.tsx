@@ -1,4 +1,5 @@
 import { useInitiative } from '../hooks/useInitiative'
+import { useInitiativeStream } from '../hooks/useInitiativeStream'
 import { useAdjustCharacterHp, useCharacters } from '../hooks/useCharacters'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
@@ -9,6 +10,8 @@ import CombatantRow from '../components/organisms/initiative/CombatantRow'
 import InitiativeAddForm from '../components/organisms/initiative/InitiativeAddForm'
 
 function Initiative() {
+  useInitiativeStream()
+
   const {
     combatants,
     currentIndex,
