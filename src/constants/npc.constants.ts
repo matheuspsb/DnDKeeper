@@ -28,6 +28,20 @@ export const NPC_STATUS_COLOR: Record<NpcStatus, string> = {
   desconhecido: '#94a3b8',
 }
 
+export const NPC_STATUS_STAMP_COLOR: Record<NpcStatus, string> = {
+  vivo: '#7faf6b',
+  morto: '#b21e2d',
+  desaparecido: '#c8a24a',
+  desconhecido: '#8f8875',
+}
+
+export const NPC_STATUS_STAMP_ROT: Record<NpcStatus, string> = {
+  vivo: '-3deg',
+  morto: '-2deg',
+  desaparecido: '-4deg',
+  desconhecido: '-2.5deg',
+}
+
 export const FACTION_IMAGE: Partial<Record<Faction, string>> = {
   Zhentarim: zhentarimImg,
   'Culto do Dragão': cultoImg,

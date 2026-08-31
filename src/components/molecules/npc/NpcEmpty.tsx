@@ -6,21 +6,23 @@ interface NpcEmptyProps {
 
 function NpcEmpty({ onAdd }: NpcEmptyProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-      <div className="text-white-300/20">
+    <div className="flex flex-col items-center gap-5 py-24 text-center">
+      <div className="text-bone-400/20">
         <MaskIcon size={56} />
       </div>
-      <div>
-        <p className="text-white-300 font-medium">Nenhum NPC cadastrado</p>
-        <p className="text-white-300/50 text-sm mt-1">
-          Adicione personagens não-jogáveis da sua campanha
+      <div className="flex flex-col gap-1">
+        <p className="font-display text-lg font-semibold tracking-[0.12em] text-bone-100 uppercase">
+          Arquivo vazio
+        </p>
+        <p className="max-w-xs font-body text-[13px] leading-relaxed text-bone-400">
+          Nenhuma ficha registrada. Comece pelos rostos que a mesa vai encontrar primeiro.
         </p>
       </div>
       <button
         onClick={onAdd}
-        className="text-sm font-medium text-red-100 hover:text-red-200 underline underline-offset-4 transition-colors cursor-pointer"
+        className="border border-brass/50 px-4 py-2 font-mono text-[11px] tracking-[0.15em] text-brass uppercase transition-colors hover:bg-brass/10"
       >
-        Adicionar primeiro NPC
+        Abrir a primeira ficha
       </button>
     </div>
   )

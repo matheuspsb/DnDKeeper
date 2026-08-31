@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
-import type { Faction, NpcStatus } from '../types/npc.types'
+import type { NpcStatus } from '../types/npc.types'
 import { useAddNpc, useDeleteNpc, useNpcs, useUpdateNpc } from '../hooks/useNpcs'
 import { FACTIONS } from '../constants/npc.constants'
 import { resolveImageUrl } from '../constants/arts'
 import NpcContent from '../components/molecules/npc/NpcContent'
-import NpcFilters from '../components/molecules/npc/NpcFilters'
+import NpcDossierControls from '../components/molecules/npc/NpcDossierControls'
 import NpcModal from '../components/organisms/npc/NpcModal'
 import Lightbox from '../components/organisms/Lightbox'
 import Button from '../components/atoms/Button'
@@ -14,10 +14,15 @@ import PlusIcon from '../components/atoms/icons/PlusIcon'
 import { useAuth } from '../contexts/AuthContext'
 
 type StatusFilter = NpcStatus | 'todos'
-type FactionFilter = Faction | 'todas'
+
+function matches(npc: Npc, term: string) {
+  const haystack = [npc.name, npc.faction, npc.description, npc.notes].join(' ').toLowerCase()
+  return haystack.includes(term)
+}
 
 function Npcs() {
   const { user } = useAuth()
+  const canEdit = user?.role === 'dm'
   const { data: npcs = [], isLoading, isError } = useNpcs()
   const addNpc = useAddNpc()
   const updateNpc = useUpdateNpc()
@@ -29,24 +34,28 @@ function Npcs() {
   const [lightboxNpc, setLightboxNpc] = useState<Npc | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  const query = searchParams.get('q') ?? ''
   const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
-  const factionFilter = (searchParams.get('faction') ?? 'todas') as FactionFilter
 
-  function setFilter(key: 'status' | 'faction', value: string, emptyValue: string) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev)
-      value === emptyValue ? next.delete(key) : next.set(key, value)
-      return next
-    })
+  function setParam(key: 'status' | 'q', value: string, emptyValue: string) {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        value === emptyValue ? next.delete(key) : next.set(key, value)
+        return next
+      },
+      { replace: true },
+    )
   }
 
   const filtered = useMemo(() => {
+    const term = query.trim().toLowerCase()
     return npcs.filter((npc) => {
       if (statusFilter !== 'todos' && npc.status !== statusFilter) return false
-      if (factionFilter !== 'todas' && npc.faction !== factionFilter) return false
+      if (term && !matches(npc, term)) return false
       return true
     })
-  }, [npcs, statusFilter, factionFilter])
+  }, [npcs, statusFilter, query])
 
   const groupedByFaction = useMemo(() => {
     return FACTIONS.map((faction) => ({
@@ -54,6 +63,10 @@ function Npcs() {
       npcs: filtered.filter((npc) => npc.faction === faction),
     })).filter(({ npcs }) => npcs.length > 0)
   }, [filtered])
+
+  const npcsWithImage = useMemo(() => filtered.filter((n) => n.imageUrl), [filtered])
+
+  const hasActiveFilters = query.trim() !== '' || statusFilter !== 'todos'
 
   function openAdd() {
     setEditingNpc(null)
@@ -64,8 +77,6 @@ function Npcs() {
     setEditingNpc(npc)
     setModalOpen(true)
   }
-
-  const npcsWithImage = useMemo(() => filtered.filter((n) => n.imageUrl), [filtered])
 
   async function handleSave(data: Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>) {
     if (editingNpc) {
@@ -81,63 +92,64 @@ function Npcs() {
     try {
       await deleteNpc.mutateAsync(id)
     } catch {
-      setDeleteError('Não foi possível remover o NPC.')
+      setDeleteError('Não foi possível remover a ficha.')
     }
   }
 
+  const factionCount = groupedByFaction.length
+  const meta = isLoading
+    ? 'carregando o arquivo…'
+    : `${npcs.length} ${npcs.length === 1 ? 'ficha' : 'fichas'} · ${factionCount} ${
+        factionCount === 1 ? 'facção' : 'facções'
+      }${filtered.length !== npcs.length ? ` · ${filtered.length} em exibição` : ''}`
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="shrink-0 px-8 pt-4 pb-4 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col bg-ink-950">
+      <div className="flex shrink-0 flex-col gap-4 px-8 pt-5 pb-4">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-white-100 text-3xl font-bold">NPCs</h2>
-            <p className="text-white-300/60 text-sm mt-1">
-              {isLoading
-                ? 'Carregando…'
-                : npcs.length === 0
-                  ? 'Nenhum NPC'
-                  : `${npcs.length} NPC${npcs.length > 1 ? 's' : ''}`}
-              {!isLoading &&
-                filtered.length !== npcs.length &&
-                ` · ${filtered.length} exibido${filtered.length !== 1 ? 's' : ''}`}
+            <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-brass uppercase">
+              Dossiê
             </p>
+            <h2 className="font-display text-4xl font-bold tracking-wide text-bone-100">NPCs</h2>
+            <p className="mt-1 font-mono text-[12px] text-bone-400">{meta}</p>
           </div>
-          <div className="flex items-center gap-2">
-            {user?.role === 'dm' && (
-              <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
-                <PlusIcon size={16} />
-                Novo NPC
-              </Button>
-            )}
-          </div>
+          {canEdit && (
+            <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
+              <PlusIcon size={16} />
+              Nova ficha
+            </Button>
+          )}
         </div>
 
         {npcs.length > 0 && (
-          <NpcFilters
+          <NpcDossierControls
+            query={query}
             statusFilter={statusFilter}
-            factionFilter={factionFilter}
-            onStatusChange={(v) => setFilter('status', v, 'todos')}
-            onFactionChange={(v) => setFilter('faction', v, 'todas')}
-            onClear={() => setSearchParams(new URLSearchParams())}
+            hasActiveFilters={hasActiveFilters}
+            onQueryChange={(v) => setParam('q', v, '')}
+            onStatusChange={(v) => setParam('status', v, 'todos')}
+            onClear={() => setSearchParams(new URLSearchParams(), { replace: true })}
           />
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pb-8">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto px-8 pt-1 pb-10">
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
-            <p className="text-white-300/50 text-sm">Carregando NPCs…</p>
+            <p className="font-mono text-[12px] text-bone-400">abrindo o arquivo…</p>
           </div>
         ) : isError ? (
           <div className="flex items-center justify-center py-24">
-            <p className="text-red-100 text-sm">Não foi possível carregar os NPCs.</p>
+            <p className="font-mono text-[12px] text-wax">o arquivo não pôde ser aberto.</p>
           </div>
         ) : (
           <>
-            {deleteError && <p className="text-red-100 text-xs mb-4">{deleteError}</p>}
+            {deleteError && <p className="mb-4 font-mono text-[11px] text-wax">{deleteError}</p>}
             <NpcContent
               npcs={npcs}
               grouped={groupedByFaction}
+              canEdit={canEdit}
               onAdd={openAdd}
               onEdit={openEdit}
               onDelete={handleDelete}
@@ -151,22 +163,26 @@ function Npcs() {
         <NpcModal initialNpc={editingNpc} onSave={handleSave} onClose={() => setModalOpen(false)} />
       )}
 
-      {lightboxNpc?.imageUrl && (() => {
-        const idx = npcsWithImage.findIndex((n) => n.id === lightboxNpc.id)
-        return (
-          <Lightbox
-            image={{
-              id: lightboxNpc.id,
-              name: lightboxNpc.name,
-              url: resolveImageUrl(lightboxNpc.imageUrl),
-              fullUrl: resolveImageUrl(lightboxNpc.imageUrl),
-            }}
-            onClose={() => setLightboxNpc(null)}
-            onPrev={idx > 0 ? () => setLightboxNpc(npcsWithImage[idx - 1]) : null}
-            onNext={idx < npcsWithImage.length - 1 ? () => setLightboxNpc(npcsWithImage[idx + 1]) : null}
-          />
-        )
-      })()}
+      {lightboxNpc?.imageUrl &&
+        (() => {
+          const idx = npcsWithImage.findIndex((n) => n.id === lightboxNpc.id)
+          return (
+            <Lightbox
+              image={{
+                id: lightboxNpc.id,
+                name: lightboxNpc.name,
+                url: resolveImageUrl(lightboxNpc.imageUrl),
+                fullUrl: resolveImageUrl(lightboxNpc.imageUrl),
+                category: 'npcs',
+              }}
+              onClose={() => setLightboxNpc(null)}
+              onPrev={idx > 0 ? () => setLightboxNpc(npcsWithImage[idx - 1]) : null}
+              onNext={
+                idx < npcsWithImage.length - 1 ? () => setLightboxNpc(npcsWithImage[idx + 1]) : null
+              }
+            />
+          )
+        })()}
     </div>
   )
 }
