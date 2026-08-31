@@ -151,7 +151,8 @@ src/
 │   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
 │   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
 │   ├── useGlobalSearch.ts                  # Filtra NPCs e personagens por query — resultado dentro de useMemo
-│   ├── useInitiative.ts                    # Estado da iniciativa (combatentes, turno, rodada, condições) + localStorage
+│   ├── useInitiative.ts                    # Estado da iniciativa via backend (`/api/initiative`, React Query) + cache local; ver docs/iniciativa-realtime.md
+│   ├── useInitiativeStream.ts              # Assina o SSE `/api/initiative/stream` e empurra o estado no cache do React Query
 │   ├── useInitiativeAddForm.ts             # Lógica de formulário do InitiativeAddForm — RHF + Zod
 │   ├── useMapInteraction.ts                # Hook de interação com o mapa (pan, zoom, drag)
 │   ├── useMapRuler.ts                      # Hook de régua do mapa — calibração e medição em milhas
@@ -171,7 +172,8 @@ src/
 │   ├── Npcs.tsx                            # Gestão de NPCs — filtros, cards agrupados por facção, modal de criação/edição
 │   ├── RandomTables.tsx                    # Tabelas aleatórias — 17 tabelas em 6 categorias, rolar individualmente ou tudo
 │   ├── Search.tsx                          # Busca global por URL (/search?q=) — NPCs e personagens (personagens só para DM)
-│   └── Sounds.tsx                          # (em construção)
+│   ├── Sounds.tsx                          # (em construção)
+│   └── Table.tsx                           # Painel público /mesa — acompanhamento ao vivo da iniciativa no tablet (ver docs/iniciativa-realtime.md)
 │
 ├── schemas/
 │   ├── auth.ts                             # authFormSchema — validação do formulário de login
@@ -258,11 +260,12 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 
 ## Persistência local
 
-- `useInitiative` — persiste em `localStorage` com chave `dndkeeper_initiative`
 - `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
 - `useNpcRelations` — persiste em `localStorage` com chave `dndkeeper_npc_relations`
 - Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
-- **Exceção**: `useNpcs` e `useCharacters` não usam `localStorage` — dado vem do backend via **React Query** (`@tanstack/react-query`); ver seções "NPCs e Conexões" e "Personagens"
+- **Exceção**: `useNpcs`, `useCharacters` e `useInitiative` não usam só `localStorage` — o dado vem do backend via **React Query** (`@tanstack/react-query`)
+  - `useInitiative` sincroniza com `backendApi` (`/api/initiative`) e mantém `localStorage` (`dndkeeper_initiative_v2`) só como cache de carga fria / fallback offline — ver **`docs/iniciativa-realtime.md`**
+  - ver também seções "NPCs e Conexões" e "Personagens"
 
 ## Paleta de cores
 
@@ -292,12 +295,14 @@ Definida via `@theme` no `index.css` e acessível como classes Tailwind.
 ## Rotas
 
 Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta incluir uma entrada no array `ROUTES`.
-A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) pois não aparece na sidebar.
+`/search` é declarada direto em `App.tsx` (fora do `ROUTES`, dentro do `AuthGuard`) pois não aparece na sidebar.
+`/mesa` também é declarada em `App.tsx`, mas **fora do `AuthGuard`** — é pública, sem login.
 
 | Path | Página | Acesso |
 |---|---|---|
 | `/` | redirect | → `/artes` |
 | `/login` | Login | público |
+| `/mesa` | Table | **público** — painel de acompanhamento da mesa (tablet/TV) |
 | `/search` | Search | todos |
 | `/artes` | Arts | todos — **path não renomear** (configurado na API do Drive) |
 | `/npcs` | Npcs | todos |
@@ -348,13 +353,22 @@ A rota `/search` é declarada diretamente em `App.tsx` (fora do array `ROUTES`) 
 - **Imagem de fundo atmosférica**: `Combatant` tem campo `imageUrl?: string` (opcional); quando presente, renderiza a imagem como camada absoluta com overlay `bg-black-300/45`
   - Personagens importados herdam `imageUrl` automaticamente; monstros adicionados manualmente ficam sem imagem
   - Estrutura de duas camadas: `absolute inset-0` para imagem + overlay; `relative z-10` para o conteúdo
-- **Condições de combate**: `Combatant` tem campo `conditions?: string[]` persistido no localStorage
+- **Condições de combate**: `Combatant` tem campo `conditions?: string[]`
   - 15 condições D&D 5e em português definidas em `constants/initiative.ts` como `CONDITIONS`
   - `ConditionBadge` (âmbar) exibe condições ativas no card; botão com borda tracejada abre `ConditionModal`
   - `ConditionModal` tem estado local para permitir cancelar sem salvar; só chama `onSave` ao confirmar
-  - `useInitiative` expõe `setConditions(id, conditions[])` que persiste no localStorage
+  - `useInitiative` expõe `setConditions(id, conditions[])`
+- **Esconder HP de monstro na mesa**: `Combatant.hpRevealed?` — monstro nasce oculto; olho no `CombatantRow` alterna. No `/mesa` oculto vira faixa de saúde (`getHealthBand`)
 - Botões de ajuste de HP visíveis em **todos** os combatentes (não só o atual)
 - `resolveImageUrl` de `constants/arts.ts` é usada em `CombatantRow` para resolver `local:filename`
+- **Estado é sincronizado com o backend** (não é mais só `localStorage`) e transmitido ao vivo para o `/mesa` via SSE — ver **`docs/iniciativa-realtime.md`**
+
+## Painel da Mesa (`/mesa`)
+
+- Rota **pública** (declarada em `App.tsx` fora do `AuthGuard`) — tela só de acompanhamento para o tablet/TV da mesa, sem login. Botão "Abrir painel da mesa" no `Login.tsx`
+- `pages/Table.tsx` é só composição; blocos em `components/{molecules,organisms}/table/`, side-effects em hooks genéricos (`useTicker`, `useDelayedFlag`, `useValueChangePulse`, `useFullscreen`, `useScrollIntoViewOnChange`)
+- PWA: `public/manifest.webmanifest` (`display: standalone`, `start_url: /mesa`) + botão de tela cheia + `min-h-dvh` para fugir da barra de URL do Chrome no tablet
+- Detalhes completos em **`docs/iniciativa-realtime.md`**
 
 ## Estilo visual dos cards de personagem
 
