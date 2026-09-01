@@ -18,6 +18,7 @@ function Initiative() {
     round,
     saveFailed,
     setHpRevealed,
+    setHp,
     addCombatant,
     addCombatants,
     removeCombatant,
@@ -116,6 +117,7 @@ function Initiative() {
                 status={i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'pending'}
                 onRemove={() => removeCombatant(combatant.id)}
                 onAdjustHp={(delta) => handleAdjustHp(combatant, delta)}
+                onSetHp={(hp, maxHp) => setHp(combatant.id, hp, maxHp)}
                 onUpdateInitiative={(val) => updateInitiative(combatant.id, val)}
                 onSetConditions={(conditions) => setConditions(combatant.id, conditions)}
                 onSetImageUrl={(url) => setImageUrl(combatant.id, url)}

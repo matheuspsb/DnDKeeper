@@ -68,6 +68,22 @@ function withHpDelta(state: InitiativeState, id: string, delta: number): Initiat
   return { ...state, combatants }
 }
 
+function withHpValues(
+  state: InitiativeState,
+  id: string,
+  hp: number,
+  maxHp: number,
+): InitiativeState {
+  const nextMax = Math.max(1, Math.round(maxHp))
+  const nextHp = Math.max(0, Math.min(nextMax, Math.round(hp)))
+  return {
+    ...state,
+    combatants: state.combatants.map((combatant) =>
+      combatant.id === id ? { ...combatant, hp: nextHp, maxHp: nextMax } : combatant,
+    ),
+  }
+}
+
 function withInitiative(state: InitiativeState, id: string, initiative: number): InitiativeState {
   const activeId = currentId(state)
   const combatants = sortedByInitiative(
@@ -170,6 +186,7 @@ export function useInitiative() {
     },
     removeCombatant: (id: string) => mutate((s) => withoutCombatant(s, id)),
     adjustHp: (id: string, delta: number) => mutate((s) => withHpDelta(s, id, delta)),
+    setHp: (id: string, hp: number, maxHp: number) => mutate((s) => withHpValues(s, id, hp, maxHp)),
     updateInitiative: (id: string, initiative: number) =>
       mutate((s) => withInitiative(s, id, initiative)),
     setConditions: (id: string, conditions: string[]) =>

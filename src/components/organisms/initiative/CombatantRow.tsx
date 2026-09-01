@@ -9,16 +9,19 @@ import TrashIcon from '../../atoms/icons/TrashIcon'
 import ImageIcon from '../../atoms/icons/ImageIcon'
 import EyeIcon from '../../atoms/icons/EyeIcon'
 import EyeOffIcon from '../../atoms/icons/EyeOffIcon'
+import PencilIcon from '../../atoms/icons/PencilIcon'
 import TypeBadge from '../../atoms/TypeBadge'
 import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
 import ConditionBadge from '../../molecules/initiative/ConditionBadge'
 import ConditionModal from './ConditionModal'
+import CombatantHpEditor from './CombatantHpEditor'
 
 interface CombatantRowProps {
   combatant: Combatant
   status: CombatantStatus
   onRemove: () => void
   onAdjustHp: (delta: number) => void
+  onSetHp: (hp: number, maxHp: number) => void
   onUpdateInitiative: (val: number) => void
   onSetConditions: (conditions: string[]) => void
   onSetImageUrl: (url: string) => void
@@ -30,6 +33,7 @@ function CombatantRow({
   status,
   onRemove,
   onAdjustHp,
+  onSetHp,
   onUpdateInitiative,
   onSetConditions,
   onSetImageUrl,
@@ -38,7 +42,10 @@ function CombatantRow({
   const [conditionModalOpen, setConditionModalOpen] = useState(false)
   const [imageInputOpen, setImageInputOpen] = useState(false)
   const [imageInputValue, setImageInputValue] = useState('')
+  const [hpEditOpen, setHpEditOpen] = useState(false)
   const imageInputRef = useRef<HTMLInputElement>(null)
+
+  const canEditHp = !combatant.isPlayer && combatant.hp !== null && combatant.maxHp !== null
 
   function handleOpenImageInput() {
     setImageInputValue('')
@@ -165,8 +172,24 @@ function CombatantRow({
             {combatant.hp !== null && combatant.maxHp !== null && (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium" style={{ color: hpColor }}>
+                  <span
+                    className="flex items-center gap-1.5 font-medium"
+                    style={{ color: hpColor }}
+                  >
                     ♥ HP
+                    {canEditHp && (
+                      <button
+                        onClick={() => setHpEditOpen((value) => !value)}
+                        title="Editar HP atual e máximo"
+                        className={`flex h-5 w-5 items-center justify-center rounded transition-colors cursor-pointer ${
+                          hpEditOpen
+                            ? 'text-white-100'
+                            : 'text-white-300/30 hover:text-white-300/70'
+                        }`}
+                      >
+                        <PencilIcon size={11} />
+                      </button>
+                    )}
                   </span>
                   <span className="tabular-nums font-semibold" style={{ color: hpColor }}>
                     {combatant.hp} / {combatant.maxHp}
@@ -181,31 +204,43 @@ function CombatantRow({
               </div>
             )}
 
-            {combatant.hp !== null && (
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-1">
-                  {HP_DELTAS.filter((delta) => delta < 0).map((delta) => (
-                    <button
-                      key={delta}
-                      onClick={() => onAdjustHp(delta)}
-                      className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-red-400/40 text-red-100/80 bg-black-500/60 hover:text-white-100 hover:bg-red-100 hover:border-red-100"
-                    >
-                      {delta}
-                    </button>
-                  ))}
+            {hpEditOpen && canEditHp ? (
+              <CombatantHpEditor
+                hp={combatant.hp!}
+                maxHp={combatant.maxHp!}
+                onConfirm={(hp, maxHp) => {
+                  onSetHp(hp, maxHp)
+                  setHpEditOpen(false)
+                }}
+                onCancel={() => setHpEditOpen(false)}
+              />
+            ) : (
+              combatant.hp !== null && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex gap-1">
+                    {HP_DELTAS.filter((delta) => delta < 0).map((delta) => (
+                      <button
+                        key={delta}
+                        onClick={() => onAdjustHp(delta)}
+                        className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-red-400/40 text-red-100/80 bg-black-500/60 hover:text-white-100 hover:bg-red-100 hover:border-red-100"
+                      >
+                        {delta}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-1">
+                    {HP_DELTAS.filter((delta) => delta > 0).map((delta) => (
+                      <button
+                        key={delta}
+                        onClick={() => onAdjustHp(delta)}
+                        className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-black-100/60 text-white-300/70 hover:text-white-100 bg-black-500/60 hover:bg-black-400/80"
+                      >
+                        +{delta}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  {HP_DELTAS.filter((delta) => delta > 0).map((delta) => (
-                    <button
-                      key={delta}
-                      onClick={() => onAdjustHp(delta)}
-                      className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-black-100/60 text-white-300/70 hover:text-white-100 bg-black-500/60 hover:bg-black-400/80"
-                    >
-                      +{delta}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )
             )}
           </div>
         </div>
