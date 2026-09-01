@@ -371,8 +371,22 @@ body {
   animation: round-pop 0.5s ease-out;
 }
 
+@keyframes spotlight-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.spotlight-in {
+  animation: spotlight-in 0.25s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .round-pop {
+  .round-pop,
+  .spotlight-in {
     animation: none;
   }
 }

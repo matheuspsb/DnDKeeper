@@ -12,3 +12,8 @@ export interface Combatant {
 }
 
 export type CombatantStatus = 'current' | 'pending' | 'done'
+
+export interface SpotlightImage {
+  url: string
+  label?: string
+}

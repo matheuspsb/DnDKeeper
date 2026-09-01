@@ -3,6 +3,7 @@ import type { DriveImage } from '../../types/image'
 import { stripImageFlags } from '../../utils/image'
 import ChevronLeftIcon from '../atoms/icons/ChevronLeftIcon'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
+import MonitorIcon from '../atoms/icons/MonitorIcon'
 import XIcon from '../atoms/icons/XIcon'
 
 interface LightboxProps {
@@ -10,9 +11,11 @@ interface LightboxProps {
   onClose: () => void
   onPrev: (() => void) | null
   onNext: (() => void) | null
+  onCast?: () => void
+  isCast?: boolean
 }
 
-function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
+function Lightbox({ image, onClose, onPrev, onNext, onCast, isCast = false }: LightboxProps) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -28,13 +31,32 @@ function Lightbox({ image, onClose, onPrev, onNext }: LightboxProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-white-300 hover:text-white-100 transition-colors"
-        aria-label="Fechar"
-      >
-        <XIcon size={28} />
-      </button>
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        {onCast && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onCast()
+            }}
+            title={isCast ? 'Parar de exibir na mesa' : 'Exibir na mesa'}
+            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              isCast
+                ? 'bg-red-100 text-white hover:bg-red-200'
+                : 'bg-white/10 text-white-200 hover:bg-white/20'
+            }`}
+          >
+            <MonitorIcon size={16} />
+            {isCast ? 'Na mesa' : 'Exibir na mesa'}
+          </button>
+        )}
+        <button
+          onClick={onClose}
+          className="text-white-300 hover:text-white-100 transition-colors"
+          aria-label="Fechar"
+        >
+          <XIcon size={28} />
+        </button>
+      </div>
 
       {onPrev && (
         <button

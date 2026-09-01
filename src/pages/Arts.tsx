@@ -9,12 +9,23 @@ import GalleryCategorySection from '../components/molecules/gallery/GalleryCateg
 import GalleryEmpty from '../components/molecules/gallery/GalleryEmpty'
 import Lightbox from '../components/organisms/Lightbox'
 import { useDriveImages } from '../hooks/useDriveImages'
+import { useInitiative } from '../hooks/useInitiative'
+import { useAuth } from '../contexts/AuthContext'
 import { DEFAULT_IMAGE_CATEGORY } from '../services/googleDrive'
 
 function Artes() {
   const { images, loading, error, sync } = useDriveImages()
+  const { user } = useAuth()
+  const { spotlight, setSpotlight } = useInitiative()
   const [selected, setSelected] = useState<DriveImage | null>(null)
   const [blurred, setBlurred] = useState(false)
+
+  const isDm = user?.role === 'dm'
+
+  function castImage(image: DriveImage) {
+    const alreadyCast = spotlight?.url === image.fullUrl
+    setSpotlight(alreadyCast ? null : { url: image.fullUrl, label: image.name })
+  }
 
   const selectedIndex = images.findIndex((img) => img.id === selected?.id)
   const hasImages = images.length > 0
@@ -85,6 +96,8 @@ function Artes() {
               images={categoryImages}
               blurred={blurred}
               onImageClick={setSelected}
+              onCast={isDm ? castImage : undefined}
+              castUrl={spotlight?.url ?? null}
             />
           ))}
         </div>
@@ -98,6 +111,8 @@ function Artes() {
           onNext={
             selectedIndex < images.length - 1 ? () => setSelected(images[selectedIndex + 1]) : null
           }
+          onCast={isDm ? () => castImage(selected) : undefined}
+          isCast={spotlight?.url === selected.fullUrl}
         />
       )}
     </div>

@@ -1,12 +1,13 @@
 import { useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Combatant } from '../types/initiative'
+import type { Combatant, SpotlightImage } from '../types/initiative'
 import backendApi from '../services/backendApi'
 
 interface InitiativeState {
   combatants: Combatant[]
   currentIndex: number
   round: number
+  spotlight?: SpotlightImage | null
 }
 
 const STORAGE_KEY = 'dndkeeper_initiative_v2'
@@ -151,6 +152,24 @@ export function useInitiative() {
     },
   })
 
+  const patchSpotlight = useMutation({
+    mutationFn: async (spotlight: SpotlightImage | null) => {
+      const res = await backendApi.patch<{ state: InitiativeState }>('/api/initiative/spotlight', {
+        spotlight,
+      })
+      return res.data.state
+    },
+    onMutate: (spotlight) => {
+      const next = { ...currentState(), spotlight }
+      queryClient.setQueryData(initiativeKeys.all, next)
+      saveLocal(next)
+    },
+    onSuccess: (serverState) => {
+      queryClient.setQueryData(initiativeKeys.all, serverState)
+      saveLocal(serverState)
+    },
+  })
+
   function currentState(): InitiativeState {
     return queryClient.getQueryData<InitiativeState>(initiativeKeys.all) ?? EMPTY_STATE
   }
@@ -175,8 +194,10 @@ export function useInitiative() {
     combatants: state.combatants,
     currentIndex: state.currentIndex,
     round: state.round,
+    spotlight: state.spotlight ?? null,
     isSaving: push.isPending,
     saveFailed: push.isError,
+    setSpotlight: (spotlight: SpotlightImage | null) => patchSpotlight.mutate(spotlight),
     setHpRevealed: (id: string, revealed: boolean) =>
       mutate((s) => withHpRevealed(s, id, revealed)),
     addCombatant: (data: Omit<Combatant, 'id'>) => mutate((s) => withCombatant(s, data)),

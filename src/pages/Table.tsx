@@ -8,6 +8,7 @@ import CurrentTurnHero from '../components/organisms/table/CurrentTurnHero'
 import InitiativeOrderList from '../components/organisms/table/InitiativeOrderList'
 import OfflineNotice from '../components/molecules/table/OfflineNotice'
 import RoundFlash from '../components/molecules/table/RoundFlash'
+import SpotlightImageLayer from '../components/molecules/table/SpotlightImageLayer'
 import TableEmptyState from '../components/molecules/table/TableEmptyState'
 
 const OFFLINE_GRACE_MS = 4000
@@ -15,7 +16,7 @@ const ROUND_FLASH_MS = 1600
 
 function Table() {
   const { connected, lastEventAt } = useInitiativeStream()
-  const { combatants, currentIndex, round } = useInitiative()
+  const { combatants, currentIndex, round, spotlight } = useInitiative()
 
   const now = useTicker(1000)
   const offline = useDelayedFlag(!connected, OFFLINE_GRACE_MS)
@@ -42,6 +43,7 @@ function Table() {
       )}
 
       <RoundFlash round={round} visible={roundFlash} />
+      <SpotlightImageLayer spotlight={spotlight} />
     </div>
   )
 }

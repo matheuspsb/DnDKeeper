@@ -12,6 +12,8 @@ interface GalleryCategorySectionProps {
   images: DriveImage[]
   blurred: boolean
   onImageClick: (image: DriveImage) => void
+  onCast?: (image: DriveImage) => void
+  castUrl?: string | null
 }
 
 function GalleryCategorySection({
@@ -19,6 +21,8 @@ function GalleryCategorySection({
   images,
   blurred,
   onImageClick,
+  onCast,
+  castUrl,
 }: GalleryCategorySectionProps) {
   const [page, setPage] = useState(0)
 
@@ -42,6 +46,8 @@ function GalleryCategorySection({
             blurred={blurred}
             dead={img.name.includes('_dead')}
             onClick={onImageClick}
+            onCast={onCast}
+            isCast={!!castUrl && castUrl === img.fullUrl}
           />
         ))}
       </div>
