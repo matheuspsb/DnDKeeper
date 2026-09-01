@@ -29,18 +29,18 @@ function NpcContent({
 
   if (grouped.length === 0)
     return (
-      <div className="flex flex-col items-center gap-1 py-24 text-center">
-        <p className="font-display text-sm tracking-[0.15em] text-bone-400 uppercase">
+      <div className="flex flex-col items-center gap-2 py-24 text-center">
+        <p className="font-display text-base tracking-[0.12em] text-bone-300 uppercase">
           Nenhuma ficha corresponde
         </p>
-        <p className="font-body text-[13px] text-bone-400/70">
+        <p className="font-body text-[14px] text-bone-400">
           Ajuste a busca ou os filtros para reabrir o arquivo.
         </p>
       </div>
     )
 
   return (
-    <div className="flex flex-col gap-9">
+    <div className="flex flex-col gap-10">
       {grouped.map(({ faction, npcs: factionNpcs }) => (
         <NpcFactionChannel key={faction} faction={faction} count={factionNpcs.length}>
           {factionNpcs.map((npc) => (

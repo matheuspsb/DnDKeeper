@@ -108,11 +108,11 @@ function Npcs() {
       <div className="flex shrink-0 flex-col gap-4 px-8 pt-5 pb-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-display text-[11px] font-semibold tracking-[0.4em] text-brass uppercase">
+            <p className="font-display text-[12px] font-semibold tracking-[0.3em] text-brass uppercase">
               Dossiê
             </p>
             <h2 className="font-display text-4xl font-bold tracking-wide text-bone-100">NPCs</h2>
-            <p className="mt-1 font-mono text-[12px] text-bone-400">{meta}</p>
+            <p className="mt-1.5 font-mono text-[13px] text-bone-300">{meta}</p>
           </div>
           {canEdit && (
             <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
@@ -137,15 +137,15 @@ function Npcs() {
       <div className="flex-1 overflow-x-hidden overflow-y-auto px-8 pt-1 pb-10">
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
-            <p className="font-mono text-[12px] text-bone-400">abrindo o arquivo…</p>
+            <p className="font-mono text-[14px] text-bone-300">abrindo o arquivo…</p>
           </div>
         ) : isError ? (
           <div className="flex items-center justify-center py-24">
-            <p className="font-mono text-[12px] text-wax">o arquivo não pôde ser aberto.</p>
+            <p className="font-mono text-[14px] text-wax">o arquivo não pôde ser aberto.</p>
           </div>
         ) : (
           <>
-            {deleteError && <p className="mb-4 font-mono text-[11px] text-wax">{deleteError}</p>}
+            {deleteError && <p className="mb-4 font-mono text-[13px] text-wax">{deleteError}</p>}
             <NpcContent
               npcs={npcs}
               grouped={groupedByFaction}

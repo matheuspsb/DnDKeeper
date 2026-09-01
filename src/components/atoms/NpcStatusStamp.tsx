@@ -17,7 +17,7 @@ function NpcStatusStamp({ status, animate = true }: NpcStatusStampProps) {
 
   return (
     <span
-      className={`relative inline-flex shrink-0 items-center border-2 px-1.5 py-0.75 font-display text-[10px] font-semibold uppercase leading-none tracking-[0.18em] select-none ${
+      className={`relative inline-flex shrink-0 items-center border-2 px-2 py-1 font-display text-[11px] font-semibold uppercase leading-none tracking-[0.13em] select-none ${
         animate ? 'dossier-stamp' : ''
       }`}
       style={{ color, borderColor: color, '--stamp-rot': rot } as CSSProperties}
@@ -27,7 +27,7 @@ function NpcStatusStamp({ status, animate = true }: NpcStatusStampProps) {
       {status === 'morto' && (
         <span
           aria-hidden
-          className="absolute inset-x-0.75 top-1/2 h-0.5 -translate-y-1/2 -rotate-[9deg]"
+          className="absolute inset-x-0.5 top-1/2 h-0.5 -translate-y-1/2 -rotate-[9deg]"
           style={{ background: color }}
         />
       )}
