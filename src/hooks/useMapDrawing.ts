@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useLatestRef } from './useLatestRef'
 import type { DrawnPath } from '../types/drawing'
 
 const STORAGE_KEY = 'dndkeeper_map_drawings'
@@ -20,21 +21,11 @@ export function useMapDrawing() {
   const [isDrawingMode, setIsDrawingMode] = useState(false)
   const [paths, setPaths] = useState<DrawnPath[]>(() => load())
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[] | null>(null)
-  const [brushColor, _setBrushColor] = useState('#D72334')
-  const [brushSize, _setBrushSize] = useState(4)
+  const [brushColor, setBrushColor] = useState('#D72334')
+  const [brushSize, setBrushSize] = useState(4)
 
-  const brushColorRef = useRef(brushColor)
-  const brushSizeRef = useRef(brushSize)
-
-  function setBrushColor(color: string) {
-    brushColorRef.current = color
-    _setBrushColor(color)
-  }
-
-  function setBrushSize(size: number) {
-    brushSizeRef.current = size
-    _setBrushSize(size)
-  }
+  const brushColorRef = useLatestRef(brushColor)
+  const brushSizeRef = useLatestRef(brushSize)
 
   const toggleDrawingMode = useCallback(() => {
     setIsDrawingMode((prev) => !prev)
