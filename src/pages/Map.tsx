@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import GalleryEmpty from '../components/molecules/gallery/GalleryEmpty'
@@ -9,8 +9,10 @@ import MapCalibrationModal from '../components/organisms/map/MapCalibrationModal
 import { useMapRuler } from '../hooks/useMapRuler'
 import { useMapInteraction } from '../hooks/useMapInteraction'
 import { useMapDrawing } from '../hooks/useMapDrawing'
+import { useMapImage } from '../hooks/useMapImage'
 import { driveImageUrl } from '../utils/driveUrl'
 import { MAP_LOCATIONS } from '../constants/mapLocations'
+import { findLocationAt } from '../utils/mapLocations'
 import type { MapLocation } from '../types/mapLocation'
 import MapLocationPopup from '../components/organisms/map/MapLocationPopup'
 
@@ -20,11 +22,6 @@ const MAP_SIZE = 'w6000'
 function Mapa() {
   const containerRef = useRef<HTMLDivElement>(null)
   const transformRef = useRef<ReactZoomPanPinchRef>(null)
-  const [minScale, setMinScale] = useState(0.01)
-  const [currentScale, setCurrentScale] = useState(1)
-  const [imageReady, setImageReady] = useState(false)
-  const [imageError, setImageError] = useState(false)
-  const [imgSize, setImgSize] = useState<{ width: number; height: number } | null>(null)
 
   const [selectedLocation, setSelectedLocation] = useState<{
     location: MapLocation
@@ -32,26 +29,10 @@ function Mapa() {
     screenY: number
   } | null>(null)
 
+  const image = useMapImage(containerRef, transformRef)
   const ruler = useMapRuler()
-  const interaction = useMapInteraction(transformRef, currentScale)
+  const interaction = useMapInteraction(transformRef, image.currentScale)
   const drawing = useMapDrawing()
-
-  function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
-    const img = e.currentTarget
-    setImgSize({ width: img.naturalWidth, height: img.naturalHeight })
-  }
-
-  useEffect(() => {
-    if (!imgSize || !containerRef.current || !transformRef.current) return
-    const scale = Math.max(
-      containerRef.current.clientWidth / imgSize.width,
-      containerRef.current.clientHeight / imgSize.height,
-    )
-    setMinScale(scale)
-    setCurrentScale(scale)
-    transformRef.current.centerView(scale, 0)
-    setImageReady(true)
-  }, [imgSize])
 
   function handleMapClick(e: React.MouseEvent<HTMLDivElement>) {
     if (drawing.isDrawingMode) return
@@ -61,13 +42,15 @@ function Mapa() {
       return
     }
     const coords = interaction.getImageCoords(e)
-    const hit = MAP_LOCATIONS.find(
-      (loc) => coords.x >= loc.x1 && coords.x <= loc.x2 && coords.y >= loc.y1 && coords.y <= loc.y2,
-    )
+    const hit = findLocationAt(coords, MAP_LOCATIONS)
     if (hit) {
       if (selectedLocation?.location.id === hit.id) return
       const rect = containerRef.current!.getBoundingClientRect()
-      setSelectedLocation({ location: hit, screenX: e.clientX - rect.left, screenY: e.clientY - rect.top })
+      setSelectedLocation({
+        location: hit,
+        screenX: e.clientX - rect.left,
+        screenY: e.clientY - rect.top,
+      })
     } else {
       setSelectedLocation(null)
     }
@@ -102,9 +85,9 @@ function Mapa() {
   const handleZoomIn = useCallback(() => transformRef.current?.zoomIn(), [])
   const handleZoomOut = useCallback(() => transformRef.current?.zoomOut(), [])
   const handleReset = useCallback(() => {
-    transformRef.current?.centerView(minScale, 200)
+    transformRef.current?.centerView(image.minScale, 200)
     ruler.exitRuler()
-  }, [minScale, ruler.exitRuler])
+  }, [image.minScale, ruler.exitRuler])
 
   const previewLabel =
     interaction.mousePos !== null ? ruler.getPreviewDistance(interaction.mousePos) : null
@@ -132,13 +115,13 @@ function Mapa() {
   return (
     <div className="flex flex-col h-full">
       <div ref={containerRef} className="flex-1 overflow-hidden relative bg-black-500">
-        {!imageReady && !imageError && (
+        {!image.imageReady && !image.imageError && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
             <div className="w-10 h-10 rounded-full border-2 border-black-100 border-t-red-100 animate-spin" />
             <span className="text-white-300 text-sm">Carregando mapa...</span>
           </div>
         )}
-        {imageError && (
+        {image.imageError && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
             <span className="text-white-300 text-sm">
               Erro ao carregar o mapa. Verifique o VITE_GOOGLE_DRIVE_MAP_FILE_ID e reinicie o
@@ -175,13 +158,13 @@ function Mapa() {
         <TransformWrapper
           ref={transformRef}
           initialScale={0.01}
-          minScale={minScale}
+          minScale={image.minScale}
           maxScale={10}
           limitToBounds={true}
           wheel={{ step: 0.001, disabled: !!selectedLocation }}
           doubleClick={{ disabled: true }}
           panning={{ disabled: drawing.isDrawingMode || !!selectedLocation }}
-          onTransform={(ref) => setCurrentScale(ref.state.scale)}
+          onTransform={(ref) => image.setCurrentScale(ref.state.scale)}
         >
           <TransformComponent
             wrapperStyle={{ width: '100%', height: '100%' }}
@@ -199,15 +182,15 @@ function Mapa() {
                 src={driveImageUrl(MAP_FILE_ID, MAP_SIZE)}
                 alt="Mapa"
                 draggable={false}
-                onLoad={handleImageLoad}
-                onError={() => setImageError(true)}
+                onLoad={image.handleImageLoad}
+                onError={image.handleImageError}
                 style={{ display: 'block' }}
-                className={`select-none max-w-none transition-opacity duration-500 ${imageReady ? 'opacity-100' : 'opacity-0'}`}
+                className={`select-none max-w-none transition-opacity duration-500 ${image.imageReady ? 'opacity-100' : 'opacity-0'}`}
               />
 
-              {imgSize && (
+              {image.imgSize && (
                 <MapSvgOverlay
-                  imgSize={imgSize}
+                  imgSize={image.imgSize}
                   points={ruler.points}
                   mousePos={interaction.mousePos}
                   mode={ruler.mode}
@@ -215,7 +198,7 @@ function Mapa() {
                   midpoint={ruler.getMidpoint()}
                   previewLabel={previewLabel}
                   showPreviewLine={showPreviewLine}
-                  currentScale={currentScale}
+                  currentScale={image.currentScale}
                   drawnPaths={drawing.paths}
                   currentDrawPath={drawing.currentPath}
                   currentDrawColor={drawing.brushColor}
