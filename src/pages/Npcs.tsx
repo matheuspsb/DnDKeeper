@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useDeferredValue } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { NpcStatus } from '../types/npc.types'
@@ -35,6 +35,7 @@ function Npcs() {
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const query = searchParams.get('q') ?? ''
+  const deferredQuery = useDeferredValue(query)
   const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
 
   function setParam(key: 'status' | 'q', value: string, emptyValue: string) {
@@ -49,13 +50,13 @@ function Npcs() {
   }
 
   const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase()
+    const term = deferredQuery.trim().toLowerCase()
     return npcs.filter((npc) => {
       if (statusFilter !== 'todos' && npc.status !== statusFilter) return false
       if (term && !matches(npc, term)) return false
       return true
     })
-  }, [npcs, statusFilter, query])
+  }, [npcs, statusFilter, deferredQuery])
 
   const groupedByFaction = useMemo(() => {
     return FACTIONS.map((faction) => ({
