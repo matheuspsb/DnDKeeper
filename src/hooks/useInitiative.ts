@@ -131,6 +131,7 @@ async function fetchInitiative(): Promise<InitiativeState> {
 export function useInitiative() {
   const queryClient = useQueryClient()
   const flushTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const localEditSeq = useRef(0)
 
   const { data: state = EMPTY_STATE } = useQuery({
     queryKey: initiativeKeys.all,
@@ -142,11 +143,12 @@ export function useInitiative() {
   })
 
   const push = useMutation({
-    mutationFn: async (next: InitiativeState) => {
+    mutationFn: async ({ state: next }: { state: InitiativeState; seq: number }) => {
       const res = await backendApi.put<{ state: InitiativeState }>('/api/initiative', next)
       return res.data.state
     },
-    onSuccess: (serverState) => {
+    onSuccess: (serverState, variables) => {
+      if (variables.seq !== localEditSeq.current) return
       queryClient.setQueryData(initiativeKeys.all, serverState)
       saveLocal(serverState)
     },
@@ -178,16 +180,21 @@ export function useInitiative() {
     if (flushTimer.current) clearTimeout(flushTimer.current)
     flushTimer.current = setTimeout(() => {
       flushTimer.current = null
-      push.mutate(currentState())
+      push.mutate({ state: currentState(), seq: localEditSeq.current })
     }, FLUSH_DELAY_MS)
   }
 
   function mutate(transform: (s: InitiativeState) => InitiativeState) {
     queryClient.cancelQueries({ queryKey: initiativeKeys.all })
     const next = transform(currentState())
+    localEditSeq.current += 1
     queryClient.setQueryData(initiativeKeys.all, next)
     saveLocal(next)
     scheduleFlush()
+  }
+
+  function hasPendingLocalChange() {
+    return flushTimer.current !== null || push.isPending
   }
 
   return {
@@ -197,6 +204,7 @@ export function useInitiative() {
     spotlight: state.spotlight ?? null,
     isSaving: push.isPending,
     saveFailed: push.isError,
+    hasPendingLocalChange,
     setSpotlight: (spotlight: SpotlightImage | null) => patchSpotlight.mutate(spotlight),
     setHpRevealed: (id: string, revealed: boolean) =>
       mutate((s) => withHpRevealed(s, id, revealed)),

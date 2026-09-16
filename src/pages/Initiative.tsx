@@ -10,13 +10,12 @@ import CombatantRow from '../components/organisms/initiative/CombatantRow'
 import InitiativeAddForm from '../components/organisms/initiative/InitiativeAddForm'
 
 function Initiative() {
-  useInitiativeStream()
-
   const {
     combatants,
     currentIndex,
     round,
     saveFailed,
+    hasPendingLocalChange,
     setHpRevealed,
     setHp,
     addCombatant,
@@ -30,6 +29,8 @@ function Initiative() {
     goToTop,
     reset,
   } = useInitiative()
+
+  useInitiativeStream(hasPendingLocalChange)
 
   const { data: characters = [] } = useCharacters()
   const adjustCharacterHp = useAdjustCharacterHp()
