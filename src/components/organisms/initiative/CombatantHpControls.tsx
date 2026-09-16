@@ -12,7 +12,13 @@ interface CombatantHpControlsProps {
   onSetHp: (hp: number, maxHp: number) => void
 }
 
-function CombatantHpControls({ hp, maxHp, canEdit, onAdjustHp, onSetHp }: CombatantHpControlsProps) {
+function CombatantHpControls({
+  hp,
+  maxHp,
+  canEdit,
+  onAdjustHp,
+  onSetHp,
+}: CombatantHpControlsProps) {
   const [editOpen, setEditOpen] = useState(false)
 
   const percent = hpPercent(hp, maxHp)

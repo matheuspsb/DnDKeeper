@@ -25,7 +25,6 @@ type MapSvgOverlayProps = {
   currentDrawWidth?: number
 }
 
-
 const MapSvgOverlay = memo(function MapSvgOverlay({
   imgSize,
   points,

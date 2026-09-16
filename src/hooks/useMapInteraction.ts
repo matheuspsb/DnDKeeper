@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import type { Point } from './useMapRuler'
@@ -8,6 +8,14 @@ export function useMapInteraction(
   currentScale: number,
 ) {
   const [mousePos, setMousePos] = useState<Point | null>(null)
+  const pendingPos = useRef<Point | null>(null)
+  const rafId = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current)
+    }
+  }, [])
 
   function getImageCoords(e: React.MouseEvent<HTMLDivElement>): Point {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -19,10 +27,20 @@ export function useMapInteraction(
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    setMousePos(getImageCoords(e))
+    pendingPos.current = getImageCoords(e)
+    if (rafId.current !== null) return
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null
+      setMousePos(pendingPos.current)
+    })
   }
 
   function handleMouseLeave() {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current)
+      rafId.current = null
+    }
+    pendingPos.current = null
     setMousePos(null)
   }
 
