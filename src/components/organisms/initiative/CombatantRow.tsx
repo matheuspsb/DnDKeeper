@@ -1,20 +1,14 @@
-import { useState, useRef } from 'react'
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
-import { HP_DELTAS } from '../../../constants/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
-import { resolveDriveUrl } from '../../../utils/driveUrl'
-import { resolveHpBarColor } from '../../../utils/character'
-import { combatantHpPercent } from '../../../utils/initiative'
+import { useCombatantImagePicker } from '../../../hooks/useCombatantImagePicker'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import ImageIcon from '../../atoms/icons/ImageIcon'
 import EyeIcon from '../../atoms/icons/EyeIcon'
 import EyeOffIcon from '../../atoms/icons/EyeOffIcon'
-import PencilIcon from '../../atoms/icons/PencilIcon'
 import TypeBadge from '../../atoms/TypeBadge'
 import InitiativeBadge from '../../molecules/initiative/InitiativeBadge'
-import ConditionBadge from '../../molecules/initiative/ConditionBadge'
-import ConditionModal from './ConditionModal'
-import CombatantHpEditor from './CombatantHpEditor'
+import CombatantConditions from './CombatantConditions'
+import CombatantHpControls from './CombatantHpControls'
 
 interface CombatantRowProps {
   combatant: Combatant
@@ -39,222 +33,121 @@ function CombatantRow({
   onSetImageUrl,
   onToggleHpReveal,
 }: CombatantRowProps) {
-  const [conditionModalOpen, setConditionModalOpen] = useState(false)
-  const [imageInputOpen, setImageInputOpen] = useState(false)
-  const [imageInputValue, setImageInputValue] = useState('')
-  const [hpEditOpen, setHpEditOpen] = useState(false)
-  const imageInputRef = useRef<HTMLInputElement>(null)
-
-  const canEditHp = !combatant.isPlayer && combatant.hp !== null && combatant.maxHp !== null
-
-  function handleOpenImageInput() {
-    setImageInputValue('')
-    setImageInputOpen(true)
-    setTimeout(() => imageInputRef.current?.focus(), 0)
-  }
-
-  function handleConfirmImage() {
-    if (imageInputValue.trim()) onSetImageUrl(resolveDriveUrl(imageInputValue.trim()))
-    setImageInputOpen(false)
-  }
+  const imagePicker = useCombatantImagePicker(onSetImageUrl)
   const isCurrent = status === 'current'
 
-  const hpPercent = combatantHpPercent(combatant)
-  const hpColor = hpPercent === null ? '#C0C0C0' : resolveHpBarColor(hpPercent)
-
   return (
-    <>
-      <div className={`rounded-xl overflow-hidden ${isCurrent ? 'p-0.5 current-turn-border' : ''}`}>
-        <div
-          className={`relative overflow-hidden min-h-44
-          ${
-            isCurrent
-              ? 'bg-black-300 rounded-[10px]'
-              : 'bg-black-300 rounded-xl border border-black-100'
-          }`}
-        >
-          {combatant.imageUrl && (
-            <div className="absolute inset-0 pointer-events-none">
-              <img
-                src={resolveImageUrl(combatant.imageUrl)}
-                alt="combatent image"
-                aria-hidden
-                className="w-full h-full object-cover object-top"
+    <div className={`rounded-xl overflow-hidden ${isCurrent ? 'p-0.5 current-turn-border' : ''}`}>
+      <div
+        className={`relative overflow-hidden min-h-44
+        ${
+          isCurrent
+            ? 'bg-black-300 rounded-[10px]'
+            : 'bg-black-300 rounded-xl border border-black-100'
+        }`}
+      >
+        {combatant.imageUrl && (
+          <div className="absolute inset-0 pointer-events-none">
+            <img
+              src={resolveImageUrl(combatant.imageUrl)}
+              alt="combatent image"
+              aria-hidden
+              className="w-full h-full object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-black-300/45" />
+          </div>
+        )}
+
+        <div className="relative z-10 flex flex-col gap-3 p-4 h-full">
+          <div className="flex items-start justify-between gap-2">
+            <InitiativeBadge
+              value={combatant.initiative}
+              isCurrent={isCurrent}
+              onUpdate={onUpdateInitiative}
+            />
+            <div className="flex items-center gap-1 shrink-0">
+              {!combatant.isPlayer && combatant.hp !== null && (
+                <button
+                  onClick={onToggleHpReveal}
+                  title={
+                    combatant.hpRevealed
+                      ? 'HP numérico visível na mesa — clique para esconder'
+                      : 'HP escondido na mesa (jogadores veem só a faixa) — clique para revelar'
+                  }
+                  className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors cursor-pointer
+                  ${combatant.hpRevealed ? 'text-yellow hover:text-yellow/80' : 'text-white-300/30 hover:text-white-300/70'}`}
+                >
+                  {combatant.hpRevealed ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
+                </button>
+              )}
+              <button
+                onClick={imagePicker.open}
+                title="Definir imagem"
+                className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors cursor-pointer
+                ${combatant.imageUrl ? 'text-white-300/70 hover:text-white-300' : 'text-white-300/30 hover:text-white-300/70'}`}
+              >
+                <ImageIcon size={13} />
+              </button>
+              <button
+                onClick={onRemove}
+                title="Remover"
+                className="flex items-center justify-center w-7 h-7 rounded-lg text-white-300/40 hover:text-white-300 transition-colors cursor-pointer"
+              >
+                <TrashIcon size={13} />
+              </button>
+            </div>
+          </div>
+
+          {imagePicker.isOpen && (
+            <div className="flex gap-1.5">
+              <input
+                ref={imagePicker.inputRef}
+                value={imagePicker.value}
+                onChange={(e) => imagePicker.setValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') imagePicker.confirm()
+                  if (e.key === 'Escape') imagePicker.close()
+                }}
+                placeholder="URL da imagem ou link do Drive..."
+                className="flex-1 min-w-0 text-xs bg-black-500 border border-black-100 rounded-lg px-2 py-1.5 text-white-100 placeholder-white-300/40 outline-none focus:border-white-300/40"
               />
-              <div className="absolute inset-0 bg-black-300/45" />
+              <button
+                onClick={imagePicker.confirm}
+                className="text-xs px-2 py-1.5 rounded-lg bg-red-100 text-white-100 font-semibold cursor-pointer hover:bg-red-200 transition-colors shrink-0"
+              >
+                OK
+              </button>
             </div>
           )}
 
-          <div className="relative z-10 flex flex-col gap-3 p-4 h-full">
-            <div className="flex items-start justify-between gap-2">
-              <InitiativeBadge
-                value={combatant.initiative}
-                isCurrent={isCurrent}
-                onUpdate={onUpdateInitiative}
-              />
-              <div className="flex items-center gap-1 shrink-0">
-                {!combatant.isPlayer && combatant.hp !== null && (
-                  <button
-                    onClick={onToggleHpReveal}
-                    title={
-                      combatant.hpRevealed
-                        ? 'HP numérico visível na mesa — clique para esconder'
-                        : 'HP escondido na mesa (jogadores veem só a faixa) — clique para revelar'
-                    }
-                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors cursor-pointer
-                    ${combatant.hpRevealed ? 'text-yellow hover:text-yellow/80' : 'text-white-300/30 hover:text-white-300/70'}`}
-                  >
-                    {combatant.hpRevealed ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
-                  </button>
-                )}
-                <button
-                  onClick={handleOpenImageInput}
-                  title="Definir imagem"
-                  className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors cursor-pointer
-                  ${combatant.imageUrl ? 'text-white-300/70 hover:text-white-300' : 'text-white-300/30 hover:text-white-300/70'}`}
-                >
-                  <ImageIcon size={13} />
-                </button>
-                <button
-                  onClick={onRemove}
-                  title="Remover"
-                  className="flex items-center justify-center w-7 h-7 rounded-lg text-white-300/40 hover:text-white-300 transition-colors cursor-pointer"
-                >
-                  <TrashIcon size={13} />
-                </button>
-              </div>
+          <div className="flex-1">
+            <span
+              className={`font-bold leading-tight block ${isCurrent ? 'text-white-100 text-base' : 'text-white-100 text-sm'}`}
+            >
+              {combatant.name}
+            </span>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <TypeBadge isPlayer={combatant.isPlayer} />
             </div>
-
-            {imageInputOpen && (
-              <div className="flex gap-1.5">
-                <input
-                  ref={imageInputRef}
-                  value={imageInputValue}
-                  onChange={(e) => setImageInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleConfirmImage()
-                    if (e.key === 'Escape') setImageInputOpen(false)
-                  }}
-                  placeholder="URL da imagem ou link do Drive..."
-                  className="flex-1 min-w-0 text-xs bg-black-500 border border-black-100 rounded-lg px-2 py-1.5 text-white-100 placeholder-white-300/40 outline-none focus:border-white-300/40"
-                />
-                <button
-                  onClick={handleConfirmImage}
-                  className="text-xs px-2 py-1.5 rounded-lg bg-red-100 text-white-100 font-semibold cursor-pointer hover:bg-red-200 transition-colors shrink-0"
-                >
-                  OK
-                </button>
-              </div>
-            )}
-
-            <div className="flex-1">
-              <span
-                className={`font-bold leading-tight block ${isCurrent ? 'text-white-100 text-base' : 'text-white-100 text-sm'}`}
-              >
-                {combatant.name}
-              </span>
-              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                <TypeBadge isPlayer={combatant.isPlayer} />
-              </div>
-              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                {(combatant.conditions ?? []).map((c) => (
-                  <ConditionBadge key={c} label={c} />
-                ))}
-                <button
-                  onClick={() => setConditionModalOpen(true)}
-                  className="text-[10px] font-medium px-1.5 py-0.5 rounded border border-dashed border-white-300/30 text-white-300/60 hover:text-white-300 hover:border-white-300/60 transition-colors cursor-pointer leading-tight shrink-0"
-                >
-                  {(combatant.conditions?.length ?? 0) > 0 ? 'Editar' : '+ Condição'}
-                </button>
-              </div>
-            </div>
-
-            {combatant.hp !== null && combatant.maxHp !== null && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span
-                    className="flex items-center gap-1.5 font-medium"
-                    style={{ color: hpColor }}
-                  >
-                    ♥ HP
-                    {canEditHp && (
-                      <button
-                        onClick={() => setHpEditOpen((value) => !value)}
-                        title="Editar HP atual e máximo"
-                        className={`flex h-5 w-5 items-center justify-center rounded transition-colors cursor-pointer ${
-                          hpEditOpen
-                            ? 'text-white-100'
-                            : 'text-white-300/30 hover:text-white-300/70'
-                        }`}
-                      >
-                        <PencilIcon size={11} />
-                      </button>
-                    )}
-                  </span>
-                  <span className="tabular-nums font-semibold" style={{ color: hpColor }}>
-                    {combatant.hp} / {combatant.maxHp}
-                  </span>
-                </div>
-                <div className="h-1.5 w-full bg-black-500/80 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-300"
-                    style={{ width: `${hpPercent}%`, backgroundColor: hpColor }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {hpEditOpen && canEditHp ? (
-              <CombatantHpEditor
-                hp={combatant.hp!}
-                maxHp={combatant.maxHp!}
-                onConfirm={(hp, maxHp) => {
-                  onSetHp(hp, maxHp)
-                  setHpEditOpen(false)
-                }}
-                onCancel={() => setHpEditOpen(false)}
-              />
-            ) : (
-              combatant.hp !== null && (
-                <div className="flex flex-col gap-1">
-                  <div className="flex gap-1">
-                    {HP_DELTAS.filter((delta) => delta < 0).map((delta) => (
-                      <button
-                        key={delta}
-                        onClick={() => onAdjustHp(delta)}
-                        className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-red-400/40 text-red-100/80 bg-black-500/60 hover:text-white-100 hover:bg-red-100 hover:border-red-100"
-                      >
-                        {delta}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-1">
-                    {HP_DELTAS.filter((delta) => delta > 0).map((delta) => (
-                      <button
-                        key={delta}
-                        onClick={() => onAdjustHp(delta)}
-                        className="flex-1 text-xs font-semibold py-1.5 rounded-lg border transition-colors cursor-pointer border-black-100/60 text-white-300/70 hover:text-white-100 bg-black-500/60 hover:bg-black-400/80"
-                      >
-                        +{delta}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )
-            )}
+            <CombatantConditions
+              combatantName={combatant.name}
+              conditions={combatant.conditions ?? []}
+              onSave={onSetConditions}
+            />
           </div>
+
+          {combatant.hp !== null && combatant.maxHp !== null && (
+            <CombatantHpControls
+              hp={combatant.hp}
+              maxHp={combatant.maxHp}
+              canEdit={!combatant.isPlayer}
+              onAdjustHp={onAdjustHp}
+              onSetHp={onSetHp}
+            />
+          )}
         </div>
       </div>
-
-      {conditionModalOpen && (
-        <ConditionModal
-          combatantName={combatant.name}
-          active={combatant.conditions ?? []}
-          onSave={onSetConditions}
-          onClose={() => setConditionModalOpen(false)}
-        />
-      )}
-    </>
+    </div>
   )
 }
 

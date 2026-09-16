@@ -1,13 +1,10 @@
-import { useState, type KeyboardEvent } from 'react'
 import type { Character } from '../../../types/character'
 import { getXpProgress } from '../../../constants/dnd'
-import { HP_DELTA_OPTIONS } from '../../../constants/character'
 import { resolveImageUrl } from '../../../constants/arts'
-import { clampNumber, formatNumber } from '../../../utils/number'
-import { hpPercent, resolveHpBarColor } from '../../../utils/character'
-import PencilIcon from '../../atoms/icons/PencilIcon'
-import TrashIcon from '../../atoms/icons/TrashIcon'
+import { formatNumber } from '../../../utils/number'
 import UsersIcon from '../../atoms/icons/UsersIcon'
+import CharacterCardActions from './CharacterCardActions'
+import CharacterHpControls from './CharacterHpControls'
 
 interface CharacterCardProps {
   character: Character
@@ -17,34 +14,8 @@ interface CharacterCardProps {
 }
 
 function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCardProps) {
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
-  const [isEditingHp, setIsEditingHp] = useState(false)
-  const [hpInputValue, setHpInputValue] = useState('')
-
-  const hpPercentage = hpPercent(character.currentHP, character.maxHP)
-
   const xpProgress = getXpProgress(character.xp)
   const isCharacterDead = character.currentHP === 0
-
-  function startHpEdit() {
-    setHpInputValue(String(character.currentHP))
-    setIsEditingHp(true)
-  }
-
-  function commitHpEdit() {
-    const newHp = parseInt(hpInputValue, 10)
-    if (!isNaN(newHp)) {
-      onHpAdjust(clampNumber(newHp, 0, character.maxHP) - character.currentHP)
-    }
-    setIsEditingHp(false)
-  }
-
-  function handleHpInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') commitHpEdit()
-    if (e.key === 'Escape') setIsEditingHp(false)
-  }
-
-  const hpColor = resolveHpBarColor(hpPercentage)
 
   return (
     <div
@@ -74,39 +45,7 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
           </span>
         </div>
 
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <button
-            onClick={onEdit}
-            title="Editar"
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-white-100 hover:bg-red-200 transition-colors cursor-pointer"
-          >
-            <PencilIcon size={14} />
-          </button>
-          {isConfirmingDelete ? (
-            <div className="flex items-center gap-0.5 bg-red-100/90 backdrop-blur-sm rounded-lg px-1">
-              <button
-                onClick={() => setIsConfirmingDelete(false)}
-                className="text-white-100/70 hover:text-white-100 transition-colors px-1.5 py-1 text-xs cursor-pointer"
-              >
-                Não
-              </button>
-              <button
-                onClick={onDelete}
-                className="text-white-100 hover:text-white-200 transition-colors font-semibold px-1.5 py-1 text-xs cursor-pointer"
-              >
-                Sim
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsConfirmingDelete(true)}
-              title="Remover"
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-white-100 hover:bg-red-200 transition-colors cursor-pointer"
-            >
-              <TrashIcon size={14} />
-            </button>
-          )}
-        </div>
+        <CharacterCardActions onEdit={onEdit} onDelete={onDelete} />
 
         {isCharacterDead && (
           <div className="absolute inset-0 bg-red-500/20 flex items-end justify-center pb-3 pointer-events-none">
@@ -128,65 +67,11 @@ function CharacterCard({ character, onEdit, onDelete, onHpAdjust }: CharacterCar
           </p>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-white-300/80 text-xs font-medium flex items-center gap-1.5">
-              <span style={{ color: hpColor }}>♥</span> Pontos de Vida
-            </span>
-            <div className="flex items-center gap-1 text-sm">
-              {isEditingHp ? (
-                <input
-                  autoFocus
-                  type="number"
-                  value={hpInputValue}
-                  onChange={(e) => setHpInputValue(e.target.value)}
-                  onBlur={commitHpEdit}
-                  onKeyDown={handleHpInputKeyDown}
-                  className="w-14 bg-black-500 border border-red-100 rounded px-1.5 text-center text-white-100 text-sm focus:outline-none tabular-nums"
-                />
-              ) : (
-                <button
-                  onClick={startHpEdit}
-                  title="Clique para editar HP"
-                  className="font-bold tabular-nums hover:opacity-70 transition-opacity"
-                  style={{ color: hpColor }}
-                >
-                  {character.currentHP}
-                </button>
-              )}
-              <span className="text-white-300/40 tabular-nums">/ {character.maxHP}</span>
-              <span className="text-white-300/30 text-xs ml-1">({hpPercentage}%)</span>
-            </div>
-          </div>
-
-          <div className="h-2 w-full bg-black-500 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${hpPercentage}%`,
-                backgroundColor: hpColor,
-                transition: 'width 0.35s ease, background-color 0.5s ease',
-              }}
-            />
-          </div>
-
-          <div className="flex gap-1">
-            {HP_DELTA_OPTIONS.map((delta) => (
-              <button
-                key={delta}
-                onClick={() => onHpAdjust(delta)}
-                className={`flex-1 text-xs font-medium py-1 rounded border transition-colors cursor-pointer
-                  ${
-                    delta < 0
-                      ? 'border-black-100 text-red-100/70 hover:text-red-100 hover:border-red-400/50 bg-black-500 hover:bg-red-400/10'
-                      : 'border-black-100 text-white-300/70 hover:text-white-100 bg-black-500 hover:bg-black-400'
-                  }`}
-              >
-                {delta > 0 ? `+${delta}` : delta}
-              </button>
-            ))}
-          </div>
-        </div>
+        <CharacterHpControls
+          currentHP={character.currentHP}
+          maxHP={character.maxHP}
+          onHpAdjust={onHpAdjust}
+        />
 
         <div className="border-t border-black-200" />
 
