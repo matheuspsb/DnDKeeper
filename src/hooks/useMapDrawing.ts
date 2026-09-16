@@ -1,25 +1,14 @@
 import { useCallback, useState } from 'react'
 import { useLatestRef } from './useLatestRef'
+import { useLocalStorageState } from './useLocalStorageState'
 import type { DrawnPath } from '../types/drawing'
 
 const STORAGE_KEY = 'dndkeeper_map_drawings'
 const POINT_DISTANCE_THRESHOLD = 4
 
-function load(): DrawnPath[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
-  } catch {
-    return []
-  }
-}
-
-function save(paths: DrawnPath[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(paths))
-}
-
 export function useMapDrawing() {
   const [isDrawingMode, setIsDrawingMode] = useState(false)
-  const [paths, setPaths] = useState<DrawnPath[]>(() => load())
+  const [paths, setPaths] = useLocalStorageState<DrawnPath[]>(STORAGE_KEY, [])
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[] | null>(null)
   const [brushColor, setBrushColor] = useState('#D72334')
   const [brushSize, setBrushSize] = useState(4)
@@ -56,27 +45,18 @@ export function useMapDrawing() {
         color: brushColorRef.current,
         width: brushSizeRef.current,
       }
-      setPaths((existing) => {
-        const next = [...existing, newPath]
-        save(next)
-        return next
-      })
+      setPaths((existing) => [...existing, newPath])
       return null
     })
-  }, [])
+  }, [setPaths])
 
   const undoLast = useCallback(() => {
-    setPaths((prev) => {
-      const next = prev.slice(0, -1)
-      save(next)
-      return next
-    })
-  }, [])
+    setPaths((prev) => prev.slice(0, -1))
+  }, [setPaths])
 
   const clearDrawings = useCallback(() => {
     setPaths([])
-    save([])
-  }, [])
+  }, [setPaths])
 
   return {
     isDrawingMode,

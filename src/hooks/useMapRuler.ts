@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { useLocalStorageState } from './useLocalStorageState'
 
 export type RulerMode = 'idle' | 'calibrating' | 'measuring'
 export type Point = { x: number; y: number }
@@ -18,10 +19,11 @@ function formatMiles(miles: number): string {
 export function useMapRuler() {
   const [mode, setMode] = useState<RulerMode>('idle')
   const [points, setPoints] = useState<Point[]>([])
-  const [pixelsPerMile, setPixelsPerMile] = useState<number | null>(() => {
-    const saved = localStorage.getItem(CALIBRATION_KEY)
-    return saved ? Number(saved) : null
-  })
+  const [pixelsPerMile, setPixelsPerMile] = useLocalStorageState<number | null>(
+    CALIBRATION_KEY,
+    null,
+    { serialize: String, deserialize: Number },
+  )
   const [showCalibInput, setShowCalibInput] = useState(false)
   const [calibMiles, setCalibMiles] = useState('')
 
@@ -72,7 +74,6 @@ export function useMapRuler() {
     if (isNaN(miles) || miles <= 0 || points.length < 2) return
     const newPixelsPerMile = pixelDist(points[0], points[1]) / miles
     setPixelsPerMile(newPixelsPerMile)
-    localStorage.setItem(CALIBRATION_KEY, String(newPixelsPerMile))
     setShowCalibInput(false)
     setCalibMiles('')
     setPoints([])

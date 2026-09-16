@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useLocalStorageState } from './useLocalStorageState'
 import type {
   EncounterSnapshot,
   EncounterResult,
@@ -8,29 +9,8 @@ import type {
 
 const STORAGE_KEY = 'dndkeeper_encounter_history'
 
-function load(): EncounterSnapshot[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as EncounterSnapshot[]) : []
-  } catch {
-    return []
-  }
-}
-
-function persist(history: EncounterSnapshot[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
-}
-
 export function useEncounterHistory() {
-  const [history, setHistory] = useState<EncounterSnapshot[]>(load)
-
-  const mutate = useCallback((updater: (prev: EncounterSnapshot[]) => EncounterSnapshot[]) => {
-    setHistory((prev) => {
-      const next = updater(prev)
-      persist(next)
-      return next
-    })
-  }, [])
+  const [history, setHistory] = useLocalStorageState<EncounterSnapshot[]>(STORAGE_KEY, [])
 
   const saveEncounter = useCallback(
     (party: PartyMember[], monsters: MonsterEntry[], result: EncounterResult) => {
@@ -45,30 +25,30 @@ export function useEncounterHistory() {
         monsterCount: monsters.reduce((total, monster) => total + monster.quantity, 0),
         xpSent: false,
       }
-      mutate((prev) => [snapshot, ...prev])
+      setHistory((prev) => [snapshot, ...prev])
     },
-    [mutate],
+    [setHistory],
   )
 
   const markAllSent = useCallback(
     (ids: string[]) => {
-      mutate((prev) =>
+      setHistory((prev) =>
         prev.map((snapshot) =>
           ids.includes(snapshot.id) ? { ...snapshot, xpSent: true } : snapshot,
         ),
       )
     },
-    [mutate],
+    [setHistory],
   )
 
   const deleteSnapshot = useCallback(
     (id: string) => {
-      mutate((prev) => prev.filter((snapshot) => snapshot.id !== id))
+      setHistory((prev) => prev.filter((snapshot) => snapshot.id !== id))
     },
-    [mutate],
+    [setHistory],
   )
 
-  const clearHistory = useCallback(() => mutate(() => []), [mutate])
+  const clearHistory = useCallback(() => setHistory([]), [setHistory])
 
   return { history, saveEncounter, markAllSent, deleteSnapshot, clearHistory }
 }
