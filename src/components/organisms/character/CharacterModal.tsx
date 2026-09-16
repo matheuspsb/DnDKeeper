@@ -30,8 +30,11 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Nome do Personagem *</label>
+              <label htmlFor="name" className={labelClass}>
+                Nome do Personagem *
+              </label>
               <Input
+                id="name"
                 {...register('name')}
                 error={!!errors.name}
                 className={fieldClass}
@@ -40,26 +43,45 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
               {errors.name && <p className={errorClass}>{errors.name.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>Nome do Jogador</label>
-              <Input {...register('playerName')} className={fieldClass} placeholder="João" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Classe</label>
-              <Input {...register('characterClass')} className={fieldClass} placeholder="Mago" />
-            </div>
-            <div>
-              <label className={labelClass}>Raça</label>
-              <Input {...register('race')} className={fieldClass} placeholder="Elfo" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>HP Máximo</label>
+              <label htmlFor="playerName" className={labelClass}>
+                Nome do Jogador
+              </label>
               <Input
+                id="playerName"
+                {...register('playerName')}
+                className={fieldClass}
+                placeholder="João"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="characterClass" className={labelClass}>
+                Classe
+              </label>
+              <Input
+                id="characterClass"
+                {...register('characterClass')}
+                className={fieldClass}
+                placeholder="Mago"
+              />
+            </div>
+            <div>
+              <label htmlFor="race" className={labelClass}>
+                Raça
+              </label>
+              <Input id="race" {...register('race')} className={fieldClass} placeholder="Elfo" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="maxHP" className={labelClass}>
+                HP Máximo
+              </label>
+              <Input
+                id="maxHP"
                 {...register('maxHP')}
                 type="number"
                 min={1}
@@ -70,8 +92,11 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
               {errors.maxHP && <p className={errorClass}>{errors.maxHP.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>HP Atual</label>
+              <label htmlFor="currentHP" className={labelClass}>
+                HP Atual
+              </label>
               <Input
+                id="currentHP"
                 {...register('currentHP')}
                 type="number"
                 min={0}
@@ -84,8 +109,11 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
           </div>
 
           <div>
-            <label className={labelClass}>Pontos de Experiência (XP Total)</label>
+            <label htmlFor="xp" className={labelClass}>
+              Pontos de Experiência (XP Total)
+            </label>
             <Input
+              id="xp"
               {...register('xp')}
               type="number"
               min={0}
@@ -97,8 +125,11 @@ function CharacterModal({ initialCharacter, onSave, onClose }: CharacterModalPro
           </div>
 
           <div>
-            <label className={labelClass}>Anotações</label>
+            <label htmlFor="notes" className={labelClass}>
+              Anotações
+            </label>
             <textarea
+              id="notes"
               {...register('notes')}
               className="w-full bg-black-500 border border-black-100 rounded-lg px-3 py-2 text-white-100 text-sm placeholder:text-white-300/30 focus:outline-none focus:border-red-100 transition-colors resize-none h-18"
               placeholder="Condições, itens importantes, lembretes rápidos..."

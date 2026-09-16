@@ -72,15 +72,15 @@ function Mapa() {
     drawing.endStroke()
   }
 
-  const handleCalibrateToggle = useCallback(() => {
+  function handleCalibrateToggle() {
     if (ruler.mode === 'calibrating') ruler.exitRuler()
     else ruler.enterCalibrate()
-  }, [ruler.mode, ruler.exitRuler, ruler.enterCalibrate])
+  }
 
-  const handleMeasureToggle = useCallback(() => {
+  function handleMeasureToggle() {
     if (ruler.mode === 'measuring') ruler.exitRuler()
     else ruler.enterMeasure()
-  }, [ruler.mode, ruler.exitRuler, ruler.enterMeasure])
+  }
 
   const handleZoomIn = useCallback(() => transformRef.current?.zoomIn(), [])
   const handleZoomOut = useCallback(() => transformRef.current?.zoomOut(), [])

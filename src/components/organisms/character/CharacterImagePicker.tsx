@@ -13,7 +13,7 @@ interface CharacterImagePickerProps {
 function CharacterImagePicker({ imageUrl, register, setValue }: CharacterImagePickerProps) {
   return (
     <div className="flex flex-col gap-2">
-      <label className={labelClass}>
+      <label htmlFor="imageUrl" className={labelClass}>
         Imagem do Personagem
       </label>
       <div className="flex gap-2">
@@ -48,6 +48,7 @@ function CharacterImagePicker({ imageUrl, register, setValue }: CharacterImagePi
         )}
       </div>
       <Input
+        id="imageUrl"
         {...register('imageUrl')}
         className="w-full bg-black-500 rounded-lg px-3 py-2"
         placeholder="ou cole uma URL externa..."

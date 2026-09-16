@@ -12,7 +12,9 @@ interface NpcImagePickerProps {
 function NpcImagePicker({ imageUrl, onSelect, registration }: NpcImagePickerProps) {
   return (
     <div className="flex flex-col gap-2">
-      <label className={labelClass}>Imagem</label>
+      <label htmlFor={registration.name} className={labelClass}>
+        Imagem
+      </label>
       <div className="flex gap-2 flex-wrap">
         {LOCAL_ARTS.map((art) => {
           const artKey = toLocalArtUrl(art.key)
@@ -40,7 +42,12 @@ function NpcImagePicker({ imageUrl, onSelect, registration }: NpcImagePickerProp
           </div>
         )}
       </div>
-      <Input {...registration} className="w-full bg-black-500 rounded-lg px-3 py-2" placeholder="ou cole uma URL externa..." />
+      <Input
+        id={registration.name}
+        {...registration}
+        className="w-full bg-black-500 rounded-lg px-3 py-2"
+        placeholder="ou cole uma URL externa..."
+      />
     </div>
   )
 }

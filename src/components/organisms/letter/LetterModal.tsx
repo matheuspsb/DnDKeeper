@@ -32,8 +32,11 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
 
         <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
           <div>
-            <label className={labelClass}>Título *</label>
+            <label htmlFor="title" className={labelClass}>
+              Título *
+            </label>
             <Input
+              id="title"
               {...register('title')}
               error={!!errors.title}
               className={fieldClass}
@@ -44,16 +47,22 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Destinatário</label>
+              <label htmlFor="recipient" className={labelClass}>
+                Destinatário
+              </label>
               <Input
+                id="recipient"
                 {...register('recipient')}
                 className={fieldClass}
                 placeholder="Aventureiros da Taverna do Grifo"
               />
             </div>
             <div>
-              <label className={labelClass}>Data de encontro *</label>
+              <label htmlFor="foundAt" className={labelClass}>
+                Data de encontro *
+              </label>
               <Input
+                id="foundAt"
                 {...register('foundAt')}
                 error={!!errors.foundAt}
                 className={fieldClass}
@@ -64,8 +73,11 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
           </div>
 
           <div>
-            <label className={labelClass}>Data de escrita (alinhada à direita)</label>
+            <label htmlFor="writtenAt" className={labelClass}>
+              Data de escrita (alinhada à direita)
+            </label>
             <Input
+              id="writtenAt"
               {...register('writtenAt')}
               className={fieldClass}
               placeholder="Uktar, 16, 1371 DR"
@@ -73,8 +85,11 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
           </div>
 
           <div>
-            <label className={labelClass}>Conteúdo *</label>
+            <label htmlFor="content" className={labelClass}>
+              Conteúdo *
+            </label>
             <textarea
+              id="content"
               {...register('content')}
               className={`${textareaClass} h-52`}
               placeholder="Estimados aventureiros..."

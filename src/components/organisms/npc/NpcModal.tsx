@@ -45,8 +45,11 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
           )}
 
           <div>
-            <label className={labelClass}>Nome *</label>
+            <label htmlFor="name" className={labelClass}>
+              Nome *
+            </label>
             <Input
+              id="name"
               {...register('name')}
               error={!!errors.name}
               className={fieldClass}
@@ -57,9 +60,11 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Facção</label>
+              <label htmlFor="faction" className={labelClass}>
+                Facção
+              </label>
               <div className="relative">
-                <select {...register('faction')} className={selectClass}>
+                <select id="faction" {...register('faction')} className={selectClass}>
                   {FACTIONS.map((faction) => (
                     <option key={faction} value={faction}>
                       {faction}
@@ -70,9 +75,11 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Status</label>
+              <label htmlFor="status" className={labelClass}>
+                Status
+              </label>
               <div className="relative">
-                <select {...register('status')} className={selectClass}>
+                <select id="status" {...register('status')} className={selectClass}>
                   <option value="vivo">Vivo</option>
                   <option value="morto">Morto</option>
                   <option value="desaparecido">Desaparecido</option>
@@ -84,8 +91,11 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
           </div>
 
           <div>
-            <label className={labelClass}>Descrição</label>
+            <label htmlFor="description" className={labelClass}>
+              Descrição
+            </label>
             <textarea
+              id="description"
               {...register('description')}
               className={textareaClass}
               placeholder="Aparência, personalidade, papel na campanha..."
@@ -93,8 +103,11 @@ function NpcModal({ initialNpc, onSave, onClose }: NpcModalProps) {
           </div>
 
           <div>
-            <label className={labelClass}>O que sabe / O que possui</label>
+            <label htmlFor="notes" className={labelClass}>
+              O que sabe / O que possui
+            </label>
             <textarea
+              id="notes"
               {...register('notes')}
               className={textareaClass}
               placeholder="Informações que este NPC carrega..."
