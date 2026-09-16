@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { Npc, Faction } from '../../../types/npc.types'
 import NpcFactionChannel from './NpcFactionChannel'
 import NpcDossierRow from './NpcDossierRow'
@@ -25,6 +25,10 @@ function NpcContent({
 }: NpcContentProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
+  const handleToggle = useCallback((id: string) => {
+    setExpandedId((current) => (current === id ? null : id))
+  }, [])
+
   if (npcs.length === 0) return <NpcEmpty onAdd={onAdd} />
 
   if (grouped.length === 0)
@@ -49,10 +53,10 @@ function NpcContent({
               npc={npc}
               canEdit={canEdit}
               expanded={expandedId === npc.id}
-              onToggle={() => setExpandedId((id) => (id === npc.id ? null : npc.id))}
-              onEdit={() => onEdit(npc)}
-              onDelete={() => onDelete(npc.id)}
-              onImageClick={() => onImageClick(npc)}
+              onToggle={handleToggle}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onImageClick={onImageClick}
             />
           ))}
         </NpcFactionChannel>

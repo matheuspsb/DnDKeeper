@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { HierarchyTree } from '../../../constants/cult'
 import { FACTION_COLOR } from '../../../constants/npc.constants'
 import { TreeNode } from './TreeNode'
@@ -48,7 +49,7 @@ interface RightTreeProps {
   wasJustClick: () => boolean
 }
 
-export function RightTree({ tree, wasJustClick }: RightTreeProps) {
+export const RightTree = memo(function RightTree({ tree, wasJustClick }: RightTreeProps) {
   const { expandedIds, mountedIds, toggleExpanded } = useTreeExpansion()
 
   const accentColor = FACTION_COLOR[tree.root.faction as keyof typeof FACTION_COLOR]
@@ -98,4 +99,4 @@ export function RightTree({ tree, wasJustClick }: RightTreeProps) {
       />
     </>
   )
-}
+})

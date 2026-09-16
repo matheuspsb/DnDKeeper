@@ -118,7 +118,7 @@ describe('CombatantRow', () => {
     fireEvent.change(input, { target: { value: 'https://exemplo.com/img.png' } })
     fireEvent.click(screen.getByText('OK'))
 
-    expect(onSetImageUrl).toHaveBeenCalledWith('https://exemplo.com/img.png')
+    expect(onSetImageUrl).toHaveBeenCalledWith('m1', 'https://exemplo.com/img.png')
   })
 
   it('clicar em ajustar HP (+1) chama onAdjustHp', () => {
@@ -137,7 +137,7 @@ describe('CombatantRow', () => {
       />,
     )
     fireEvent.click(screen.getByText('+1'))
-    expect(onAdjustHp).toHaveBeenCalledWith(1)
+    expect(onAdjustHp).toHaveBeenCalledWith('m1', 1)
   })
 
   it('clicar em revelar/esconder HP (monstro) chama onToggleHpReveal', () => {

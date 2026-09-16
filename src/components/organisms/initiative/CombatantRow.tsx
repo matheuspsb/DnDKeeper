@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
 import { useCombatantImagePicker } from '../../../hooks/useCombatantImagePicker'
@@ -13,16 +14,16 @@ import CombatantHpControls from './CombatantHpControls'
 interface CombatantRowProps {
   combatant: Combatant
   status: CombatantStatus
-  onRemove: () => void
-  onAdjustHp: (delta: number) => void
-  onSetHp: (hp: number, maxHp: number) => void
-  onUpdateInitiative: (val: number) => void
-  onSetConditions: (conditions: string[]) => void
-  onSetImageUrl: (url: string) => void
-  onToggleHpReveal: () => void
+  onRemove: (id: string) => void
+  onAdjustHp: (id: string, delta: number) => void
+  onSetHp: (id: string, hp: number, maxHp: number) => void
+  onUpdateInitiative: (id: string, val: number) => void
+  onSetConditions: (id: string, conditions: string[]) => void
+  onSetImageUrl: (id: string, url: string) => void
+  onToggleHpReveal: (id: string) => void
 }
 
-function CombatantRow({
+const CombatantRow = memo(function CombatantRow({
   combatant,
   status,
   onRemove,
@@ -33,7 +34,7 @@ function CombatantRow({
   onSetImageUrl,
   onToggleHpReveal,
 }: CombatantRowProps) {
-  const imagePicker = useCombatantImagePicker(onSetImageUrl)
+  const imagePicker = useCombatantImagePicker((url) => onSetImageUrl(combatant.id, url))
   const isCurrent = status === 'current'
 
   return (
@@ -63,12 +64,12 @@ function CombatantRow({
             <InitiativeBadge
               value={combatant.initiative}
               isCurrent={isCurrent}
-              onUpdate={onUpdateInitiative}
+              onUpdate={(val) => onUpdateInitiative(combatant.id, val)}
             />
             <div className="flex items-center gap-1 shrink-0">
               {!combatant.isPlayer && combatant.hp !== null && (
                 <button
-                  onClick={onToggleHpReveal}
+                  onClick={() => onToggleHpReveal(combatant.id)}
                   title={
                     combatant.hpRevealed
                       ? 'HP numérico visível na mesa — clique para esconder'
@@ -89,7 +90,7 @@ function CombatantRow({
                 <ImageIcon size={13} />
               </button>
               <button
-                onClick={onRemove}
+                onClick={() => onRemove(combatant.id)}
                 title="Remover"
                 className="flex items-center justify-center w-7 h-7 rounded-lg text-white-300/40 hover:text-white-300 transition-colors cursor-pointer"
               >
@@ -132,7 +133,7 @@ function CombatantRow({
             <CombatantConditions
               combatantName={combatant.name}
               conditions={combatant.conditions ?? []}
-              onSave={onSetConditions}
+              onSave={(conditions) => onSetConditions(combatant.id, conditions)}
             />
           </div>
 
@@ -141,14 +142,14 @@ function CombatantRow({
               hp={combatant.hp}
               maxHp={combatant.maxHp}
               canEdit={!combatant.isPlayer}
-              onAdjustHp={onAdjustHp}
-              onSetHp={onSetHp}
+              onAdjustHp={(delta) => onAdjustHp(combatant.id, delta)}
+              onSetHp={(hp, maxHp) => onSetHp(combatant.id, hp, maxHp)}
             />
           )}
         </div>
       </div>
     </div>
   )
-}
+})
 
 export default CombatantRow

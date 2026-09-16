@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useConfirm } from '../../../hooks/useConfirm'
 import type { Npc } from '../../../types/npc.types'
 import { resolveImageUrl } from '../../../constants/arts'
@@ -10,13 +11,13 @@ interface NpcDossierRowProps {
   npc: Npc
   expanded: boolean
   canEdit: boolean
-  onToggle: () => void
-  onEdit: () => void
-  onDelete: () => void
-  onImageClick: () => void
+  onToggle: (id: string) => void
+  onEdit: (npc: Npc) => void
+  onDelete: (id: string) => void
+  onImageClick: (npc: Npc) => void
 }
 
-function NpcDossierRow({
+const NpcDossierRow = memo(function NpcDossierRow({
   npc,
   expanded,
   canEdit,
@@ -33,7 +34,7 @@ function NpcDossierRow({
   return (
     <article className={`border-b border-ink-800/70 ${isDead ? 'opacity-60' : ''}`}>
       <button
-        onClick={onToggle}
+        onClick={() => onToggle(npc.id)}
         aria-expanded={expanded}
         className="flex w-full items-center gap-4 py-3.5 pr-2 text-left transition-colors hover:bg-ink-900/60 focus-visible:outline focus-visible:outline-brass"
       >
@@ -77,7 +78,7 @@ function NpcDossierRow({
       {expanded && (
         <div className="dossier-open flex flex-col gap-5 pb-6 pl-18 sm:flex-row">
           <button
-            onClick={onImageClick}
+            onClick={() => onImageClick(npc)}
             disabled={!image}
             className={`h-48 w-40 shrink-0 overflow-hidden border border-ink-800 bg-ink-800 ${
               image ? 'cursor-zoom-in' : 'cursor-default'
@@ -123,7 +124,7 @@ function NpcDossierRow({
             {canEdit && (
               <div className="mt-1 flex items-center gap-2">
                 <button
-                  onClick={onEdit}
+                  onClick={() => onEdit(npc)}
                   className="border border-ink-800 px-3.5 py-2 font-mono text-[12px] tracking-wider text-bone-300 uppercase transition-colors hover:border-bone-400 hover:text-bone-100"
                 >
                   Editar
@@ -132,7 +133,7 @@ function NpcDossierRow({
                   <span className="flex items-center gap-2 font-mono text-[12px] tracking-wider text-bone-300 uppercase">
                     remover?
                     <button
-                      onClick={() => confirm(onDelete)}
+                      onClick={() => confirm(() => onDelete(npc.id))}
                       className="border border-wax/60 px-2.5 py-2 text-wax transition-colors hover:bg-wax/10"
                     >
                       sim
@@ -159,6 +160,6 @@ function NpcDossierRow({
       )}
     </article>
   )
-}
+})
 
 export default NpcDossierRow

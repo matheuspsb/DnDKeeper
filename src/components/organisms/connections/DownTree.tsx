@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { HierarchyTree } from '../../../constants/cult'
 import { FACTION_COLOR } from '../../../constants/npc.constants'
 import { FILTER_ID } from './TreeFilters'
@@ -33,7 +34,7 @@ interface DownTreeProps {
   wasJustClick: () => boolean
 }
 
-export function DownTree({ tree, wasJustClick }: DownTreeProps) {
+export const DownTree = memo(function DownTree({ tree, wasJustClick }: DownTreeProps) {
   const { expandedIds, mountedIds, toggleExpanded } = useTreeExpansion()
 
   const nodeCount = tree.children.length
@@ -98,4 +99,4 @@ export function DownTree({ tree, wasJustClick }: DownTreeProps) {
       />
     </>
   )
-}
+})

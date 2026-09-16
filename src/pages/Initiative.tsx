@@ -1,6 +1,8 @@
+import { useCallback } from 'react'
 import { useInitiative } from '../hooks/useInitiative'
 import { useInitiativeStream } from '../hooks/useInitiativeStream'
 import { useAdjustCharacterHp, useCharacters } from '../hooks/useCharacters'
+import { useLatestRef } from '../hooks/useLatestRef'
 import Button from '../components/atoms/Button'
 import ChevronRightIcon from '../components/atoms/icons/ChevronRightIcon'
 import RefreshIcon from '../components/atoms/icons/RefreshIcon'
@@ -49,13 +51,51 @@ function Initiative() {
     )
   }
 
-  function handleAdjustHp(combatant: (typeof combatants)[number], delta: number) {
-    adjustHp(combatant.id, delta)
-    if (combatant.characterId && combatant.hp !== null && combatant.maxHp !== null) {
+  const latest = useLatestRef({
+    combatants,
+    removeCombatant,
+    adjustHp,
+    setHp,
+    updateInitiative,
+    setConditions,
+    setImageUrl,
+    setHpRevealed,
+    adjustCharacterHp,
+  })
+
+  const handleRemove = useCallback((id: string) => {
+    latest.current.removeCombatant(id)
+  }, [])
+
+  const handleAdjustHp = useCallback((id: string, delta: number) => {
+    latest.current.adjustHp(id, delta)
+    const combatant = latest.current.combatants.find((c) => c.id === id)
+    if (combatant?.characterId && combatant.hp !== null && combatant.maxHp !== null) {
       const newHp = Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta))
-      adjustCharacterHp(combatant.characterId, newHp)
+      latest.current.adjustCharacterHp(combatant.characterId, newHp)
     }
-  }
+  }, [])
+
+  const handleSetHp = useCallback((id: string, hp: number, maxHp: number) => {
+    latest.current.setHp(id, hp, maxHp)
+  }, [])
+
+  const handleUpdateInitiative = useCallback((id: string, val: number) => {
+    latest.current.updateInitiative(id, val)
+  }, [])
+
+  const handleSetConditions = useCallback((id: string, conditions: string[]) => {
+    latest.current.setConditions(id, conditions)
+  }, [])
+
+  const handleSetImageUrl = useCallback((id: string, url: string) => {
+    latest.current.setImageUrl(id, url)
+  }, [])
+
+  const handleToggleHpReveal = useCallback((id: string) => {
+    const combatant = latest.current.combatants.find((c) => c.id === id)
+    if (combatant) latest.current.setHpRevealed(id, !combatant.hpRevealed)
+  }, [])
 
   const partyCombatants = combatants.filter((c) => c.isPlayer && c.hp !== null && c.maxHp !== null)
   const totalGroupHP = partyCombatants.reduce((sum, c) => sum + (c.hp ?? 0), 0)
@@ -116,13 +156,13 @@ function Initiative() {
                 key={combatant.id}
                 combatant={combatant}
                 status={i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'pending'}
-                onRemove={() => removeCombatant(combatant.id)}
-                onAdjustHp={(delta) => handleAdjustHp(combatant, delta)}
-                onSetHp={(hp, maxHp) => setHp(combatant.id, hp, maxHp)}
-                onUpdateInitiative={(val) => updateInitiative(combatant.id, val)}
-                onSetConditions={(conditions) => setConditions(combatant.id, conditions)}
-                onSetImageUrl={(url) => setImageUrl(combatant.id, url)}
-                onToggleHpReveal={() => setHpRevealed(combatant.id, !combatant.hpRevealed)}
+                onRemove={handleRemove}
+                onAdjustHp={handleAdjustHp}
+                onSetHp={handleSetHp}
+                onUpdateInitiative={handleUpdateInitiative}
+                onSetConditions={handleSetConditions}
+                onSetImageUrl={handleSetImageUrl}
+                onToggleHpReveal={handleToggleHpReveal}
               />
             ))}
           </div>

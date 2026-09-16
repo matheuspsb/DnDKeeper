@@ -13,13 +13,22 @@ export function useCanvasInteraction() {
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [isDragging, setIsDragging] = useState(false)
+
   const svgRef = useRef<SVGSVGElement>(null)
   const isPanning = useRef(false)
   const lastMousePos = useRef<Point>({ x: 0, y: 0 })
   const dragDistance = useRef(0)
+  const pendingDelta = useRef<{ dx: number; dy: number } | null>(null)
+  const rafId = useRef<number | null>(null)
 
   const stateRef = useRef({ pan, zoom })
   stateRef.current = { pan, zoom }
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current)
+    }
+  }, [])
 
   useEffect(() => {
     const svg = svgRef.current
@@ -57,7 +66,19 @@ export function useCanvasInteraction() {
     const dy = event.clientY - lastMousePos.current.y
     dragDistance.current += Math.sqrt(dx * dx + dy * dy)
     lastMousePos.current = { x: event.clientX, y: event.clientY }
-    setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }))
+
+    pendingDelta.current = {
+      dx: (pendingDelta.current?.dx ?? 0) + dx,
+      dy: (pendingDelta.current?.dy ?? 0) + dy,
+    }
+    if (rafId.current !== null) return
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null
+      const delta = pendingDelta.current
+      pendingDelta.current = null
+      if (!delta) return
+      setPan((prev) => ({ x: prev.x + delta.dx, y: prev.y + delta.dy }))
+    })
   }, [])
 
   const onMouseUp = useCallback(() => {

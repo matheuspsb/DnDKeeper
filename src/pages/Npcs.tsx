@@ -1,4 +1,4 @@
-import { useState, useMemo, useDeferredValue } from 'react'
+import { useState, useMemo, useCallback, useDeferredValue } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { Npc } from '../types/npc.types'
 import type { NpcStatus } from '../types/npc.types'
@@ -69,15 +69,15 @@ function Npcs() {
 
   const hasActiveFilters = query.trim() !== '' || statusFilter !== 'todos'
 
-  function openAdd() {
+  const openAdd = useCallback(() => {
     setEditingNpc(null)
     setModalOpen(true)
-  }
+  }, [])
 
-  function openEdit(npc: Npc) {
+  const openEdit = useCallback((npc: Npc) => {
     setEditingNpc(npc)
     setModalOpen(true)
-  }
+  }, [])
 
   async function handleSave(data: Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>) {
     if (editingNpc) {
@@ -88,14 +88,17 @@ function Npcs() {
     setModalOpen(false)
   }
 
-  async function handleDelete(id: string) {
-    setDeleteError(null)
-    try {
-      await deleteNpc.mutateAsync(id)
-    } catch {
-      setDeleteError('Não foi possível remover a ficha.')
-    }
-  }
+  const handleDelete = useCallback(
+    async (id: string) => {
+      setDeleteError(null)
+      try {
+        await deleteNpc.mutateAsync(id)
+      } catch {
+        setDeleteError('Não foi possível remover a ficha.')
+      }
+    },
+    [deleteNpc],
+  )
 
   const factionCount = groupedByFaction.length
   const meta = isLoading
