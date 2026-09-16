@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useConfirm } from '../../../hooks/useConfirm'
 import Button from '../../atoms/Button'
 
 interface LetterSeedResetProps {
@@ -6,21 +6,16 @@ interface LetterSeedResetProps {
 }
 
 function LetterSeedReset({ onReset }: LetterSeedResetProps) {
-  const [confirm, setConfirm] = useState(false)
+  const { armed, arm, disarm, confirm } = useConfirm()
 
-  function handleConfirm() {
-    onReset()
-    setConfirm(false)
-  }
-
-  if (confirm) {
+  if (armed) {
     return (
       <>
         <span className="text-white-300/50 text-xs">Substituir todas as cartas pelo seed?</span>
-        <Button variant="secondary" onClick={() => setConfirm(false)} className="px-3">
+        <Button variant="secondary" onClick={disarm} className="px-3">
           Cancelar
         </Button>
-        <Button variant="primary" onClick={handleConfirm} className="px-3">
+        <Button variant="primary" onClick={() => confirm(onReset)} className="px-3">
           Confirmar
         </Button>
       </>
@@ -28,7 +23,7 @@ function LetterSeedReset({ onReset }: LetterSeedResetProps) {
   }
 
   return (
-    <Button variant="secondary" onClick={() => setConfirm(true)} className="px-3">
+    <Button variant="secondary" onClick={arm} className="px-3">
       Atualizar
     </Button>
   )

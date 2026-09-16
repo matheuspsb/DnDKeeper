@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useConfirm } from '../../../hooks/useConfirm'
 import type { Npc } from '../../../types/npc.types'
 import { resolveImageUrl } from '../../../constants/arts'
 import { formatDate } from '../../../utils/time'
@@ -25,7 +25,7 @@ function NpcDossierRow({
   onDelete,
   onImageClick,
 }: NpcDossierRowProps) {
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const { armed: confirmingDelete, arm, disarm, confirm } = useConfirm()
   const isDead = npc.status === 'morto'
   const image = npc.imageUrl ? resolveImageUrl(npc.imageUrl) : ''
   const revised = npc.updatedAt && npc.updatedAt !== npc.createdAt
@@ -132,13 +132,13 @@ function NpcDossierRow({
                   <span className="flex items-center gap-2 font-mono text-[12px] tracking-wider text-bone-300 uppercase">
                     remover?
                     <button
-                      onClick={onDelete}
+                      onClick={() => confirm(onDelete)}
                       className="border border-wax/60 px-2.5 py-2 text-wax transition-colors hover:bg-wax/10"
                     >
                       sim
                     </button>
                     <button
-                      onClick={() => setConfirmingDelete(false)}
+                      onClick={disarm}
                       className="border border-ink-800 px-2.5 py-2 transition-colors hover:border-bone-400 hover:text-bone-100"
                     >
                       não
@@ -146,7 +146,7 @@ function NpcDossierRow({
                   </span>
                 ) : (
                   <button
-                    onClick={() => setConfirmingDelete(true)}
+                    onClick={arm}
                     className="border border-wax/40 px-3.5 py-2 font-mono text-[12px] tracking-wider text-wax uppercase transition-colors hover:bg-wax/10"
                   >
                     Remover

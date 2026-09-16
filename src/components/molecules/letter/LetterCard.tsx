@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useConfirm } from '../../../hooks/useConfirm'
 import type { Letter } from '../../../types/letter'
 import EyeIcon from '../../atoms/icons/EyeIcon'
 import PencilIcon from '../../atoms/icons/PencilIcon'
@@ -13,18 +13,18 @@ interface LetterCardProps {
 }
 
 function LetterCard({ letter, isDm, onView, onEdit, onDelete }: LetterCardProps) {
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { armed: confirmDelete, arm, disarm, confirm } = useConfirm()
 
   function handleDelete() {
     if (confirmDelete) {
-      onDelete(letter.id)
+      confirm(() => onDelete(letter.id))
     } else {
-      setConfirmDelete(true)
+      arm()
     }
   }
 
   return (
-    <div className="parchment group" onMouseLeave={() => setConfirmDelete(false)}>
+    <div className="parchment group" onMouseLeave={disarm}>
       <div className="relative z-10 p-5 flex flex-col gap-3">
         <div className="flex justify-between items-start gap-2">
           <h3 className="text-[#2c1506] font-bold text-sm leading-tight wrap-break-word tracking-wide">
