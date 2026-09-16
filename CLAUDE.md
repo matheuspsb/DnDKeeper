@@ -15,8 +15,9 @@ Ferramenta web para auxiliar o mestre na gestão de campanhas de D&D. Permite or
 | React Hook Form | 7 | formulários com validação — sempre com `zodResolver` |
 | Zod | 4 | schemas de validação em `src/schemas/` |
 | @hookform/resolvers | 5 | ponte entre RHF e Zod |
-| @xyflow/react | latest | grafo de relações entre NPCs (Conexões) |
-| @tanstack/react-query | 5 | cache de estado de servidor — usado para dados que vêm do backend (hoje: NPCs) |
+| @tanstack/react-query | 5 | cache de estado de servidor — usado para dados que vêm do backend (NPCs, personagens, iniciativa) |
+
+`@xyflow/react` está no `package.json` mas **não é importado em lugar nenhum de `src/`** — dependência morta, sobra do antigo grafo de relações entre NPCs (`NpcGraph`), removido junto com a migração de Conexões para `TreeView` (ver seção "Conexões" abaixo). Seguro remover com `npm remove @xyflow/react`.
 
 ## Linguagem
 
@@ -36,12 +37,12 @@ src/
 │
 ├── components/                             # Atomic Design
 │   ├── atoms/                              # Primitivos sem dependência de outros componentes
-│   │   ├── Button.tsx                      # Botão de texto: variantes primary e secondary
-│   │   ├── FactionBadge.tsx                # Badge colorido de facção usando FACTION_COLOR
+│   │   ├── Button.tsx                      # Botão de texto: variantes primary/secondary, size md/sm, prop fullWidth
+│   │   ├── CloseButton.tsx                 # Botão de fechar (X) padrão de modais/popups — prop tone (default/parchment), size
 │   │   ├── IconButton.tsx                  # Botão quadrado para ícones, com prop active
 │   │   ├── Input.tsx                       # Input de texto reutilizável — prop error troca borda para red-200
+│   │   ├── NpcStatusStamp.tsx              # "Carimbo" de status do NPC (dossiê) — ver seção "NPCs"
 │   │   ├── SelectArrow.tsx                 # Seta customizada para selects (appearance-none + SVG absoluto)
-│   │   ├── StatusDot.tsx                   # Bolinha colorida + label de status do NPC
 │   │   ├── TypeBadge.tsx                   # Badge PC / Monstro para combatentes
 │   │   └── icons/                          # SVGs como componentes — props: size, className, strokeWidth
 │   │       ├── ChevronLeftIcon.tsx
@@ -81,14 +82,12 @@ src/
 │   │   │   ├── ConditionBadge.tsx          # Badge âmbar de condição de combate (D&D 5e)
 │   │   │   ├── InitiativeBadge.tsx         # Badge de iniciativa editável inline (clique para editar)
 │   │   │   └── InitiativeEmpty.tsx         # Estado vazio da página de iniciativa
-│   │   ├── npc/
-│   │   │   ├── NpcCard.tsx                 # Card de NPC — compõe Image + Body + Actions
-│   │   │   ├── NpcCardActions.tsx          # Botões editar/deletar com estado de confirmação
-│   │   │   ├── NpcCardBody.tsx             # Nome, StatusDot, FactionBadge, descrição e notas
-│   │   │   ├── NpcCardImage.tsx            # Área de imagem com watermark de facção e overlay de morto
-│   │   │   ├── NpcContent.tsx              # Grid de cards agrupados por facção com section headers
-│   │   │   ├── NpcEmpty.tsx                # Estado vazio da página de NPCs — com ações
-│   │   │   └── NpcFilters.tsx              # Filtros de status e facção com SelectArrow e "Limpar filtros"
+│   │   ├── npc/                            # Dossiê de NPCs — ver seção "NPCs"
+│   │   │   ├── NpcContent.tsx              # Lista os NpcFactionChannel; estado vazio e "sem resultado" do filtro
+│   │   │   ├── NpcDossierControls.tsx      # Busca (nome/facção/ficha) + filtro de status + "Limpar"
+│   │   │   ├── NpcDossierRow.tsx           # Linha do dossiê — expande/recolhe pra ficha completa
+│   │   │   ├── NpcEmpty.tsx                # Estado vazio da página de NPCs — com ação
+│   │   │   └── NpcFactionChannel.tsx       # Agrupamento por facção com header, cor e contagem
 │   │   ├── search/
 │   │   │   ├── CharacterResult.tsx         # Linha de resultado de personagem na busca global — memoizado
 │   │   │   ├── NpcResult.tsx               # Linha de resultado de NPC na busca global — memoizado
@@ -98,17 +97,33 @@ src/
 │   │
 │   └── organisms/                          # Blocos complexos com estado ou múltiplas responsabilidades
 │       ├── character/
-│       │   ├── CharacterCard.tsx           # Card completo de personagem — HP, XP, notas, ações
+│       │   ├── CharacterCard.tsx           # Card de personagem — composição: retrato, ações, HP, XP, notas
+│       │   ├── CharacterCardActions.tsx    # Botões editar/remover do card — confirmação de exclusão própria
+│       │   ├── CharacterHpControls.tsx     # HP do card — número editável inline, barra, botões de delta
 │       │   ├── CharacterImagePicker.tsx    # Seletor de imagem para personagens — thumbnails LOCAL_ARTS + input de URL
 │       │   ├── CharacterModal.tsx          # Modal de criação/edição de personagem — usa useCharacterForm
 │       │   └── CharacterModalHeader.tsx    # Cabeçalho do CharacterModal com título e botão fechar
+│       ├── connections/                    # Árvore de hierarquia de facção (SVG) — ver seção "Conexões"
+│       │   ├── DownTree.tsx                # Árvore orientada pra baixo (ex.: Culto do Dragão) — raiz com visual próprio
+│       │   ├── NodeImage.tsx               # Imagem circular recortada (clipPath) dentro de um TreeNode
+│       │   ├── RightTree.tsx               # Árvore orientada pra direita (ex.: Harpers)
+│       │   ├── TreeChevron.tsx             # Seta de expandir/recolher de um TreeNode
+│       │   ├── TreeConnector.tsx           # Linha curva entre dois nós, colorida por status
+│       │   ├── TreeDescendants.tsx         # Render recursivo dos descendentes — compartilhado por RightTree/DownTree
+│       │   ├── TreeFilters.tsx             # Filtros SVG (glow, grayscale) compartilhados via <defs>
+│       │   ├── TreeNode.tsx                # Nó circular — imagem, nome, status, chevron de expandir
+│       │   ├── TreeView.tsx                # Componente de topo — canvas com pan/zoom, monta as árvores
+│       │   └── treeLayout.utils.ts         # computeLayout — offsets das árvores no canvas
 │       ├── encounter/
 │       │   ├── EncounterHistoryPanel.tsx   # Histórico de snapshots de combate — envio de XP por encontro ou em lote
 │       │   ├── EncounterMonstersPanel.tsx  # Painel de monstros do encontro — nome, CR, quantidade
 │       │   ├── EncounterPartyPanel.tsx     # Painel de membros do grupo — nome e nível, importação de personagens
 │       │   └── EncounterResultPanel.tsx    # Resultado do encontro — dificuldade, XP total, XP por jogador
 │       ├── initiative/
-│       │   ├── CombatantRow.tsx            # Card de combatente — status, HP, condições, ajustes
+│       │   ├── CombatantConditions.tsx     # Badges de condições ativas + botão que abre o ConditionModal — autocontido
+│       │   ├── CombatantHpControls.tsx     # HP do combatente — label/barra + editor (CombatantHpEditor) ou botões de delta
+│       │   ├── CombatantHpEditor.tsx       # Formulário de edição de HP atual/máximo (usado por CombatantHpControls)
+│       │   ├── CombatantRow.tsx            # Card de combatente — só composição: imagem, iniciativa, ações, delega HP/condições/imagem
 │       │   ├── ConditionModal.tsx          # Modal de seleção de condições D&D 5e — grid de 15 condições em PT
 │       │   └── InitiativeAddForm.tsx       # Formulário de adição de combatente — usa useInitiativeAddForm
 │       ├── map/
@@ -116,17 +131,12 @@ src/
 │       │   ├── MapSvgOverlay.tsx           # Overlay SVG do mapa — linhas de régua
 │       │   └── MapToolbar.tsx              # Toolbar do mapa — ferramentas de interação
 │       ├── npc/
-│       │   ├── AddRelationModal.tsx        # Modal para criar conexão entre dois NPCs — usa useAddRelationForm
-│       │   ├── NpcGraph.tsx                # Canvas de grafo de relações — @xyflow/react; ver seção "NPCs e Conexões"
 │       │   ├── NpcImagePicker.tsx          # Seletor de imagem para NPCs — thumbnails LOCAL_ARTS + input de URL
 │       │   ├── NpcImagePositionPicker.tsx  # Seletor de posição da imagem do NPC (top/center/bottom)
 │       │   ├── NpcModal.tsx                # Modal de criação/edição de NPC — usa useNpcForm
-│       │   ├── NpcModalHeader.tsx          # Cabeçalho do NpcModal com título (isEditing) e botão fechar
-│       │   ├── NpcNode.tsx                 # Nó customizado do grafo de NPCs (@xyflow/react)
-│       │   ├── NpcRelationLegend.tsx       # Legenda de cores dos tipos de relação (rodapé do grafo)
-│       │   ├── NpcRelationPanel.tsx        # Painel de conexões com botão deletar (canto superior direito do grafo)
-│       │   └── npcGraph.utils.ts           # Utilitários de layout do grafo (posicionamento de nós)
-│       ├── AuthGuard.tsx                   # Guarda de autenticação — redireciona para /login se não autenticado
+│       │   └── NpcModalHeader.tsx          # Cabeçalho do NpcModal com título (isEditing) e botão fechar
+│       ├── AppLayout.tsx                   # Layout da aplicação — Sidebar + <Outlet/>, sem lógica de autenticação
+│       ├── AuthGuard.tsx                   # Guarda de autenticação — só valida sessão e redireciona para /login; não monta layout
 │       ├── Lightbox.tsx                    # Modal de imagem expandida — navegação por clique e teclado (←→ Esc)
 │       └── Sidebar.tsx                     # Navegação lateral colapsável — logo, /search, rotas e logout
 │
@@ -144,9 +154,9 @@ src/
 │   └── AuthContext.tsx                     # Autenticação — user (role: dm | guest), login, logout
 │
 ├── hooks/
-│   ├── useAddRelationForm.ts               # Lógica de formulário do AddRelationModal — RHF + Zod
 │   ├── useCharacterForm.ts                 # Lógica de formulário do CharacterModal — RHF + Zod
 │   ├── useCharacters.ts                    # CRUD de personagens via `backendApi` (`/api/characters`) — async, sem localStorage
+│   ├── useCombatantImagePicker.ts          # Estado do input inline de URL de imagem do CombatantRow (abrir/valor/confirmar)
 │   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
 │   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
 │   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
@@ -154,17 +164,19 @@ src/
 │   ├── useInitiative.ts                    # Estado da iniciativa via backend (`/api/initiative`, React Query) + cache local; ver docs/iniciativa-realtime.md
 │   ├── useInitiativeStream.ts              # Assina o SSE `/api/initiative/stream` e empurra o estado no cache do React Query
 │   ├── useInitiativeAddForm.ts             # Lógica de formulário do InitiativeAddForm — RHF + Zod
+│   ├── useLocalStorageState.ts             # useState + localStorage genérico — ver seção "Persistência local"
+│   ├── useMapImage.ts                      # Carregamento/tamanho da imagem do mapa + centralização inicial da view
 │   ├── useMapInteraction.ts                # Hook de interação com o mapa (pan, zoom, drag)
 │   ├── useMapRuler.ts                      # Hook de régua do mapa — calibração e medição em milhas
 │   ├── useNpcForm.ts                       # Lógica de formulário do NpcModal — RHF + Zod
-│   ├── useNpcRelations.ts                  # CRUD de relações entre NPCs + localStorage `dndkeeper_npc_relations`
 │   ├── useNpcs.ts                          # CRUD de NPCs via `backendApi` (`/api/npcs`) — async, sem localStorage
-│   └── useSearchInput.ts                   # Estado do input de busca com debounce (300ms) via useRef — sem useEffect
+│   ├── useSearchInput.ts                   # Estado do input de busca com debounce (300ms) via useRef — sem useEffect
+│   └── useTreeExpansion.ts                 # expandedIds/mountedIds/toggleExpanded — compartilhado por RightTree e DownTree (Conexões)
 │
 ├── pages/
 │   ├── Arts.tsx                            # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
 │   ├── Characters.tsx                      # Gestão de personagens — HP, XP, modal de criação/edição
-│   ├── Connections.tsx                     # Grafo de conexões entre NPCs — @xyflow/react
+│   ├── Connections.tsx                     # Árvore de hierarquia de facção — TreeView + FACTION_TREES (SVG próprio)
 │   ├── Encounter.tsx                       # Calculadora de XP de encontro — party, monstros, resultado e histórico
 │   ├── Initiative.tsx                      # Controle de turnos de combate — lista ordenada por iniciativa
 │   ├── Login.tsx                           # Tela de login
@@ -179,8 +191,7 @@ src/
 │   ├── auth.ts                             # authFormSchema — validação do formulário de login
 │   ├── character.ts                        # characterFormSchema — validação do formulário de personagem
 │   ├── initiative.ts                       # combatantFormSchema — validação do formulário de combatente
-│   ├── npc.schema.ts                       # npcFormSchema — usa z.enum(FACTIONS as [Faction, ...Faction[]]) para preservar literal union
-│   └── npcRelation.schema.ts               # npcRelationFormSchema — tipo e label da conexão
+│   └── npc.schema.ts                       # npcFormSchema — usa z.enum(FACTIONS as [Faction, ...Faction[]]) para preservar literal union
 │
 ├── services/
 │   ├── api.ts                              # Instância base do Axios (baseURL + API key global)
@@ -197,7 +208,6 @@ src/
 │   ├── image.ts                            # DriveImage { id, name, url, fullUrl }
 │   ├── initiative.ts                       # Combatant { ..., imageUrl?, conditions? }, CombatantStatus
 │   ├── npc.types.ts                        # Npc { id, name, faction, status, description, notes, imageUrl? }, Faction, NpcStatus
-│   ├── npcRelation.types.ts                # NpcRelation { id, sourceId, targetId, type, label? }
 │   ├── randomTables.ts                     # RollEntry { result, key }
 │   └── route.types.ts                      # AppRoute { id, path, label, element, icon, dmOnly? }
 │
@@ -205,6 +215,7 @@ src/
 │   ├── character.ts                        # resolveHpBarColor(percentage) — cor dinâmica da barra de HP
 │   ├── encounter.ts                        # calculateEncounter(party, monsters) → EncounterResult; spawnParticles(count) → Particle[]
 │   ├── image.ts                            # Utilitários de imagem
+│   ├── mapLocations.ts                     # findLocationAt(coords, locations) — hit-test de localizações do mapa
 │   ├── number.ts                           # clampNumber, formatNumber
 │   └── random.ts                           # pickRandom<T>(entries) — sorteia um item de qualquer array
 │
@@ -252,7 +263,7 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 
 - Todos os formulários usam **React Hook Form** com **`zodResolver`**
 - Schemas ficam em `src/schemas/` — um arquivo por domínio
-- Lógica de formulário extraída em hooks próprios: `useCharacterForm`, `useNpcForm`, `useInitiativeAddForm`, `useAddRelationForm`
+- Lógica de formulário extraída em hooks próprios: `useCharacterForm`, `useNpcForm`, `useInitiativeAddForm`
 - Tipos de input/output são exportados via `z.input<>` e `z.output<>` do próprio schema
 - Para campos numéricos, usar `z.union([z.string(), z.number()]).transform(...).pipe(z.number())` para evitar o tipo `unknown` que `z.coerce` gera no zod v4
 - Para enums derivados de arrays de constantes, usar `z.enum(ARRAY as [Literal, ...Literal[]])` para preservar o union literal — nunca `as [string, ...string[]]` que descarta os tipos
@@ -260,12 +271,12 @@ Toda nova variável `VITE_*` deve ser declarada também em `src/vite-env.d.ts` d
 
 ## Persistência local
 
-- `useEncounterHistory` — persiste em `localStorage` com chave `dndkeeper_encounter_history`
-- `useNpcRelations` — persiste em `localStorage` com chave `dndkeeper_npc_relations`
-- Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())`
+- `hooks/useLocalStorageState.ts` — `useState` + `localStorage` genérico: `[value, setValue] = useLocalStorageState(key, initial, { serialize?, deserialize? })`. `setValue` aceita valor ou updater (igual `useState`) e já persiste sozinho. Default `JSON.stringify`/`JSON.parse`; passar `serialize`/`deserialize` custom quando não for JSON (ex.: `useMapRuler` guarda a calibração como número cru, não JSON)
+  - Usado por `useEncounterHistory` (`dndkeeper_encounter_history`), `useMapRuler` (calibração, `dndkeeper_map_calibration`) e `useMapDrawing` (`paths`, `dndkeeper_map_drawings`)
+- Hooks não fazem auto-fetch com `useEffect` — estado é carregado na inicialização via `useState(() => load())` (ou via `useLocalStorageState` acima)
 - **Exceção**: `useNpcs`, `useCharacters` e `useInitiative` não usam só `localStorage` — o dado vem do backend via **React Query** (`@tanstack/react-query`)
   - `useInitiative` sincroniza com `backendApi` (`/api/initiative`) e mantém `localStorage` (`dndkeeper_initiative_v2`) só como cache de carga fria / fallback offline — ver **`docs/iniciativa-realtime.md`**
-  - ver também seções "NPCs e Conexões" e "Personagens"
+  - ver também seções "NPCs" e "Personagens"
 
 ## Paleta de cores
 
@@ -307,7 +318,7 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 | `/artes` | Arts | todos — **path não renomear** (configurado na API do Drive) |
 | `/npcs` | Npcs | todos |
 | `/mapa` | Map | todos |
-| `/arvore` | Connections | todos |
+| `/conexoes` | Connections | todos |
 | `/personagens` | Characters | mestre |
 | `/iniciativa` | Initiative | mestre |
 | `/encontro` | Encounter | mestre |
@@ -323,8 +334,8 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 ## Busca Global
 
 - Rota `/search?q=` — pesquisa NPCs e personagens por nome, facção, descrição e notas
-- `useSearchInput` — gerencia `inputValue` + debounce de 300ms via `useRef`/`setTimeout` no handler; **não usa `useEffect`**
-- `useGlobalSearch(query)` — filtra com `useMemo`; `total` calculado dentro do mesmo memo
+- `useSearchInput` — `inputValue` (local, digitação sempre instantânea) + `query = useDeferredValue(inputValue)`; a URL é escrita a cada tecla (`setSearchParams(..., { replace: true })`), sem debounce manual — o `useDeferredValue` é quem evita que o filtro caro trave a digitação, não um timer
+- `useGlobalSearch(query)` — recebe o `query` já deferido; filtra com `useMemo`, `total` calculado dentro do mesmo memo
 - Personagens visíveis apenas para role `dm`; guests veem só NPCs
 - `NpcResult` e `CharacterResult` são `memo()` — evitam re-render quando props não mudam
 - `setSearchParams(..., { replace: true })` — evita poluição do histórico ao digitar
@@ -408,9 +419,10 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
   - `imageUrl` é opcional (`Character.imageUrl?: string`), igual ao `Npc`
 - Importação de personagens em `/iniciativa` (`handleImportCharacters`) e `/encontro` (`importFromCharacters`) lê os dados de `useCharacters().data`, sem mudanças de padrão
 
-## NPCs e Conexões
+## NPCs
 
-- `/npcs` — CRUD de NPCs com filtros por status e facção; cards **agrupados por facção** em seções com header
+- `/npcs` — CRUD de NPCs estilo "dossiê": busca (nome/facção/ficha) + filtro de status, linhas **agrupadas por facção** que expandem pra ficha completa (`NpcDossierRow`), status como "carimbo" (`NpcStatusStamp`)
+  - A busca fica na URL (`?q=`) sem debounce manual; o filtro (`useMemo`) usa `useDeferredValue(query)` — o input do `NpcDossierControls` continua ligado ao `query` imediato (nunca trava), só o recálculo da lista é que fica de baixa prioridade
 - NPCs são persistidos no **backend** (`rpg-system_backend`, Express + Prisma/Postgres) via **React Query**, não em `localStorage`
   - `GET /api/npcs` é público; `POST`/`PATCH`/`DELETE` exigem sessão de DM (cookie `rpg_session`, `withCredentials: true` no `backendApi`)
   - `QueryClientProvider` fica no `main.tsx`, por fora do `BrowserRouter`/`AuthProvider`; `QueryClient` configurado com `retry: 1` nas queries
@@ -419,15 +431,34 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
   - Componentes chamam `mutation.mutateAsync(...)` e tratam erro com `try/catch` — RHF/`useNpcForm` usa o `catch` para mapear erros `400` do backend (`{ error, details: { campo: [mensagem] } }`) em `setError` por campo; erro genérico (rede, 401/403/404) vira `saveError` exibido no modal
   - Não existe endpoint de "resetar pro seed" — a feature de reset foi removida (`NpcSeedReset`/`npcSeed.ts` não existem mais)
   - `Npc` ganhou `createdAt`/`updatedAt` (ISO date), preenchidos pelo backend — nunca enviar no payload de criação/edição
-- `/arvore` — grafo de relações entre NPCs usando `@xyflow/react` (`NpcGraph`)
 - **Facções** (6): Zhentarim, Culto do Dragão, Irmandade Carmesim, Harpers, Confraria da Lâmina Velada, Independente — definidas em `FACTIONS` (`constants/npc.constants.ts`)
-- **Relações bidirecionais**: `addRelation` cria dois registros (A→B e B→A); `deleteRelation` remove os dois — o grafo deduplica via `seen` set antes de criar as edges
-- **NpcGraph — armadilhas do @xyflow/react**:
-  - Nodes customizados precisam de handles `type="source"` **e** `type="target"` com IDs únicos; sem handles `target`, nenhuma edge programática é renderizada
-  - `useNodesState`/`useEdgesState` só usam o valor inicial — mudanças de prop precisam de `useEffect` com `setNodes`/`setEdges`
-  - O container do ReactFlow precisa de altura explícita; `flex-1` sozinho colapsa — usar `style={{ minHeight: 0 }}`
-  - Edge type `smoothstep` roteia pelo par de handles mais próximo automaticamente
-- **Select customizado**: usar `appearance-none` no `<select>` + `<SelectArrow />` posicionado absolutamente — nunca confiar na seta nativa do browser; aplicar também em filtros de página (ex: `NpcFilters`)
+- **Select customizado**: usar `appearance-none` no `<select>` + `<SelectArrow />` posicionado absolutamente — nunca confiar na seta nativa do browser; aplicar também em filtros de página (ex: `NpcDossierControls`)
+
+## Conexões
+
+- `/conexoes` — árvore de hierarquia das facções em SVG. **Não é mais** um grafo de relações entre NPCs — essa feature (`NpcGraph`, `@xyflow/react`, `useNpcRelations`, `AddRelationModal`) foi removida por completo; `@xyflow/react` continua no `package.json` mas não é importado em lugar nenhum
+- `pages/Connections.tsx` monta `<TreeView trees={FACTION_TREES} />`; `FACTION_TREES` (`constants/connections.constants.ts`) lista a árvore de cada facção, com dados fixos em `constants/cult.ts` (tipos `HierarchyTree`/`HierarchyNode`), `constants/harpers.ts`, `constants/zhentarim.ts`
+- Cada árvore declara `direction: 'right' | 'down'` — `TreeView` separa em `rightTrees`/`downTrees` e usa `treeLayout.utils.ts#computeLayout` pra calcular os offsets das árvores no canvas compartilhado (`useCanvasInteraction` cuida do pan/zoom)
+- **`components/organisms/connections/`**:
+  - `RightTree.tsx` / `DownTree.tsx` — só as constantes de geometria da própria árvore (raios, espaçamentos) e o bloco da **raiz**, que cada uma desenha do seu próprio jeito (o `DownTree` do Culto tem um "?" com glow pro mestre ainda não revelado — não passa por `TreeNode`, é conteúdo específico daquela árvore)
+  - `TreeDescendants.tsx` — render **recursivo** dos descendentes (conector + nó + próxima profundidade), compartilhado pelas duas orientações. Raio, espaçamento e se o nível é clicável vêm de um array `TreeLevelStyle[]` passado por cada árvore — não é código repetido por nível
+  - `treeGeometry.ts#getSpreadPosition` — posição de um nó no eixo de espalhamento, centralizada no pai; mesma fórmula em qualquer profundidade/orientação
+  - `hooks/useTreeExpansion.ts` — `expandedIds`/`mountedIds`/`toggleExpanded`, compartilhado pelas duas árvores
+  - `TreeNode.tsx` / `TreeConnector.tsx` / `NodeImage.tsx` / `TreeChevron.tsx` / `TreeFilters.tsx` — peças visuais de um nó/conector
+- **Profundidade de interação é assimétrica por design, não limitação técnica**: em `RightTree` (ex.: Harpers) dá pra expandir manualmente até o 2º nível (filho e neto); em `DownTree` (ex.: Culto) só o 1º nível (filho) é clicável — os níveis mais fundos sempre aparecem em cascata automática quando o ancestral clicável expande. Configurado por `clickable: false` no `TreeLevelStyle[]` de cada árvore
+- Detalhes da refatoração que unificou `RightTree`/`DownTree` em `docs/auditoria-hooks-arquitetura.md` (§4.1)
+
+## Testes
+
+- **Vitest** (não Jest) — compartilha o pipeline de transformação do Vite, sem config duplicada
+- `npm test` roda a suíte uma vez (`vitest run`); `npm run test:watch` fica observando
+- Config em `vitest.config.ts` (`environment: 'jsdom'`, `setupFiles: './vitest.setup.ts'`) — **`test.globals` não está ativado**, então todo teste importa `describe`/`it`/`expect`/`vi` explicitamente de `'vitest'`
+- `vitest.setup.ts` registra `@testing-library/jest-dom/vitest` (matchers) e um `afterEach(cleanup)` do `@testing-library/react` — **sem esse `cleanup()` explícito, renders de testes anteriores no mesmo arquivo continuam no DOM** (já que `globals` está desligado, o auto-cleanup do RTL não se registra sozinho) e quebram `getByText` com `getMultipleElementsFoundError` em arquivos com vários `it()` que renderizam os mesmos rótulos
+- Arquivos de teste ficam **colocados** ao lado do arquivo testado: `foo.ts` → `foo.test.ts` (ou `.test.tsx` quando o teste usa JSX, ex.: um wrapper `MemoryRouter`)
+- Camadas cobertas hoje: utils puros (`src/utils/*.test.ts`), hooks via `renderHook` (`src/hooks/*.test.ts(x)`) e componentes via `render`/`fireEvent` (`src/components/**/*.test.tsx`)
+- Para datas/horários, usar `vi.useFakeTimers()` + `vi.setSystemTime(...)` em vez de mockar `Date` na mão
+- Para simular falha de `localStorage` (quota excedida, modo privado), usar `vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw ... })`
+- SVG: atributos de apresentação como `visibility="hidden"` não são entendidos por `toBeVisible()` do jest-dom da mesma forma que CSS — testes de árvore (`TreeDescendants.test.tsx`) sobem a cadeia de `parentElement` checando o atributo manualmente
 
 ## Convenções
 
@@ -439,5 +470,8 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - **Serviços REST** usam instância do Axios de `services/api.ts`, nunca `fetch` direto
 - **Hooks** não fazem auto-fetch com `useEffect` — expõem funções de trigger explícitas ou carregam estado na inicialização
 - **Lógica de formulário** extraída em hooks (`useXxxForm`) — componentes de modal só contêm UI
+- **Botão de fechar (X) de modal/popup**: usar `<CloseButton onClick={onClose} />` (atom), não recriar `<button><XIcon/></button>` na mão — `size`/`tone="parchment"` cobrem os casos que fogem do padrão (ícone maior, tema de carta)
 - **Nomes de arquivo em inglês** — todos os arquivos novos em inglês; paths de rota não renomear (podem estar configurados em serviços externos)
 - **Fragments**: usar `<>` em vez de `<Fragment>` salvo quando precisar de `key`
+- **Ao finalizar qualquer tarefa** (feature, refactor, fix): rodar `npx tsc --noEmit`, `npm run lint` e `npm test` (suíte inteira) antes de dar por concluído — nunca só o arquivo/teste tocado isoladamente, pra pegar regressão em qualquer outro ponto do app
+  - `npx tsc --noEmit` é o único dos três que pega erro de **tipo** (ex.: matcher do jest-dom não reconhecido, prop com tipo errado) — `vite build` não faz checagem completa de tipos (só transpila) e `eslint`/`vitest` não substituem isso

@@ -47,10 +47,10 @@ export function useUpdateNpc() {
   })
 }
 
-export function useDeleteNpc() {
+export function useNpcDelete() {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const deleteNpc = useMutation({
     mutationFn: async (id: string) => {
       await backendApi.delete(`/api/npcs/${id}`)
       return id
@@ -59,4 +59,9 @@ export function useDeleteNpc() {
       queryClient.setQueryData<Npc[]>(npcKeys.all, (prev) => prev?.filter((npc) => npc.id !== id))
     },
   })
+
+  return {
+    error: deleteNpc.isError ? 'Não foi possível remover a ficha.' : null,
+    handleDelete: deleteNpc.mutate,
+  }
 }

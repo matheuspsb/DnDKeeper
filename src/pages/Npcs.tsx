@@ -1,9 +1,7 @@
-import { useState, useMemo, useCallback, useDeferredValue } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import type { Npc } from '../types/npc.types'
-import type { NpcStatus } from '../types/npc.types'
-import { useAddNpc, useDeleteNpc, useNpcs, useUpdateNpc } from '../hooks/useNpcs'
-import { FACTIONS } from '../constants/npc.constants'
+import { useNpcDelete, useNpcs } from '../hooks/useNpcs'
+import { useNpcFilters } from '../hooks/useNpcFilters'
+import { useNpcModal } from '../hooks/useNpcModal'
+import { useNpcLightbox } from '../hooks/useNpcLightbox'
 import { resolveImageUrl } from '../constants/arts'
 import NpcContent from '../components/molecules/npc/NpcContent'
 import NpcDossierControls from '../components/molecules/npc/NpcDossierControls'
@@ -13,99 +11,17 @@ import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'
 import { useAuth } from '../contexts/AuthContext'
 
-type StatusFilter = NpcStatus | 'todos'
-
-function matches(npc: Npc, term: string) {
-  const haystack = [npc.name, npc.faction, npc.description, npc.notes].join(' ').toLowerCase()
-  return haystack.includes(term)
-}
-
 function Npcs() {
   const { user } = useAuth()
   const canEdit = user?.role === 'dm'
   const { data: npcs = [], isLoading, isError } = useNpcs()
-  const addNpc = useAddNpc()
-  const updateNpc = useUpdateNpc()
-  const deleteNpc = useDeleteNpc()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { error: deleteError, handleDelete } = useNpcDelete()
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editingNpc, setEditingNpc] = useState<Npc | null>(null)
-  const [lightboxNpc, setLightboxNpc] = useState<Npc | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const npcFilters = useNpcFilters(npcs)
+  const npcModal = useNpcModal()
+  const lightbox = useNpcLightbox(npcFilters.filtered)
 
-  const query = searchParams.get('q') ?? ''
-  const deferredQuery = useDeferredValue(query)
-  const statusFilter = (searchParams.get('status') ?? 'todos') as StatusFilter
-
-  function setParam(key: 'status' | 'q', value: string, emptyValue: string) {
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev)
-        value === emptyValue ? next.delete(key) : next.set(key, value)
-        return next
-      },
-      { replace: true },
-    )
-  }
-
-  const filtered = useMemo(() => {
-    const term = deferredQuery.trim().toLowerCase()
-    return npcs.filter((npc) => {
-      if (statusFilter !== 'todos' && npc.status !== statusFilter) return false
-      if (term && !matches(npc, term)) return false
-      return true
-    })
-  }, [npcs, statusFilter, deferredQuery])
-
-  const groupedByFaction = useMemo(() => {
-    return FACTIONS.map((faction) => ({
-      faction,
-      npcs: filtered.filter((npc) => npc.faction === faction),
-    })).filter(({ npcs }) => npcs.length > 0)
-  }, [filtered])
-
-  const npcsWithImage = useMemo(() => filtered.filter((n) => n.imageUrl), [filtered])
-
-  const hasActiveFilters = query.trim() !== '' || statusFilter !== 'todos'
-
-  const openAdd = useCallback(() => {
-    setEditingNpc(null)
-    setModalOpen(true)
-  }, [])
-
-  const openEdit = useCallback((npc: Npc) => {
-    setEditingNpc(npc)
-    setModalOpen(true)
-  }, [])
-
-  async function handleSave(data: Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>) {
-    if (editingNpc) {
-      await updateNpc.mutateAsync({ id: editingNpc.id, data })
-    } else {
-      await addNpc.mutateAsync(data)
-    }
-    setModalOpen(false)
-  }
-
-  const handleDelete = useCallback(
-    async (id: string) => {
-      setDeleteError(null)
-      try {
-        await deleteNpc.mutateAsync(id)
-      } catch {
-        setDeleteError('Não foi possível remover a ficha.')
-      }
-    },
-    [deleteNpc],
-  )
-
-  const factionCount = groupedByFaction.length
-  const meta = isLoading
-    ? 'carregando o arquivo…'
-    : `${npcs.length} ${npcs.length === 1 ? 'ficha' : 'fichas'} · ${factionCount} ${
-        factionCount === 1 ? 'facção' : 'facções'
-      }${filtered.length !== npcs.length ? ` · ${filtered.length} em exibição` : ''}`
+  const meta = isLoading ? 'carregando o arquivo…' : npcFilters.meta
 
   return (
     <div className="flex h-full flex-col bg-ink-950">
@@ -119,7 +35,7 @@ function Npcs() {
             <p className="mt-1.5 font-mono text-[13px] text-bone-300">{meta}</p>
           </div>
           {canEdit && (
-            <Button variant="primary" onClick={openAdd} className="flex items-center gap-2">
+            <Button variant="primary" onClick={npcModal.openAdd} className="flex items-center gap-2">
               <PlusIcon size={16} />
               Nova ficha
             </Button>
@@ -128,65 +44,67 @@ function Npcs() {
 
         {npcs.length > 0 && (
           <NpcDossierControls
-            query={query}
-            statusFilter={statusFilter}
-            hasActiveFilters={hasActiveFilters}
-            onQueryChange={(v) => setParam('q', v, '')}
-            onStatusChange={(v) => setParam('status', v, 'todos')}
-            onClear={() => setSearchParams(new URLSearchParams(), { replace: true })}
+            query={npcFilters.query}
+            statusFilter={npcFilters.statusFilter}
+            hasActiveFilters={npcFilters.hasActiveFilters}
+            onQueryChange={npcFilters.setQuery}
+            onStatusChange={npcFilters.setStatusFilter}
+            onClear={npcFilters.clearFilters}
           />
         )}
       </div>
 
       <div className="flex-1 overflow-x-hidden overflow-y-auto px-8 pt-1 pb-10">
-        {isLoading ? (
+        {isLoading && (
           <div className="flex items-center justify-center py-24">
             <p className="font-mono text-[14px] text-bone-300">abrindo o arquivo…</p>
           </div>
-        ) : isError ? (
+        )}
+
+        {isError && (
           <div className="flex items-center justify-center py-24">
             <p className="font-mono text-[14px] text-wax">o arquivo não pôde ser aberto.</p>
           </div>
-        ) : (
+        )}
+
+        {!isLoading && !isError && (
           <>
             {deleteError && <p className="mb-4 font-mono text-[13px] text-wax">{deleteError}</p>}
             <NpcContent
               npcs={npcs}
-              grouped={groupedByFaction}
+              grouped={npcFilters.groupedByFaction}
               canEdit={canEdit}
-              onAdd={openAdd}
-              onEdit={openEdit}
+              onAdd={npcModal.openAdd}
+              onEdit={npcModal.openEdit}
               onDelete={handleDelete}
-              onImageClick={setLightboxNpc}
+              onImageClick={lightbox.open}
             />
           </>
         )}
       </div>
 
-      {modalOpen && (
-        <NpcModal initialNpc={editingNpc} onSave={handleSave} onClose={() => setModalOpen(false)} />
+      {npcModal.isOpen && (
+        <NpcModal
+          initialNpc={npcModal.editingNpc}
+          onSave={npcModal.handleSave}
+          onClose={npcModal.close}
+        />
       )}
 
-      {lightboxNpc?.imageUrl &&
-        (() => {
-          const idx = npcsWithImage.findIndex((n) => n.id === lightboxNpc.id)
-          return (
-            <Lightbox
-              image={{
-                id: lightboxNpc.id,
-                name: lightboxNpc.name,
-                url: resolveImageUrl(lightboxNpc.imageUrl),
-                fullUrl: resolveImageUrl(lightboxNpc.imageUrl),
-                category: 'npcs',
-              }}
-              onClose={() => setLightboxNpc(null)}
-              onPrev={idx > 0 ? () => setLightboxNpc(npcsWithImage[idx - 1]) : null}
-              onNext={
-                idx < npcsWithImage.length - 1 ? () => setLightboxNpc(npcsWithImage[idx + 1]) : null
-              }
-            />
-          )
-        })()}
+      {lightbox.activeNpc?.imageUrl && (
+        <Lightbox
+          image={{
+            id: lightbox.activeNpc.id,
+            name: lightbox.activeNpc.name,
+            url: resolveImageUrl(lightbox.activeNpc.imageUrl),
+            fullUrl: resolveImageUrl(lightbox.activeNpc.imageUrl),
+            category: 'npcs',
+          }}
+          onClose={lightbox.close}
+          onPrev={lightbox.hasPrev ? lightbox.goPrev : null}
+          onNext={lightbox.hasNext ? lightbox.goNext : null}
+        />
+      )}
     </div>
   )
 }
