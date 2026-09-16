@@ -3,7 +3,7 @@ import { useLetterForm } from '../../../hooks/useLetterForm'
 import { labelClass } from '../../../styles/form'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
-import XIcon from '../../atoms/icons/XIcon'
+import CloseButton from '../../atoms/CloseButton'
 
 interface LetterModalProps {
   initialLetter: Letter | null
@@ -25,9 +25,7 @@ function LetterModal({ initialLetter, onSave, onClose }: LetterModalProps) {
           <h2 className="text-white-100 font-semibold text-lg">
             {initialLetter ? 'Editar Carta' : 'Nova Carta'}
           </h2>
-          <button onClick={onClose} className="text-white-300 hover:text-white-100 transition-colors">
-            <XIcon size={20} />
-          </button>
+          <CloseButton onClick={onClose} />
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">

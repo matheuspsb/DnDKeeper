@@ -1,5 +1,5 @@
 import type { MapLocation } from '../../../types/mapLocation'
-import XIcon from '../../atoms/icons/XIcon'
+import CloseButton from '../../atoms/CloseButton'
 
 type Props = {
   location: MapLocation
@@ -28,12 +28,7 @@ export default function MapLocationPopup({ location, screenX, screenY, onClose }
         <div className="p-3">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3 className="text-white-100 font-bold text-sm leading-tight">{location.name}</h3>
-            <button
-              onClick={onClose}
-              className="text-white-300 hover:text-white-100 transition-colors shrink-0 mt-0.5 cursor-pointer"
-            >
-              <XIcon size={14} />
-            </button>
+            <CloseButton onClick={onClose} size={14} className="shrink-0 mt-0.5" />
           </div>
 
           {location.description && (

@@ -1,9 +1,11 @@
 import type { ButtonHTMLAttributes } from 'react'
 
 type ButtonVariant = 'primary' | 'secondary'
+type ButtonSize = 'md' | 'sm'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
+  size?: ButtonSize
   fullWidth?: boolean
 }
 
@@ -22,23 +24,28 @@ const variants: Record<ButtonVariant, string> = {
   `,
 }
 
+const sizes: Record<ButtonSize, string> = {
+  md: 'h-[42px] px-6 py-2 rounded-full text-sm',
+  sm: 'h-10 px-4 py-2 rounded-lg text-sm',
+}
+
 const base = `
   inline-flex items-center justify-center
-  h-[42px] px-6 py-2
-  rounded-full font-medium text-sm
+  font-medium
   transition-all cursor-pointer
 `
 
 function Button({
   children,
   variant = 'primary',
+  size = 'md',
   fullWidth = false,
   className = '',
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`${base} ${fullWidth ? 'w-full' : ''} ${variants[variant]} ${className}`}
+      className={`${base} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${variants[variant]} ${className}`}
       {...props}
     >
       {children}

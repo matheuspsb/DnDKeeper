@@ -4,7 +4,7 @@ import { stripImageFlags } from '../../utils/image'
 import ChevronLeftIcon from '../atoms/icons/ChevronLeftIcon'
 import ChevronRightIcon from '../atoms/icons/ChevronRightIcon'
 import MonitorIcon from '../atoms/icons/MonitorIcon'
-import XIcon from '../atoms/icons/XIcon'
+import CloseButton from '../atoms/CloseButton'
 
 interface LightboxProps {
   image: DriveImage
@@ -49,13 +49,7 @@ function Lightbox({ image, onClose, onPrev, onNext, onCast, isCast = false }: Li
             {isCast ? 'Na mesa' : 'Exibir na mesa'}
           </button>
         )}
-        <button
-          onClick={onClose}
-          className="text-white-300 hover:text-white-100 transition-colors"
-          aria-label="Fechar"
-        >
-          <XIcon size={28} />
-        </button>
+        <CloseButton onClick={onClose} size={28} />
       </div>
 
       {onPrev && (

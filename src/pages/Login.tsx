@@ -7,6 +7,7 @@ import { dmLoginSchema, guestSchema } from '../schemas/auth'
 import type { DmLoginInput, GuestInput } from '../schemas/auth'
 import logo from '../assets/logo.png'
 import Input from '../components/atoms/Input'
+import Button from '../components/atoms/Button'
 
 function Login() {
   const { user, isLoading, dmLogin, guestLogin } = useAuth()
@@ -86,13 +87,16 @@ function Login() {
 
             {dmError && <p className="text-red-100 text-xs text-center">{dmError}</p>}
 
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="sm"
+              fullWidth
               disabled={dmForm.formState.isSubmitting}
-              className="w-full h-10 rounded-lg bg-linear-to-b from-btn-from to-btn-to border border-btn-border text-white-100 text-sm font-semibold transition-opacity disabled:opacity-50"
+              className="font-semibold disabled:opacity-50"
             >
               {dmForm.formState.isSubmitting ? 'Entrando…' : 'Entrar como Mestre'}
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -119,13 +123,16 @@ function Login() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
+            variant="secondary"
+            size="sm"
+            fullWidth
             disabled={guestForm.formState.isSubmitting}
-            className="w-full h-10 rounded-lg border border-btn-secondary-border text-btn-secondary-text text-sm font-semibold transition-opacity disabled:opacity-50 hover:bg-red-100/10"
+            className="font-semibold disabled:opacity-50"
           >
             {guestForm.formState.isSubmitting ? 'Entrando…' : 'Entrar como Convidado'}
-          </button>
+          </Button>
         </form>
 
         {/* Painel da mesa */}

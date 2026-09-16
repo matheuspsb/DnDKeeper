@@ -1,5 +1,5 @@
 import type { Letter } from '../../../types/letter'
-import XIcon from '../../atoms/icons/XIcon'
+import CloseButton from '../../atoms/CloseButton'
 
 interface LetterViewModalProps {
   letter: Letter
@@ -26,12 +26,7 @@ function LetterViewModal({ letter, onClose }: LetterViewModalProps) {
                 Encontrada em: {letter.foundAt}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="shrink-0 text-[#3d1e06] hover:text-black transition-colors mt-0.5"
-            >
-              <XIcon size={20} />
-            </button>
+            <CloseButton onClick={onClose} tone="parchment" className="shrink-0 mt-0.5" />
           </div>
           <div className="px-7 py-6 flex flex-col gap-3">
             {letter.writtenAt && (

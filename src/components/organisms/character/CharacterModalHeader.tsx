@@ -1,4 +1,4 @@
-import XIcon from '../../atoms/icons/XIcon'
+import CloseButton from '../../atoms/CloseButton'
 
 interface CharacterModalHeaderProps {
   isEditing: boolean
@@ -11,13 +11,7 @@ function CharacterModalHeader({ isEditing, onClose }: CharacterModalHeaderProps)
       <h2 className="text-white-100 font-bold text-lg">
         {isEditing ? 'Editar Personagem' : 'Novo Personagem'}
       </h2>
-      <button
-        type="button"
-        onClick={onClose}
-        className="text-white-300 hover:text-white-100 transition-colors p-1 cursor-pointer"
-      >
-        <XIcon size={20} />
-      </button>
+      <CloseButton onClick={onClose} className="p-1" />
     </div>
   )
 }
