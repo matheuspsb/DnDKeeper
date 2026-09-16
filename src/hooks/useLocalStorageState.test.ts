@@ -99,4 +99,65 @@ describe('useLocalStorageState', () => {
     expect(a.current[0]).toBe('A2')
     expect(b.current[0]).toBe('B')
   })
+
+  describe('sincronização entre abas (evento nativo "storage")', () => {
+    it('atualiza o estado quando outra aba muda a mesma chave', () => {
+      const { result } = renderHook(() => useLocalStorageState<number>(KEY, 0))
+
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent('storage', { key: KEY, newValue: JSON.stringify(7) }),
+        )
+      })
+
+      expect(result.current[0]).toBe(7)
+    })
+
+    it('ignora evento de uma chave diferente', () => {
+      const { result } = renderHook(() => useLocalStorageState<number>(KEY, 0))
+
+      act(() => {
+        window.dispatchEvent(
+          new StorageEvent('storage', { key: 'outra-chave', newValue: JSON.stringify(999) }),
+        )
+      })
+
+      expect(result.current[0]).toBe(0)
+    })
+
+    it('volta ao valor inicial quando a chave é removida em outra aba (newValue null)', () => {
+      const { result } = renderHook(() => useLocalStorageState<number>(KEY, 0))
+      act(() => result.current[1](42))
+      expect(result.current[0]).toBe(42)
+
+      act(() => {
+        window.dispatchEvent(new StorageEvent('storage', { key: KEY, newValue: null }))
+      })
+
+      expect(result.current[0]).toBe(0)
+    })
+
+    it('ignora evento com conteúdo corrompido, mantendo o valor atual', () => {
+      const { result } = renderHook(() => useLocalStorageState<number>(KEY, 0))
+      act(() => result.current[1](5))
+
+      act(() => {
+        window.dispatchEvent(new StorageEvent('storage', { key: KEY, newValue: '{not json' }))
+      })
+
+      expect(result.current[0]).toBe(5)
+    })
+
+    it('respeita deserialize customizado nos eventos de outra aba', () => {
+      const { result } = renderHook(() =>
+        useLocalStorageState<number | null>(KEY, null, { serialize: String, deserialize: Number }),
+      )
+
+      act(() => {
+        window.dispatchEvent(new StorageEvent('storage', { key: KEY, newValue: '3.5' }))
+      })
+
+      expect(result.current[0]).toBe(3.5)
+    })
+  })
 })
