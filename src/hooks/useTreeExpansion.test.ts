@@ -58,4 +58,44 @@ describe('useTreeExpansion', () => {
 
     expect(result.current.mountedIds.size).toBe(2)
   })
+
+  it('expandir um nó recolhe os irmãos passados, evitando dois galhos abertos ao mesmo tempo', () => {
+    const { result } = renderHook(() => useTreeExpansion())
+
+    act(() => result.current.toggleExpanded('a', ['a', 'b', 'c']))
+    act(() => result.current.toggleExpanded('b', ['a', 'b', 'c']))
+
+    expect(result.current.expandedIds.has('a')).toBe(false)
+    expect(result.current.expandedIds.has('b')).toBe(true)
+  })
+
+  it('recolher os irmãos não desmonta o que foi fechado (mountedIds preserva)', () => {
+    const { result } = renderHook(() => useTreeExpansion())
+
+    act(() => result.current.toggleExpanded('a', ['a', 'b']))
+    act(() => result.current.toggleExpanded('b', ['a', 'b']))
+
+    expect(result.current.mountedIds.has('a')).toBe(true)
+    expect(result.current.mountedIds.has('b')).toBe(true)
+  })
+
+  it('nós que não são irmãos (grupos diferentes) não se afetam', () => {
+    const { result } = renderHook(() => useTreeExpansion())
+
+    act(() => result.current.toggleExpanded('a', ['a', 'b']))
+    act(() => result.current.toggleExpanded('c', ['c', 'd']))
+
+    expect(result.current.expandedIds.has('a')).toBe(true)
+    expect(result.current.expandedIds.has('c')).toBe(true)
+  })
+
+  it('recolher manualmente o nó já expandido não mexe nos irmãos', () => {
+    const { result } = renderHook(() => useTreeExpansion())
+
+    act(() => result.current.toggleExpanded('a', ['a', 'b']))
+    act(() => result.current.toggleExpanded('a', ['a', 'b'])) // recolhe a de novo
+
+    expect(result.current.expandedIds.has('a')).toBe(false)
+    expect(result.current.expandedIds.has('b')).toBe(false)
+  })
 })

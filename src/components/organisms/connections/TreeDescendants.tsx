@@ -22,7 +22,7 @@ interface TreeDescendantsProps {
   direction: 'right' | 'down' | 'left'
   expandedIds: Set<string>
   mountedIds: Set<string>
-  onToggle: (nodeId: string) => void
+  onToggle: (nodeId: string, siblingIds: string[]) => void
   wasJustClick: () => boolean
   visible: boolean
   accentColor?: string
@@ -57,6 +57,7 @@ export function TreeDescendants({
   const count = nodes.length
   const clickable = style.clickable ?? true
   const parentPoint = toPoint(parentAlong, parentAcross, direction)
+  const siblingIds = nodes.map((n) => n.id)
 
   return (
     <>
@@ -91,7 +92,7 @@ export function TreeDescendants({
               onClick={
                 clickable && hasChildren
                   ? () => {
-                      if (wasJustClick()) onToggle(node.id)
+                      if (wasJustClick()) onToggle(node.id, siblingIds)
                     }
                   : undefined
               }

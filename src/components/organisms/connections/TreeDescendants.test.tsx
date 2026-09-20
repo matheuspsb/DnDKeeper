@@ -15,6 +15,11 @@ const NODES: HierarchyNode[] = [
   { id: 'b', label: 'B', status: 'morto' },
 ]
 
+const TWO_EXPANDABLE_SIBLINGS: HierarchyNode[] = [
+  { id: 'a', label: 'A', status: 'vivo', children: [{ id: 'a1', label: 'A1', status: 'vivo' }] },
+  { id: 'b', label: 'B', status: 'vivo', children: [{ id: 'b1', label: 'B1', status: 'vivo' }] },
+]
+
 const TWO_CLICKABLE_LEVELS: TreeLevelStyle[] = [
   { radius: 30, imageRadius: 27, acrossSpacing: 100 },
   { radius: 20, imageRadius: 17, acrossSpacing: 50 },
@@ -68,9 +73,9 @@ function Harness({
         direction={direction}
         expandedIds={expandedIds}
         mountedIds={mountedIds}
-        onToggle={(id) => {
+        onToggle={(id, siblingIds) => {
           onToggleSpy?.(id)
-          toggleExpanded(id)
+          toggleExpanded(id, siblingIds)
         }}
         wasJustClick={wasJustClick ?? (() => true)}
         visible
@@ -169,6 +174,18 @@ describe('TreeDescendants', () => {
     fireEvent.click(screen.getByText('A'))
 
     expect(screen.queryByText('A1')).not.toBeInTheDocument()
+  })
+
+  it('expandir um irmão recolhe o outro que já estava aberto (evita sobreposição de layout)', () => {
+    render(<Harness nodes={TWO_EXPANDABLE_SIBLINGS} levels={TWO_CLICKABLE_LEVELS} />)
+
+    fireEvent.click(screen.getByText('A'))
+    expect(isHiddenBySvgVisibility(screen.getByText('A1'))).toBe(false)
+
+    fireEvent.click(screen.getByText('B'))
+
+    expect(isHiddenBySvgVisibility(screen.getByText('A1'))).toBe(true)
+    expect(isHiddenBySvgVisibility(screen.getByText('B1'))).toBe(false)
   })
 
   it('direction="left" com alongByDepth negativo renderiza e expande normalmente', () => {
