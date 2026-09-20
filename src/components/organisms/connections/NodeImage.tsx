@@ -5,6 +5,8 @@ const PRESERVE_ASPECT_RATIO: Record<ImagePosition, string> = {
   top:    'xMidYMin slice',
   center: 'xMidYMid slice',
   bottom: 'xMidYMax slice',
+  left:   'xMinYMid slice',
+  right:  'xMaxYMid slice',
 }
 
 interface NodeImageProps {

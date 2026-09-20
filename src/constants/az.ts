@@ -35,6 +35,7 @@ export const AZ_TREE: HierarchyTree = {
           name: 'Carpinteiro',
           status: 'vivo',
           imageUrl: '/drive-img?id=1JdYKYq4-wBqcgZMqrkunO8G0kfAMRLgj&sz=w800',
+          imagePosition: 'right',
         },
       ],
     },

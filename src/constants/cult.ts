@@ -1,6 +1,6 @@
 import { NpcStatus } from '@/types/npc.types'
 
-export type ImagePosition = 'top' | 'center' | 'bottom'
+export type ImagePosition = 'top' | 'center' | 'bottom' | 'left' | 'right'
 
 export interface HierarchyNode {
   id: string
