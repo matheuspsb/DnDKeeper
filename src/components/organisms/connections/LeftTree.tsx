@@ -22,7 +22,7 @@ const GREAT_GRANDCHILD_SPACING_Y = 90
 const LEVEL4_SPACING_Y = 70
 
 const LEVELS: TreeLevelStyle[] = [
-  { radius: CHILD_RADIUS, imageRadius: CHILD_IMG_R, acrossSpacing: CHILD_SPACING_Y },
+  { radius: CHILD_RADIUS, imageRadius: CHILD_IMG_R, acrossSpacing: CHILD_SPACING_Y, clickable: false },
   {
     radius: GRANDCHILD_RADIUS,
     imageRadius: GRANDCHILD_IMG_R,
