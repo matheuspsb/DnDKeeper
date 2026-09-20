@@ -40,26 +40,26 @@ const LEVELS: TreeLevelStyle[] = [
   },
 ]
 
-export function getRightTreeSpan(tree: HierarchyTree): number {
+export function getLeftTreeSpan(tree: HierarchyTree): number {
   return Math.max(200, (tree.children.length - 1) * CHILD_SPACING_Y + CHILD_RADIUS * 2)
 }
 
-interface RightTreeProps {
+interface LeftTreeProps {
   tree: HierarchyTree
   wasJustClick: () => boolean
 }
 
-export const RightTree = memo(function RightTree({ tree, wasJustClick }: RightTreeProps) {
+export const LeftTree = memo(function LeftTree({ tree, wasJustClick }: LeftTreeProps) {
   const { expandedIds, mountedIds, toggleExpanded } = useTreeExpansion()
 
   const accentColor = tree.root.color ?? FACTION_COLOR[tree.root.faction as keyof typeof FACTION_COLOR]
   const hideRoot = tree.hideRoot ?? false
-  const childX = hideRoot ? 0 : LEVEL_SPACING_X
+  const childX = hideRoot ? 0 : -LEVEL_SPACING_X
   const alongByDepth = [
     childX,
-    childX + LEVEL_SPACING_X,
-    childX + LEVEL_SPACING_X * 2,
-    childX + LEVEL_SPACING_X * 3,
+    childX - LEVEL_SPACING_X,
+    childX - LEVEL_SPACING_X * 2,
+    childX - LEVEL_SPACING_X * 3,
   ]
 
   return (
@@ -88,7 +88,7 @@ export const RightTree = memo(function RightTree({ tree, wasJustClick }: RightTr
         parentRadius={ROOT_RADIUS}
         alongByDepth={alongByDepth}
         levels={LEVELS}
-        direction="right"
+        direction="left"
         expandedIds={expandedIds}
         mountedIds={mountedIds}
         onToggle={toggleExpanded}

@@ -37,12 +37,22 @@ function isHiddenBySvgVisibility(el: Element): boolean {
 interface HarnessProps {
   nodes?: HierarchyNode[]
   levels: TreeLevelStyle[]
+  direction?: 'right' | 'down' | 'left'
+  alongByDepth?: number[]
   wasJustClick?: () => boolean
   hideParentConnector?: boolean
   onToggleSpy?: (id: string) => void
 }
 
-function Harness({ nodes = NODES, levels, wasJustClick, hideParentConnector, onToggleSpy }: HarnessProps) {
+function Harness({
+  nodes = NODES,
+  levels,
+  direction = 'right',
+  alongByDepth = [100, 200],
+  wasJustClick,
+  hideParentConnector,
+  onToggleSpy,
+}: HarnessProps) {
   const { expandedIds, mountedIds, toggleExpanded } = useTreeExpansion()
 
   return (
@@ -53,9 +63,9 @@ function Harness({ nodes = NODES, levels, wasJustClick, hideParentConnector, onT
         parentAlong={0}
         parentAcross={0}
         parentRadius={40}
-        alongByDepth={[100, 200]}
+        alongByDepth={alongByDepth}
         levels={levels}
-        direction="right"
+        direction={direction}
         expandedIds={expandedIds}
         mountedIds={mountedIds}
         onToggle={(id) => {
@@ -159,6 +169,19 @@ describe('TreeDescendants', () => {
     fireEvent.click(screen.getByText('A'))
 
     expect(screen.queryByText('A1')).not.toBeInTheDocument()
+  })
+
+  it('direction="left" com alongByDepth negativo renderiza e expande normalmente', () => {
+    render(<Harness levels={TWO_CLICKABLE_LEVELS} direction="left" alongByDepth={[-100, -200]} />)
+
+    expect(screen.getByText('A')).toBeInTheDocument()
+    expect(screen.queryByText('A1')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('A'))
+
+    const child = screen.getByText('A1')
+    expect(child).toBeInTheDocument()
+    expect(isHiddenBySvgVisibility(child)).toBe(false)
   })
 
   it('hideParentConnector remove o conector de profundidade 1', () => {

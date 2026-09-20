@@ -26,7 +26,7 @@ interface TreeNodeProps {
   hasChildren?: boolean
   isExpanded?: boolean
   fontSize?: number
-  expandDirection?: 'down' | 'right'
+  expandDirection?: 'down' | 'right' | 'left'
   accentColor?: string
 }
 
@@ -110,7 +110,9 @@ export function TreeNode({
           direction={
             expandDirection === 'right'
               ? isExpanded ? 'left' : 'right'
-              : isExpanded ? 'up' : 'down'
+              : expandDirection === 'left'
+                ? isExpanded ? 'right' : 'left'
+                : isExpanded ? 'up' : 'down'
           }
         />
       )}

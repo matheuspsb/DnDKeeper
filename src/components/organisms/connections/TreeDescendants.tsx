@@ -19,7 +19,7 @@ interface TreeDescendantsProps {
   parentRadius: number
   alongByDepth: number[]
   levels: TreeLevelStyle[]
-  direction: 'right' | 'down'
+  direction: 'right' | 'down' | 'left'
   expandedIds: Set<string>
   mountedIds: Set<string>
   onToggle: (nodeId: string) => void
@@ -29,8 +29,8 @@ interface TreeDescendantsProps {
   hideParentConnector?: boolean
 }
 
-function toPoint(along: number, across: number, direction: 'right' | 'down') {
-  return direction === 'right' ? { x: along, y: across } : { x: across, y: along }
+function toPoint(along: number, across: number, direction: 'right' | 'down' | 'left') {
+  return direction === 'down' ? { x: across, y: along } : { x: along, y: across }
 }
 
 export function TreeDescendants({

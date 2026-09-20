@@ -41,7 +41,8 @@ export const DownTree = memo(function DownTree({ tree, wasJustClick }: DownTreeP
   const treeWidth = getDownTreeWidth(tree)
   const nodeSpacing = (treeWidth - PADDING_X * 2) / (nodeCount - 1)
   const rootCenterX = treeWidth / 2
-  const rootColor = FACTION_COLOR[tree.root.faction as keyof typeof FACTION_COLOR] ?? '#7c3aed'
+  const rootColor =
+    tree.root.color ?? FACTION_COLOR[tree.root.faction as keyof typeof FACTION_COLOR] ?? '#7c3aed'
 
   const levels: TreeLevelStyle[] = [
     { radius: CHILD_RADIUS, imageRadius: IMAGE_RADIUS, acrossSpacing: nodeSpacing },

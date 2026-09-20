@@ -20,8 +20,9 @@ export interface HierarchyTree {
     status?: NpcStatus
     imageUrl?: string
     imagePosition?: ImagePosition
+    color?: string
   }
-  direction?: 'down' | 'right'
+  direction?: 'down' | 'right' | 'left'
   hideRoot?: boolean
   children: HierarchyNode[]
 }

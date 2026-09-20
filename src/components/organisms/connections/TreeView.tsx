@@ -4,6 +4,7 @@ import { useCanvasInteraction } from '../../../hooks/useCanvasInteraction'
 import { TreeFilters } from './TreeFilters'
 import { DownTree, getDownTreeWidth } from './DownTree'
 import { RightTree } from './RightTree'
+import { LeftTree } from './LeftTree'
 import { computeLayout } from './treeLayout.utils'
 
 const INITIAL_ZOOM = 0.7
@@ -66,6 +67,15 @@ export function TreeView({ trees }: TreeViewProps) {
             transform={`translate(${layout.rightOffsets[index].x}, ${layout.rightOffsets[index].y})`}
           >
             <RightTree tree={tree} wasJustClick={wasJustClick} />
+          </g>
+        ))}
+
+        {layout.leftTrees.map((tree, index) => (
+          <g
+            key={tree.root.faction || `left-${index}`}
+            transform={`translate(${layout.leftOffsets[index].x}, ${layout.leftOffsets[index].y})`}
+          >
+            <LeftTree tree={tree} wasJustClick={wasJustClick} />
           </g>
         ))}
       </g>

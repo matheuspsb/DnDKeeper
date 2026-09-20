@@ -17,7 +17,7 @@ interface TreeConnectorProps {
   toCenterY: number
   toRadius: number
   status: NpcStatus
-  direction?: 'down' | 'right'
+  direction?: 'down' | 'right' | 'left'
 }
 
 export function TreeConnector({
@@ -39,6 +39,11 @@ export function TreeConnector({
     const endX = toCenterX - toRadius
     const ctrlOffset = Math.min((endX - startX) / 2, Math.max(30, (endX - startX) * 0.4))
     path = `M ${startX} ${fromCenterY} C ${startX + ctrlOffset} ${fromCenterY}, ${endX - ctrlOffset} ${toCenterY}, ${endX} ${toCenterY}`
+  } else if (direction === 'left') {
+    const startX = fromCenterX - fromRadius
+    const endX = toCenterX + toRadius
+    const ctrlOffset = Math.min((startX - endX) / 2, Math.max(30, (startX - endX) * 0.4))
+    path = `M ${startX} ${fromCenterY} C ${startX - ctrlOffset} ${fromCenterY}, ${endX + ctrlOffset} ${toCenterY}, ${endX} ${toCenterY}`
   } else {
     const startY = fromCenterY + fromRadius
     const endY = toCenterY - toRadius
