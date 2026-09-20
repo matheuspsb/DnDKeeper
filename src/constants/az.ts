@@ -15,7 +15,15 @@ export const AZ_TREE: HierarchyTree = {
       label: 'Buf',
       status: 'vivo',
       imageUrl: buffImg,
-      children: [{ id: 'az-garrosh', label: 'Garrosh', status: 'vivo', imageUrl: garroshImg }],
+      children: [
+        { id: 'az-garrosh', label: 'Garrosh', status: 'vivo', imageUrl: garroshImg },
+        {
+          id: 'az-f-loki',
+          label: 'F. Loki',
+          status: 'vivo',
+          imageUrl: '/drive-img?id=1nznJNuGNpSKgw9qAGz1PuYr_SWPrGWHA&sz=w800',
+        },
+      ],
     },
     { id: 'az-dante', label: 'Dante', status: 'morto', imageUrl: danteImg },
     {
