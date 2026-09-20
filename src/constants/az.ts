@@ -3,7 +3,6 @@ import azImg from '../assets/watermarks/az.jpeg'
 import boffImg from '../assets/arts/4_boff.jpeg'
 import buffImg from '../assets/arts/3_buff.jpeg'
 import danteImg from '../assets/arts/1_dante.jpeg'
-import samaelImg from '../assets/arts/1_samael.jpeg'
 import garroshImg from '../assets/watermarks/garrosh.png'
 
 export const AZ_TREE: HierarchyTree = {
@@ -25,6 +24,11 @@ export const AZ_TREE: HierarchyTree = {
       status: 'vivo',
       imageUrl: '/drive-img?id=1W3ApJjqikuJXvVT8FAU-xmM1W2vSATFZ&sz=w800',
     },
-    { id: 'az-samael', label: 'Samael', status: 'vivo', imageUrl: samaelImg },
+    {
+      id: 'az-samael',
+      label: 'Samael',
+      status: 'vivo',
+      imageUrl: '/drive-img?id=1dISg4rFBCZrE8RkKXgYWj8Ixn_exgF5N&sz=w800',
+    },
   ],
 }
