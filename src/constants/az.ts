@@ -6,7 +6,13 @@ import danteImg from '../assets/arts/1_dante.jpeg'
 import garroshImg from '../assets/watermarks/garrosh.png'
 
 export const AZ_TREE: HierarchyTree = {
-  root: { label: 'Guilda AZ', faction: 'Guilda AZ', status: 'vivo', imageUrl: azImg, color: '#ECC83B' },
+  root: {
+    label: 'Guilda AZ',
+    faction: 'Guilda AZ',
+    status: 'vivo',
+    imageUrl: azImg,
+    color: '#ECC83B',
+  },
   direction: 'left',
   children: [
     { id: 'az-bof', label: 'Bof', status: 'vivo', imageUrl: boffImg },
@@ -22,6 +28,13 @@ export const AZ_TREE: HierarchyTree = {
           label: 'F. Loki',
           status: 'vivo',
           imageUrl: '/drive-img?id=1nznJNuGNpSKgw9qAGz1PuYr_SWPrGWHA&sz=w800',
+        },
+        {
+          id: 'az-rob',
+          label: 'Rob, Barba de Pedra',
+          name: 'Carpinteiro',
+          status: 'vivo',
+          imageUrl: '/drive-img?id=1JdYKYq4-wBqcgZMqrkunO8G0kfAMRLgj&sz=w800',
         },
       ],
     },
