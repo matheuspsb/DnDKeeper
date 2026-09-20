@@ -71,7 +71,27 @@ export const CULT_TREE: HierarchyTree = {
       label: '11ª Asa',
       name: 'Diaba',
       imageUrl: '/drive-img?id=1uA3kr2lxTh1SRaIm6G4V6E94gjxL7FmM&sz=w800',
-      status: 'vivo',
+      status: 'morto',
+      children: [
+        {
+          id: 'asa-11-1',
+          label: 'Gorgoroth',
+          imageUrl: '/drive-img?id=1FfWXruwRrBepxzmr2pte-S8K-z0VrFly&sz=w800',
+          status: 'vivo',
+        },
+        {
+          id: 'asa-11-2',
+          label: 'Kruor',
+          imageUrl: '/drive-img?id=14QEymu_SYUZAs17o4Ytlt1mgi2IbT6PX&sz=w800',
+          status: 'vivo',
+        },
+        {
+          id: 'asa-11-3',
+          label: 'Skithyfinax',
+          imageUrl: '/drive-img?id=1x58IJyldSUmj7UoBxe19bkS8II6aBhQJ&sz=w800',
+          status: 'vivo',
+        },
+      ],
     },
     {
       id: 'asa-12',
