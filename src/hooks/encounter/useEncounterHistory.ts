@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
-import { useLocalStorageState } from './useLocalStorageState'
+import { useLocalStorageState } from '../useLocalStorageState'
 import type {
   EncounterSnapshot,
   EncounterResult,
   PartyMember,
   MonsterEntry,
-} from '../types/encounter'
+} from '../../types/encounter'
 
 const STORAGE_KEY = 'dndkeeper_encounter_history'
 

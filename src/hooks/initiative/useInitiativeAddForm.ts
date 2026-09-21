@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Combatant } from '../types/initiative'
+import type { Combatant } from '../../types/initiative'
 import {
   combatantFormSchema,
   type CombatantFormInput,
   type CombatantFormOutput,
-} from '../schemas/initiative'
+} from '../../schemas/initiative'
 
 export function useInitiativeAddForm(onAdd: (data: Omit<Combatant, 'id'>) => void) {
   const {

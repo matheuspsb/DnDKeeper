@@ -1,4 +1,4 @@
-import { useFullscreen } from '../../../hooks/useFullscreen'
+import { useFullscreen } from '../../../hooks/table/useFullscreen'
 import ExpandIcon from '../../atoms/icons/ExpandIcon'
 import LiveStatus from '../../molecules/table/LiveStatus'
 

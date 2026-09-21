@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { PartyMember, MonsterEntry } from '../types/encounter'
-import type { CR } from '../types/encounter'
-import type { Character } from '../types/character'
-import { calculateEncounter } from '../utils/encounter'
-import { getLevel } from '../constants/dnd'
+import type { PartyMember, MonsterEntry } from '../../types/encounter'
+import type { CR } from '../../types/encounter'
+import type { Character } from '../../types/character'
+import { calculateEncounter } from '../../utils/encounter'
+import { getLevel } from '../../constants/dnd'
 
 export function useEncounter() {
   const [party, setParty] = useState<PartyMember[]>([])

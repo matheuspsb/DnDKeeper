@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
 import { resolveImageUrl } from '../../../constants/arts'
-import { useCombatantImagePicker } from '../../../hooks/useCombatantImagePicker'
+import { useCombatantImagePicker } from '../../../hooks/initiative/useCombatantImagePicker'
 import TrashIcon from '../../atoms/icons/TrashIcon'
 import ImageIcon from '../../atoms/icons/ImageIcon'
 import EyeIcon from '../../atoms/icons/EyeIcon'

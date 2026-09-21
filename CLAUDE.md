@@ -153,25 +153,49 @@ src/
 ├── contexts/
 │   └── AuthContext.tsx                     # Autenticação — user (role: dm | guest), login, logout
 │
-├── hooks/
-│   ├── useCharacterForm.ts                 # Lógica de formulário do CharacterModal — RHF + Zod
-│   ├── useCharacters.ts                    # CRUD de personagens via `backendApi` (`/api/characters`) — async, sem localStorage
-│   ├── useCombatantImagePicker.ts          # Estado do input inline de URL de imagem do CombatantRow (abrir/valor/confirmar)
+├── hooks/                                   # Agrupado por domínio (mesma convenção de components/) — só o que é
+│   │                                        # usado em 2+ domínios fica solto na raiz
+│   ├── useConfirm.ts                       # armed/arm/disarm/confirm — estado de "confirmar exclusão inline", usado em NPCs/Personagens/Cartas
 │   ├── useDriveImages.ts                   # Retorna { images, loading, error, sync } — sem auto-fetch
-│   ├── useEncounter.ts                     # Estado do calculador — party, monsters, result (useMemo)
-│   ├── useEncounterHistory.ts              # Snapshots de encontro com persistência em localStorage
-│   ├── useGlobalSearch.ts                  # Filtra NPCs e personagens por query — resultado dentro de useMemo
-│   ├── useInitiative.ts                    # Estado da iniciativa via backend (`/api/initiative`, React Query) + cache local; ver docs/iniciativa-realtime.md
-│   ├── useInitiativeStream.ts              # Assina o SSE `/api/initiative/stream` e empurra o estado no cache do React Query
-│   ├── useInitiativeAddForm.ts             # Lógica de formulário do InitiativeAddForm — RHF + Zod
+│   ├── useGlobalSearch.ts                  # Filtra NPCs e personagens por query — resultado dentro de useMemo (usa useNpcs + useCharacters)
+│   ├── useLatestRef.ts                     # ref que sempre reflete o valor/função mais recente — usado por callbacks estáveis (useCallback([]))
 │   ├── useLocalStorageState.ts             # useState + localStorage genérico — ver seção "Persistência local"
-│   ├── useMapImage.ts                      # Carregamento/tamanho da imagem do mapa + centralização inicial da view
-│   ├── useMapInteraction.ts                # Hook de interação com o mapa (pan, zoom, drag)
-│   ├── useMapRuler.ts                      # Hook de régua do mapa — calibração e medição em milhas
-│   ├── useNpcForm.ts                       # Lógica de formulário do NpcModal — RHF + Zod
-│   ├── useNpcs.ts                          # CRUD de NPCs via `backendApi` (`/api/npcs`) — async, sem localStorage
-│   ├── useSearchInput.ts                   # Estado do input de busca com debounce (300ms) via useRef — sem useEffect
-│   └── useTreeExpansion.ts                 # expandedIds/mountedIds/toggleExpanded — compartilhado por RightTree e DownTree (Conexões)
+│   ├── character/
+│   │   ├── useCharacterForm.ts             # Lógica de formulário do CharacterModal — RHF + Zod
+│   │   └── useCharacters.ts                # CRUD de personagens via `backendApi` (`/api/characters`) — async, sem localStorage
+│   ├── connections/
+│   │   ├── useCanvasInteraction.ts         # Pan/zoom/drag do canvas SVG de `/conexoes`, throttle por requestAnimationFrame
+│   │   └── useTreeExpansion.ts             # expandedIds/mountedIds/toggleExpanded(id, siblingIds?) — só 1 irmão aberto por vez
+│   ├── encounter/
+│   │   ├── useEncounter.ts                 # Estado do calculador — party, monsters, result (useMemo)
+│   │   └── useEncounterHistory.ts          # Snapshots de encontro com persistência em localStorage
+│   ├── initiative/
+│   │   ├── useCombatantImagePicker.ts      # Estado do input inline de URL de imagem do CombatantRow (abrir/valor/confirmar)
+│   │   ├── useInitiative.ts                # Estado da iniciativa via backend (`/api/initiative`, React Query) + cache local; ver docs/iniciativa-realtime.md
+│   │   ├── useInitiativeAddForm.ts         # Lógica de formulário do InitiativeAddForm — RHF + Zod
+│   │   └── useInitiativeStream.ts          # Assina o SSE `/api/initiative/stream` e empurra o estado no cache do React Query
+│   ├── letter/
+│   │   ├── useLetterForm.ts                # Lógica de formulário do LetterModal — RHF + Zod
+│   │   └── useLetters.ts                   # CRUD de cartas em localStorage, com seed inicial (`LETTER_SEED`)
+│   ├── map/
+│   │   ├── useMapDrawing.ts                # Modo de desenho livre do mapa — paths em localStorage
+│   │   ├── useMapImage.ts                  # Carregamento/tamanho da imagem do mapa + centralização inicial da view
+│   │   ├── useMapInteraction.ts            # Hook de interação com o mapa (pan, zoom, drag)
+│   │   └── useMapRuler.ts                  # Hook de régua do mapa — calibração e medição em milhas
+│   ├── npc/
+│   │   ├── useNpcFilters.ts                # busca/status via URL + agrupamento por facção + texto `meta`
+│   │   ├── useNpcForm.ts                   # Lógica de formulário do NpcModal — RHF + Zod
+│   │   ├── useNpcLightbox.ts               # navegação prev/next do lightbox de imagem do dossiê
+│   │   ├── useNpcModal.ts                  # estado do modal de criação/edição (abrir/editar/salvar)
+│   │   └── useNpcs.ts                      # useNpcs/useAddNpc/useUpdateNpc/useDeleteNpc via `backendApi` (`/api/npcs`) + `useNpcDelete` (exclusão com erro derivado de `isError` da própria mutation, sem `useState` próprio)
+│   ├── search/
+│   │   └── useSearchInput.ts               # inputValue imediato + query via `useDeferredValue` — sem debounce manual
+│   └── table/                              # side-effects do painel `/mesa` — só usados por `pages/Table.tsx` e `components/{molecules,organisms}/table/`
+│       ├── useDelayedFlag.ts               # vira `true` só depois de `delayMs` com a flag ativa (evita flash de UI)
+│       ├── useFullscreen.ts                # supported/active/toggle da Fullscreen API
+│       ├── useScrollIntoViewOnChange.ts    # rola um ref pra viewport quando `key` muda, respeitando `prefers-reduced-motion`
+│       ├── useTicker.ts                    # `Date.now()` atualizado a cada `intervalMs` — base de relógios/temporizadores
+│       └── useValueChangePulse.ts          # `true` por `durationMs` quando `value` muda — anima destaque de mudança
 │
 ├── pages/
 │   ├── Arts.tsx                            # Galeria integrada ao Google Drive — sync manual, blur toggle, lightbox
@@ -410,7 +434,7 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - `/personagens` — CRUD de personagens do grupo; grid de cards com HP, XP e anotações
 - Personagens são persistidos no **backend** (`rpg-system_backend`, Express + Prisma/Postgres) via **React Query**, mesmo padrão dos NPCs — não em `localStorage`
   - `GET /api/characters` é público; `POST`/`PATCH`/`DELETE` exigem sessão de DM (cookie `rpg_session`, `withCredentials: true` no `backendApi`)
-  - `src/hooks/useCharacters.ts` — `characterKeys.all` + `useCharacters()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddCharacter`/`useUpdateCharacter`/`useDeleteCharacter` (`useMutation`, um hook por operação)
+  - `src/hooks/character/useCharacters.ts` — `characterKeys.all` + `useCharacters()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddCharacter`/`useUpdateCharacter`/`useDeleteCharacter` (`useMutation`, um hook por operação)
   - `useAddCharacterXp` — mutation dedicada para somar XP: lê o personagem atual do cache (`queryClient.getQueryData`), soma o delta e envia só `{ xp }` via `PATCH`; usada pelo envio de XP da Calculadora de Encontro
   - Cada mutation atualiza o cache direto via `queryClient.setQueryData(characterKeys.all, ...)` no `onSuccess`, sem invalidar/refetch
   - `useCharacterForm` segue o mesmo padrão de `useNpcForm`: `onSave` assíncrono, `catch` mapeia erros `400` (`{ error, details }`) em `setError` por campo, erro genérico vira `saveError` exibido no modal; botão de salvar mostra `isSubmitting`
@@ -426,7 +450,7 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
 - NPCs são persistidos no **backend** (`rpg-system_backend`, Express + Prisma/Postgres) via **React Query**, não em `localStorage`
   - `GET /api/npcs` é público; `POST`/`PATCH`/`DELETE` exigem sessão de DM (cookie `rpg_session`, `withCredentials: true` no `backendApi`)
   - `QueryClientProvider` fica no `main.tsx`, por fora do `BrowserRouter`/`AuthProvider`; `QueryClient` configurado com `retry: 1` nas queries
-  - `src/hooks/useNpcs.ts` — `npcKeys.all` (query key factory) + `useNpcs()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddNpc`/`useUpdateNpc`/`useDeleteNpc` (`useMutation`, um hook por operação — não um hook monolítico)
+  - `src/hooks/npc/useNpcs.ts` — `npcKeys.all` (query key factory) + `useNpcs()` (`useQuery`, expõe `data`/`isLoading`/`isError`) + `useAddNpc`/`useUpdateNpc`/`useDeleteNpc` (`useMutation`, um hook por operação — não um hook monolítico)
   - Cada mutation atualiza o cache direto via `queryClient.setQueryData(npcKeys.all, ...)` no `onSuccess` (append/map/filter) em vez de invalidar e refazer o fetch
   - Componentes chamam `mutation.mutateAsync(...)` e tratam erro com `try/catch` — RHF/`useNpcForm` usa o `catch` para mapear erros `400` do backend (`{ error, details: { campo: [mensagem] } }`) em `setError` por campo; erro genérico (rede, 401/403/404) vira `saveError` exibido no modal
   - Não existe endpoint de "resetar pro seed" — a feature de reset foi removida (`NpcSeedReset`/`npcSeed.ts` não existem mais)
@@ -444,7 +468,7 @@ Definidas em `src/constants/routes.tsx`. Para adicionar uma página nova, basta 
   - `RightTree.tsx` / `DownTree.tsx` / `LeftTree.tsx` — só as constantes de geometria da própria árvore (raios, espaçamentos) e o bloco da **raiz**, que cada uma desenha do seu próprio jeito (o `DownTree` do Culto tem um "?" com glow pro mestre ainda não revelado — não passa por `TreeNode`, é conteúdo específico daquela árvore). `LeftTree` é o espelho horizontal do `RightTree` (mesmos raios/espaçamentos, offsets negativos)
   - `TreeDescendants.tsx` — render **recursivo** dos descendentes (conector + nó + próxima profundidade), compartilhado pelas três orientações. Raio, espaçamento e se o nível é clicável vêm de um array `TreeLevelStyle[]` passado por cada árvore — não é código repetido por nível
   - `treeGeometry.ts#getSpreadPosition` — posição de um nó no eixo de espalhamento, centralizada no pai; mesma fórmula em qualquer profundidade/orientação
-  - `hooks/useTreeExpansion.ts` — `expandedIds`/`mountedIds`/`toggleExpanded(nodeId, siblingIds?)`, compartilhado por todas as árvores. Ao expandir, recolhe os `siblingIds` passados — só 1 irmão (mesmo pai) fica aberto por vez, porque cada nó posiciona os próprios filhos sem saber se o vizinho também abriu; sem isso dois galhos vizinhos abertos ao mesmo tempo sobrepõem o layout um do outro. `TreeDescendants.tsx` calcula `siblingIds` a partir do array `nodes` do próprio nível e repassa no clique — árvores diferentes (Culto/Harpers/Guilda AZ) não são irmãs entre si, então continuam independentes
+  - `hooks/connections/useTreeExpansion.ts` — `expandedIds`/`mountedIds`/`toggleExpanded(nodeId, siblingIds?)`, compartilhado por todas as árvores. Ao expandir, recolhe os `siblingIds` passados — só 1 irmão (mesmo pai) fica aberto por vez, porque cada nó posiciona os próprios filhos sem saber se o vizinho também abriu; sem isso dois galhos vizinhos abertos ao mesmo tempo sobrepõem o layout um do outro. `TreeDescendants.tsx` calcula `siblingIds` a partir do array `nodes` do próprio nível e repassa no clique — árvores diferentes (Culto/Harpers/Guilda AZ) não são irmãs entre si, então continuam independentes
   - `TreeNode.tsx` / `TreeConnector.tsx` / `NodeImage.tsx` / `TreeChevron.tsx` / `TreeFilters.tsx` — peças visuais de um nó/conector
 - **Profundidade de interação é assimétrica por design, não limitação técnica**: em `RightTree` (ex.: Harpers) dá pra expandir manualmente até o 2º nível (filho e neto); em `DownTree` (ex.: Culto) só o 1º nível (filho) é clicável — os níveis mais fundos sempre aparecem em cascata automática quando o ancestral clicável expande. Configurado por `clickable: false` no `TreeLevelStyle[]` de cada árvore
 - Detalhes da refatoração que unificou `RightTree`/`DownTree` em `docs/auditoria-hooks-arquitetura.md` (§4.1)

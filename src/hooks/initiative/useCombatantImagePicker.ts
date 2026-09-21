@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { resolveDriveUrl } from '../utils/driveUrl'
+import { resolveDriveUrl } from '../../utils/driveUrl'
 
 export function useCombatantImagePicker(onSetImageUrl: (url: string) => void) {
   const [isOpen, setIsOpen] = useState(false)

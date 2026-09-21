@@ -1,5 +1,5 @@
 import type { MapLocation } from '../types/mapLocation'
-import type { Point } from '../hooks/useMapRuler'
+import type { Point } from '../hooks/map/useMapRuler'
 
 export function findLocationAt(coords: Point, locations: MapLocation[]): MapLocation | undefined {
   return locations.find(

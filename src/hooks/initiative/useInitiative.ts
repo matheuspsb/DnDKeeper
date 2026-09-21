@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Combatant, SpotlightImage } from '../types/initiative'
-import backendApi from '../services/backendApi'
+import type { Combatant, SpotlightImage } from '../../types/initiative'
+import backendApi from '../../services/backendApi'
 
 interface InitiativeState {
   combatants: Combatant[]

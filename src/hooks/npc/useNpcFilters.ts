@@ -1,7 +1,7 @@
 import { useDeferredValue, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { Npc, NpcStatus } from '../types/npc.types'
-import { FACTIONS } from '../constants/npc.constants'
+import type { Npc, NpcStatus } from '../../types/npc.types'
+import { FACTIONS } from '../../constants/npc.constants'
 
 export type StatusFilter = NpcStatus | 'todos'
 

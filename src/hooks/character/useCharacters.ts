@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Character } from '../types/character'
-import backendApi from '../services/backendApi'
+import type { Character } from '../../types/character'
+import backendApi from '../../services/backendApi'
 
 export type CharacterInput = Omit<Character, 'id'>
 

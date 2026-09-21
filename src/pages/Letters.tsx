@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Letter } from '../types/letter'
-import { useLetters } from '../hooks/useLetters'
+import { useLetters } from '../hooks/letter/useLetters'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'

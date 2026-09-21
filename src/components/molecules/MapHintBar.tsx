@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { RulerMode } from '../../hooks/useMapRuler'
+import type { RulerMode } from '../../hooks/map/useMapRuler'
 
 type MapHintBarProps = {
   mode: RulerMode

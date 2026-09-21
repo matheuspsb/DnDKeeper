@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { useLocalStorageState } from './useLocalStorageState'
+import { useLocalStorageState } from '../useLocalStorageState'
 
 export type RulerMode = 'idle' | 'calibrating' | 'measuring'
 export type Point = { x: number; y: number }

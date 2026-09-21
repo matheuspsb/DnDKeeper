@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { useNpcFilters } from './useNpcFilters'
-import type { Npc } from '../types/npc.types'
+import type { Npc } from '../../types/npc.types'
 
 function createWrapper(initialPath = '/npcs') {
   return function Wrapper({ children }: { children: ReactNode }) {

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { useNpcLightbox } from './useNpcLightbox'
-import type { Npc } from '../types/npc.types'
+import type { Npc } from '../../types/npc.types'
 
 function makeNpc(id: string, imageUrl?: string): Npc {
   return {

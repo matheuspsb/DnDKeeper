@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useEncounterHistory } from './useEncounterHistory'
-import type { EncounterResult, MonsterEntry, PartyMember } from '../types/encounter'
+import type { EncounterResult, MonsterEntry, PartyMember } from '../../types/encounter'
 
 const PARTY: PartyMember[] = [
   { id: 'p1', name: 'Aria', level: 5 },

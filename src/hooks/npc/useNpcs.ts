@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Npc } from '../types/npc.types'
-import backendApi from '../services/backendApi'
+import type { Npc } from '../../types/npc.types'
+import backendApi from '../../services/backendApi'
 
 export type NpcInput = Omit<Npc, 'id' | 'createdAt' | 'updatedAt'>
 

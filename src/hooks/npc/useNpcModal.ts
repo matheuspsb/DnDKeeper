@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { Npc } from '../types/npc.types'
+import type { Npc } from '../../types/npc.types'
 import { useAddNpc, useUpdateNpc } from './useNpcs'
 import type { NpcInput } from './useNpcs'
 

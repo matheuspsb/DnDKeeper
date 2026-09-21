@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Letter } from '../types/letter'
+import type { Letter } from '../../types/letter'
 import {
   letterFormSchema,
   type LetterFormInput,
   type LetterFormOutput,
-} from '../schemas/letter.schema'
+} from '../../schemas/letter.schema'
 
 export function useLetterForm(
   initialLetter: Letter | null,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { initiativeKeys, saveLocal } from './useInitiative'
-import { useLatestRef } from './useLatestRef'
+import { useLatestRef } from '../useLatestRef'
 
 interface InitiativeStreamStatus {
   connected: boolean

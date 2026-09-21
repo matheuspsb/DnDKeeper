@@ -1,6 +1,6 @@
 import type { Character } from '../../../types/character'
-import type { CharacterInput } from '../../../hooks/useCharacters'
-import { useCharacterForm } from '../../../hooks/useCharacterForm'
+import type { CharacterInput } from '../../../hooks/character/useCharacters'
+import { useCharacterForm } from '../../../hooks/character/useCharacterForm'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import CharacterModalHeader from './CharacterModalHeader'

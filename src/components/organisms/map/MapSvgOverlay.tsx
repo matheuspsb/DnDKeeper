@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { Point, RulerMode } from '../../../hooks/useMapRuler'
+import type { Point, RulerMode } from '../../../hooks/map/useMapRuler'
 import type { DrawnPath } from '../../../types/drawing'
 import { toSvgPath } from '../../../utils/drawing'
 

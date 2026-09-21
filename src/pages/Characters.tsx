@@ -6,7 +6,7 @@ import {
   useCharacters,
   useDeleteCharacter,
   useUpdateCharacter,
-} from '../hooks/useCharacters'
+} from '../hooks/character/useCharacters'
 import { clampNumber } from '../utils/number'
 import Button from '../components/atoms/Button'
 import PlusIcon from '../components/atoms/icons/PlusIcon'

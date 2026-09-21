@@ -1,5 +1,5 @@
 import type { Letter } from '../../../types/letter'
-import { useLetterForm } from '../../../hooks/useLetterForm'
+import { useLetterForm } from '../../../hooks/letter/useLetterForm'
 import { labelClass } from '../../../styles/form'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'

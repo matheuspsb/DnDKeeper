@@ -1,5 +1,5 @@
 import type { Combatant } from '../../../types/initiative'
-import { useInitiativeAddForm } from '../../../hooks/useInitiativeAddForm'
+import { useInitiativeAddForm } from '../../../hooks/initiative/useInitiativeAddForm'
 import Input from '../../atoms/Input'
 import Button from '../../atoms/Button'
 import PlusIcon from '../../atoms/icons/PlusIcon'

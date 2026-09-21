@@ -1,5 +1,5 @@
 import { useGlobalSearch } from '../hooks/useGlobalSearch'
-import { useSearchInput } from '../hooks/useSearchInput'
+import { useSearchInput } from '../hooks/search/useSearchInput'
 import { useAuth } from '../contexts/AuthContext'
 import NpcResult from '../components/molecules/search/NpcResult'
 import CharacterResult from '../components/molecules/search/CharacterResult'

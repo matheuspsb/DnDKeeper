@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { HierarchyTree } from '../../../constants/cult'
-import { useCanvasInteraction } from '../../../hooks/useCanvasInteraction'
+import { useCanvasInteraction } from '../../../hooks/connections/useCanvasInteraction'
 import { TreeFilters } from './TreeFilters'
 import { DownTree, getDownTreeWidth } from './DownTree'
 import { RightTree } from './RightTree'

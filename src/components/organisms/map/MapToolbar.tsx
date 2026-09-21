@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { RulerMode } from '../../../hooks/useMapRuler'
+import type { RulerMode } from '../../../hooks/map/useMapRuler'
 import RefreshIcon from '../../atoms/icons/RefreshIcon'
 import RulerIcon from '../../atoms/icons/RulerIcon'
 import CheckCircleIcon from '../../atoms/icons/CheckCircleIcon'

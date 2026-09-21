@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AxiosError } from 'axios'
-import type { Character } from '../types/character'
+import type { Character } from '../../types/character'
 import type { CharacterInput } from './useCharacters'
 import {
   characterFormSchema,
   type CharacterFormInput,
   type CharacterFormOutput,
-} from '../schemas/character'
+} from '../../schemas/character'
 
 interface ValidationErrorResponse {
   error: string

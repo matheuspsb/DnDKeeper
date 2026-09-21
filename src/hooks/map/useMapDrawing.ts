@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
-import { useLatestRef } from './useLatestRef'
-import { useLocalStorageState } from './useLocalStorageState'
-import type { DrawnPath } from '../types/drawing'
+import { useLatestRef } from '../useLatestRef'
+import { useLocalStorageState } from '../useLocalStorageState'
+import type { DrawnPath } from '../../types/drawing'
 
 const STORAGE_KEY = 'dndkeeper_map_drawings'
 const POINT_DISTANCE_THRESHOLD = 4

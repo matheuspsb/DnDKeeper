@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { TreeDescendants } from './TreeDescendants'
 import type { TreeLevelStyle } from './TreeDescendants'
-import { useTreeExpansion } from '../../../hooks/useTreeExpansion'
+import { useTreeExpansion } from '../../../hooks/connections/useTreeExpansion'
 import type { HierarchyNode } from '../../../constants/cult'
 
 const NODES: HierarchyNode[] = [

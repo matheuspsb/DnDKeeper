@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { Npc } from '../types/npc.types'
+import type { Npc } from '../../types/npc.types'
 
 export function useNpcLightbox(npcs: Npc[]) {
   const [activeNpc, setActiveNpc] = useState<Npc | null>(null)

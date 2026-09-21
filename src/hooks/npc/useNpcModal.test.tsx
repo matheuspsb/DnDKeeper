@@ -3,10 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNpcModal } from './useNpcModal'
-import backendApi from '../services/backendApi'
-import type { Npc } from '../types/npc.types'
+import backendApi from '../../services/backendApi'
+import type { Npc } from '../../types/npc.types'
 
-vi.mock('../services/backendApi', () => ({
+vi.mock('../../services/backendApi', () => ({
   default: {
     post: vi.fn(),
     patch: vi.fn(),

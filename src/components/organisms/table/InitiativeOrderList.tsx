@@ -1,5 +1,5 @@
 import type { Combatant, CombatantStatus } from '../../../types/initiative'
-import { useScrollIntoViewOnChange } from '../../../hooks/useScrollIntoViewOnChange'
+import { useScrollIntoViewOnChange } from '../../../hooks/table/useScrollIntoViewOnChange'
 import CombatantOrderCard from './CombatantOrderCard'
 
 interface InitiativeOrderListProps {

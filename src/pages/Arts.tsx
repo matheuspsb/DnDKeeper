@@ -9,7 +9,7 @@ import GalleryCategorySection from '../components/molecules/gallery/GalleryCateg
 import GalleryEmpty from '../components/molecules/gallery/GalleryEmpty'
 import Lightbox from '../components/organisms/Lightbox'
 import { useDriveImages } from '../hooks/useDriveImages'
-import { useInitiative } from '../hooks/useInitiative'
+import { useInitiative } from '../hooks/initiative/useInitiative'
 import { useAuth } from '../contexts/AuthContext'
 import { DEFAULT_IMAGE_CATEGORY } from '../services/googleDrive'
 

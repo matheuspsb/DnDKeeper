@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { Letter } from '../types/letter'
-import { LETTER_SEED } from '../constants/letterSeed'
+import type { Letter } from '../../types/letter'
+import { LETTER_SEED } from '../../constants/letterSeed'
 
 const STORAGE_KEY = 'dndkeeper_letters'
 

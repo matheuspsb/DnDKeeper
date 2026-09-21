@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useNpcs } from './useNpcs'
-import { useCharacters } from './useCharacters'
+import { useNpcs } from './npc/useNpcs'
+import { useCharacters } from './character/useCharacters'
 
 function matchesQuery(fields: (string | undefined)[], query: string): boolean {
   const lowerCaseQuery = query.toLowerCase()

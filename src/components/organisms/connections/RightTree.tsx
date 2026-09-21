@@ -4,7 +4,7 @@ import { FACTION_COLOR } from '../../../constants/npc.constants'
 import { TreeNode } from './TreeNode'
 import { TreeDescendants } from './TreeDescendants'
 import type { TreeLevelStyle } from './TreeDescendants'
-import { useTreeExpansion } from '../../../hooks/useTreeExpansion'
+import { useTreeExpansion } from '../../../hooks/connections/useTreeExpansion'
 
 const ROOT_RADIUS = 52
 const CHILD_RADIUS = 36

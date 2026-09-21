@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AxiosError } from 'axios'
-import type { Npc } from '../types/npc.types'
+import type { Npc } from '../../types/npc.types'
 import type { NpcInput } from './useNpcs'
-import { npcFormSchema, type NpcFormInput, type NpcFormOutput } from '../schemas/npc.schema'
+import { npcFormSchema, type NpcFormInput, type NpcFormOutput } from '../../schemas/npc.schema'
 
 interface ValidationErrorResponse {
   error: string

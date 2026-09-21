@@ -3,9 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNpcDelete } from './useNpcs'
-import backendApi from '../services/backendApi'
+import backendApi from '../../services/backendApi'
 
-vi.mock('../services/backendApi', () => ({
+vi.mock('../../services/backendApi', () => ({
   default: {
     delete: vi.fn(),
   },

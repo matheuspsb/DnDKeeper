@@ -3,10 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useInitiative } from './useInitiative'
-import backendApi from '../services/backendApi'
-import type { Combatant } from '../types/initiative'
+import backendApi from '../../services/backendApi'
+import type { Combatant } from '../../types/initiative'
 
-vi.mock('../services/backendApi', () => ({
+vi.mock('../../services/backendApi', () => ({
   default: {
     get: vi.fn(),
     put: vi.fn(),
